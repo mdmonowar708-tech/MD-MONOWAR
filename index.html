@@ -1694,6 +1694,13 @@
                 🚀 লগইন করুন (Log In)
             </button>
 
+            <!-- Self-verification link for network/sending delays in email verifications -->
+            <div style="margin-top: 14px; text-align: center;">
+                <a href="#" onclick="window.showSelfVerificationModal(); return false;" style="font-size: 13px; font-weight: 750; color: #EA580C; text-decoration: none; display: inline-flex; align-items: center; gap: 4px; transition: color 0.15s;" onmouseover="this.style.color='#C2410C'" onmouseout="this.style.color='#EA580C'">
+                    ⚠️ ভেরিফিকেশন ইমেইল পাননি? এখানে নিজে ভেরিফাই করুন
+                </a>
+            </div>
+
             <div style="margin-top: 24px; text-align: center; border-top: 1px solid #F1F5F9; padding-top: 16px;">
                 <p style="font-size: 13.5px; font-weight: 600; color: #64748B; margin: 0;">
                     নতুন অ্যাকাউন্ট খুলতে চান? 
@@ -1764,6 +1771,7 @@
         <a href="#" onclick="showPage('question-bank-page', document.getElementById('nav-qbank')); closeSidebar();">📖 Question Bank</a>
         <a href="#" onclick="showPage('pdf-page', this); closeSidebar();">📄 PDF বুকলেটসমূহ</a>
         <a href="#" onclick="showPage('routine-details-page', this); closeSidebar();">📅 পরীক্ষা রুটিন ও লেকচার শিট</a>
+        <a href="#" onclick="showPage('job-circulars-page', this); closeSidebar();">💼 জব সার্কুলার</a>
         <a href="#" onclick="showPage('exam-history-page', document.getElementById('nav-results')); closeSidebar();">🏆 Results</a>
         <a href="#" onclick="showPage('profile-page', this); closeSidebar();">👤 Profile</a>
         <a href="#" id="sidebarAdminPortalLink" onclick="window.openAdminSettingsModal(); closeSidebar();" style="display: none; color: #7C3AED; background: rgba(124, 58, 237, 0.08); font-weight: 750; border-radius: 8px;">🛡️ অ্যাডমিন প্যানেল</a>
@@ -2012,6 +2020,15 @@
                     <path d="M8 14h.01M12 14h.01M16 14h.01M8 18h.01M12 18h.01M16 18h.01" stroke="#059669" stroke-width="2.5" stroke-linecap="round"></path>
                 </svg>
                 <span style="color: #047857; font-weight: 750;">রুটিন</span>
+            </div>
+
+            <!-- Job Circular Card -->
+            <div onclick="showPage('job-circulars-page');" style="cursor: pointer; background: #EEF2FF; border: 1.5px solid #E0E7FF;" onmouseover="this.style.backgroundColor='#E0E7FF'" onmouseout="this.style.backgroundColor='#EEF2FF'">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#4F46E5" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="margin: 0 auto; display: block;">
+                    <rect x="2" y="7" width="20" height="14" rx="2" ry="2" fill="#4F46E5" fill-opacity="0.1" stroke="#4F46E5" stroke-width="2.2"></rect>
+                    <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16" stroke="#4F46E5" stroke-width="2.2"></path>
+                </svg>
+                <span style="color: #4338CA; font-weight: 750;">জব সার্কুলার</span>
             </div>
 
             <!-- PDF Card -->
@@ -2364,6 +2381,64 @@
                     </div>
                 </div>
             </div>
+        </div>
+    </div>
+
+    <!-- Job Circulars Page (জব সার্কুলার) -->
+    <div id="job-circulars-page" style="display:none; background: #F8FAFC; min-height: 100vh;">
+        <!-- Top bar header -->
+        <div class="hero-header" style="background: white; padding: 0; border-bottom: 1.5px solid #F1F5F9; margin-bottom: 16px;">
+            <div class="topbar" style="display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: white; margin-bottom: 0;">
+                <button onclick="showPage('home-page')" style="background: #EBFDF9; border: none; border-radius: 12px; width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: #00BFA1; font-size: 18px; font-weight: bold; transition: all 0.2s;" onmouseover="this.style.background='#D1F2EB'" onmouseout="this.style.background='#EBFDF9'">
+                    ←
+                </button>
+                <div style="font-size: 18px; font-weight: 850; color: #0A2F6B; text-align: center; display: flex; align-items: center; gap: 8px;">
+                     <span>💼 জব সার্কুলার</span>
+                </div>
+                <div style="width: 44px;"></div>
+            </div>
+        </div>
+
+        <div style="padding: 0 16px 100px 16px; max-width: 850px; margin: 0 auto; box-sizing: border-box;">
+            <!-- Informative Banner card -->
+            <div style="background: linear-gradient(135deg, rgba(10, 47, 107, 0.05), rgba(21, 101, 255, 0.05)); border: 1.5px solid rgba(10, 47, 107, 0.15); border-radius: 20px; padding: 18px; margin-bottom: 20px; box-shadow: 0 4px 12px rgba(10, 47, 107, 0.03); display: flex; gap: 14px; align-items: center;">
+                <div style="font-size: 32px; background: white; width: 54px; height: 54px; border-radius: 16px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 10px rgba(0,0,0,0.05);">💼</div>
+                <div style="text-align: left; flex: 1;">
+                    <h3 style="font-size: 15.5px; font-weight: 850; color: #0A2F6B; margin: 0 0 4px 0;">চাকরির খবর ও সার্কুলার</h3>
+                    <p style="font-size: 12 px; color: #1E3A8A; margin: 0; line-height: 1.5; font-weight: 600;">সরকারী, বেসরকারী এবং ব্যাংকসহ সকল চাকুরীর আপডেট সার্কুলার ও নোটিশসমূহ এখানে পাবেন। PDF ডাউনলোড করুন অথবা ছবি জুম করে সহজে পড়ুন।</p>
+                </div>
+            </div>
+
+            <!-- Search Area -->
+            <div style="position: relative; margin-bottom: 20px;">
+                <input type="text" id="jobCircularSearchInput" oninput="window.filterJobCirculars()" placeholder="সার্কুলারের শিরোনাম লিখে খুঁজুন..." style="width:100%; height: 48px; padding: 0 16px 0 44px; border-radius: 14px; border: 1.5px solid #CBD5E1; font-size: 13.5px; font-weight: 600; outline: none; background: white; color: #1E293B; box-shadow: inset 0 2px 4px rgba(0,0,0,0.02); transition: border-color 0.15s, box-shadow 0.15s; box-sizing: border-box;" onfocus="this.style.borderColor='#1565FF'; this.style.boxShadow='0 0 0 3px rgba(21, 101, 255, 0.1)';" onblur="this.style.borderColor='#CBD5E1'; this.style.boxShadow='none';" />
+                <span style="position: absolute; left: 16px; top: 14px; font-size: 16px; color: #94A3B8; pointer-events: none;">🔍</span>
+                <button onclick="document.getElementById('jobCircularSearchInput').value = ''; window.filterJobCirculars();" style="position: absolute; right: 14px; top: 12px; border: none; background: #F1F5F9; color: #64748B; width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; cursor: pointer; font-weight: bold; transition: all 0.15s;" onmouseover="this.style.background='#E2E8F0'" onmouseout="this.style.background='#F1F5F9'">✕</button>
+            </div>
+
+            <!-- Main circulars container -->
+            <div id="jobCircularsContainer" style="display: flex; flex-direction: column; gap: 14px;">
+                <div style="text-align: center; padding: 40px 20px;">
+                    <div style="border: 3.5px solid #F1F5F9; border-top: 3.5px solid #1565FF; border-radius: 50%; width: 36px; height: 36px; animation: spin 1s linear infinite; margin: 0 auto 12px auto;"></div>
+                    <p style="font-size: 13px; color: #64748B; font-weight: 700; margin: 0;">সার্কুলার ডাটাবেজ লোড হচ্ছে, অনুগ্রহপূর্বক অপেক্ষা করুন...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Job Circular Image Lightbox Modal Wrapper (Fully Zoomable) -->
+    <div id="jobCircularImgModal" style="display:none; position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(15, 23, 42, 0.95); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); z-index:100008; align-items:center; justify-content:center; padding:16px; box-sizing: border-box;" onclick="window.closeJobCircularImgModal()">
+        <div style="position: absolute; top: 18px; right: 18px; display: flex; gap: 12px; z-index: 100009;">
+            <!-- Zoom Buttons -->
+            <button onclick="event.stopPropagation(); window.zoomJobCircularImg(1.25)" style="border: none; background: rgba(255, 255, 255, 0.15); color: white; width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-weight: bold; cursor: pointer; font-size: 20px; transition: all 0.2s; box-shadow: 0 4px 12px rgba(0,0,0,0.3);" onmouseover="this.style.background='rgba(255,255,255,0.3)'" onmouseout="this.style.background='rgba(255,255,255,0.15)'">➕</button>
+            <button onclick="event.stopPropagation(); window.zoomJobCircularImg(0.8)" style="border: none; background: rgba(255, 255, 255, 0.15); color: white; width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-weight: bold; cursor: pointer; font-size: 20px; transition: all 0.2s; box-shadow: 0 4px 12px rgba(0,0,0,0.3);" onmouseover="this.style.background='rgba(255,255,255,0.3)'" onmouseout="this.style.background='rgba(255,255,255,0.15)'">➖</button>
+            <button onclick="window.closeJobCircularImgModal()" style="border: none; background: #EF4444; color: white; width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-weight: bold; cursor: pointer; font-size: 16px; transition: all 0.2s; box-shadow: 0 4px 12px rgba(0,0,0,0.3);" onmouseover="this.style.background='#DC2626'" onmouseout="this.style.background='#EF4444'">✕</button>
+        </div>
+        <div style="width: 100%; height: 100%; overflow: auto; display: flex; justify-content: center; align-items: center; cursor: grab;" onclick="event.stopPropagation()" id="jobCircularImgWrapper" onmousedown="window.startDragJobCircularImg(event)" onmousemove="window.dragJobCircularImg(event)" onmouseup="window.endDragJobCircularImg()" onmouseleave="window.endDragJobCircularImg()">
+            <img id="jobCircularLightboxImg" src="" style="max-width: 95%; max-height: 90%; object-fit: contain; transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1); border-radius: 12px; transform: scale(1); transform-origin: center; box-shadow: 0 20px 50px rgba(0,0,0,0.5);" />
+        </div>
+        <div style="position: absolute; bottom: 24px; left: 50%; transform: translateX(-50%); background: rgba(15, 23, 42, 0.85); border: 1px solid rgba(255,255,255,0.1); padding: 10px 20px; border-radius: 20px; color: rgba(255, 255, 255, 0.9); font-size: 12.5px; font-weight: 700; pointer-events: none; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.3); letter-spacing: -0.1px;">
+            👆 মাউস দিয়ে ড্র্যাগ করে বা স্ক্রোল করে ছবিটি জুম করে দেখতে পারেন
         </div>
     </div>
 
@@ -3685,6 +3760,59 @@
         </div>
     </div>
 
+    <!-- Self-Verification Modal for Firebase Email Delivery Failure Fail-safe -->
+    <div id="selfVerificationModal" style="display:none; position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(15, 23, 42, 0.65); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); z-index:100007; align-items:center; justify-content:center; padding:16px; box-sizing: border-box;">
+        <div style="background:#ffffff; border-radius:28px; width:100%; max-width:440px; box-shadow:0 30px 60px -15px rgba(0, 0, 0, 0.3); animation: popupIn 0.3s cubic-bezier(0.16, 1, 0.3, 1); position:relative; box-sizing: border-box; display: flex; flex-direction: column; overflow: hidden; border: 1px solid rgba(255, 255, 255, 0.8);">
+            
+            <!-- Modal Header -->
+            <div style="padding: 24px 24px 16px 24px; border-bottom: 1.5px solid #F1F5F9; position: relative;">
+                <button onclick="window.closeSelfVerificationModal()" style="position: absolute; top: 18px; right: 18px; border: none; background: #F1F5F9; color: #64748B; width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; cursor: pointer; font-size: 14px; transition: all 0.2s; outline: none;" onmouseover="this.style.background='#E2E8F0'; this.style.color='#0F172A';" onmouseout="this.style.background='#F1F5F9'; this.style.color='#64748B';">✕</button>
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    <div style="width: 44px; height: 44px; border-radius: 12px; background: #ECFDF5; display: flex; align-items: center; justify-content: center;">
+                        <span style="font-size: 22px; color: #10B981;">✔️</span>
+                    </div>
+                    <div>
+                        <h2 style="font-size: 17.5px; font-weight: 850; color: #1E293B; margin: 0; letter-spacing: -0.5px; line-height: 1.3;">ইনস্ট্যান্ট সেলফ-ভেরিফিকেশন</h2>
+                        <p style="font-size: 12px; color: #64748B; font-weight: 600; margin: 2px 0 0 0;">ইমেইল না পেলে সরাসরি ভেরিফাই করুন</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal Content -->
+            <div style="padding: 20px 24px; display: flex; flex-direction: column; gap: 14px; background: #FAFAFA;">
+                <div style="background: #FFF7ED; border: 1px dashed #FDBA74; border-radius: 12px; padding: 12px 14px; display: flex; gap: 8px;">
+                    <span style="font-size: 16px; margin-top: 1px;">💡</span>
+                    <p style="font-size: 11.5px; font-weight: 700; color: #C2410C; margin: 0; line-height: 1.55;">
+                        জিমেইলের <b>স্প্যাম (Spam)</b> অথবা <b>প্রোমোশন (Promotions)</b> ফোল্ডারটি ভালোভাবে চেক করুন। মেইল না পেলে নিচে অ্যাকাউন্ট ইমেইল ও পাসওয়ার্ড প্রদান করে সরাসরি আপনার ডিভাইস থেকে অ্যাকাউন্ট ইনস্ট্যান্ট সচল করুন!
+                    </p>
+                </div>
+
+                <div>
+                    <label style="display: block; font-size: 12.5px; font-weight: 700; color: #475569; margin-bottom: 6px;">রেজিস্টার্ড ইমেইল (User Email)</label>
+                    <input id="verifyEmailInput" type="email" placeholder="example@gmail.com" style="width: 100%; height: 44px; padding: 0 14px; border-radius: 12px; border: 1.5px solid #CBD5E1; font-size: 13.5px; font-weight: 600; color: #1E293B; background: white; outline: none; box-sizing: border-box; transition: border-color 0.15s;" onfocus="this.style.borderColor='#00BFA1';">
+                </div>
+
+                <div>
+                    <label style="display: block; font-size: 12.5px; font-weight: 700; color: #475569; margin-bottom: 6px;">পাসওয়ার্ড (Account Password)</label>
+                    <input id="verifyPasswordInput" type="password" placeholder="••••••••" style="width: 100%; height: 44px; padding: 0 14px; border-radius: 12px; border: 1.5px solid #CBD5E1; font-size: 13.5px; font-weight: 600; color: #1E293B; background: white; outline: none; box-sizing: border-box; transition: border-color 0.15s;" onfocus="this.style.borderColor='#00BFA1';">
+                </div>
+
+                <!-- Simpler Human-Proof Answer Math Challenge Captcha -->
+                <div style="background: #F1F5F9; border-radius: 12px; padding: 12px 14px; display: flex; flex-direction: column; gap: 8px;">
+                    <label style="display: block; font-size: 12px; font-weight: 800; color: #475569; margin: 0;" id="verifyCaptchaQuestion">হিউম্যান ভেরিফিকেশন: লোড হচ্ছে...</label>
+                    <input id="verifyCaptchaAnswer" type="number" placeholder="হিসাব করে উত্তর লিখুন" style="width: 100%; height: 40px; padding: 0 12px; border-radius: 10px; border: 1.5px solid #CBD5E1; font-size: 13px; font-weight: 600; color: #1E293B; background: white; outline: none; box-sizing: border-box;" />
+                </div>
+            </div>
+
+            <!-- Footer Buttons -->
+            <div style="padding: 16px 24px; border-top: 1.5px solid #F1F5F9; display: flex; gap: 12px; background: #F8FAFC;">
+                <button onclick="window.closeSelfVerificationModal()" style="flex: 1; height: 46px; border: none; background: #E2E8F0; color: #475569; font-weight: 700; border-radius: 12px; cursor: pointer; font-size: 13px; transition: all 0.2s;" onmouseover="this.style.background='#CBD5E1'" onmouseout="this.style.background='#E2E8F0'">বাতিল</button>
+                <button id="verifySubmitBtn" onclick="window.submitInstantSelfVerify()" style="flex: 1.5; height: 46px; border: none; background: linear-gradient(135deg, #10B981, #059669); color: white; font-weight: 700; border-radius: 12px; cursor: pointer; font-size: 13px; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2); transition: all 0.2s;" onmouseover="this.style.transform='translateY(-1px)';" onmouseout="this.style.transform='none'">ইনস্ট্যান্ট এক্টিভ করুন</button>
+            </div>
+            
+        </div>
+    </div>
+
     <style>
         @keyframes popupIn {
             from { transform: scale(0.9); opacity: 0; }
@@ -3771,6 +3899,12 @@
                     return;
                 }
 
+                const selfVerificationModal = document.getElementById("selfVerificationModal");
+                if (selfVerificationModal && selfVerificationModal.style.display !== "none" && selfVerificationModal.style.display !== "") {
+                    if (typeof window.closeSelfVerificationModal === "function") window.closeSelfVerificationModal();
+                    return;
+                }
+
                 // 3. Prevent accidental backing out of live exams (running exams)
                 const mcqPage = document.getElementById("mcq-page");
                 if (mcqPage && mcqPage.style.display !== "none" && mcqPage.style.display !== "") {
@@ -3803,7 +3937,7 @@
 
                 // 5. Normal page routing back to home page
                 const curPage = window.activePageId || "home-page";
-                if (curPage === "routine-details-page" || curPage === "pdf-page" || curPage === "global-leaderboard-page" || curPage === "final-result-page" || curPage === "solution-page" || curPage === "leaderboard-page" || curPage === "question-bank-page" || curPage === "exam-page" || curPage === "exam-history-page" || curPage === "profile-page" || curPage === "courses-page") {
+                if (curPage === "routine-details-page" || curPage === "job-circulars-page" || curPage === "pdf-page" || curPage === "global-leaderboard-page" || curPage === "final-result-page" || curPage === "solution-page" || curPage === "leaderboard-page" || curPage === "question-bank-page" || curPage === "exam-page" || curPage === "exam-history-page" || curPage === "profile-page" || curPage === "courses-page") {
                     if (typeof window.showPage === "function") {
                         window.showPage("home-page", document.getElementById("nav-home"));
                     } else {
@@ -3921,6 +4055,9 @@
             }
             if (pageId === "routine-details-page" && typeof window.initRoutinePage === "function") {
                 window.initRoutinePage();
+            }
+            if (pageId === "job-circulars-page" && typeof window.initJobCircularsPage === "function") {
+                window.initJobCircularsPage();
             }
 
             // Bottom Nav Active status tracking
@@ -4273,9 +4410,24 @@
                     }
                 }
 
-                if (!userCredential.user.emailVerified && !isOld) {
+                // Check self-verification or admin bypass status in Firestore
+                let isDbVerified = false;
+                let userSnap = null;
+                try {
+                    userSnap = await getDoc(doc(db, "users", userCredential.user.uid));
+                    if (userSnap.exists()) {
+                        const userData = userSnap.data();
+                        if (userData.emailVerified === true || userData.verified === true || userData.bypassVerification === true || userData.role === "admin" || userData.role === "mod") {
+                            isDbVerified = true;
+                        }
+                    }
+                } catch (e) {
+                    console.warn("Error checking db verification on login:", e);
+                }
+
+                if (!userCredential.user.emailVerified && !isOld && !isDbVerified) {
                     loader.style.display = "none";
-                    if (confirm("আপনার ইমেইল অ্যাকাউন্টটি এখনো ভেরিফাই করা হয়নি। আপনি কি ভেরিফিকেশন লিঙ্কটি পুনরায় পাঠাতে চান?")) {
+                    if (confirm("আপনার ইমেইল অ্যাকাউন্টটি এখনো ভেরিফাই করা হয়নি। আপনি কি ভেরিফিকেশন লিঙ্কটি পুনরায় পাঠাতে চান?\n\n(অথবা নিজে সরাসরি ভেরিফাই করতে লগইন পেইজের 'ভেরিফিকেশন ইমেইল পাননি? এখানে নিজে ভেরিফাই করুন' অপশনটিতে ক্লিক করুন)")) {
                         try {
                             await sendEmailVerification(userCredential.user);
                             alert("ভেরিফিকেশন ইমেইলটি পুনরায় পাঠানো হয়েছে। অনুগ্রহ করে আপনার ইনবক্স অথবা স্প্যাম ফোল্ডার চেক করুন।");
@@ -4294,8 +4446,10 @@
                 
                 // Fetch user record from Firestore to store registeredName in localStorage for immediate fallback
                 try {
-                    const userSnap = await getDoc(doc(db, "users", userCredential.user.uid));
-                    if (userSnap.exists() && userSnap.data().name) {
+                    if (!userSnap) {
+                        userSnap = await getDoc(doc(db, "users", userCredential.user.uid));
+                    }
+                    if (userSnap && userSnap.exists() && userSnap.data().name) {
                         const dbName = userSnap.data().name;
                         localStorage.setItem("registeredName", dbName);
                         localStorage.setItem("userName", dbName);
@@ -7691,14 +7845,30 @@
                 }
 
                 if (!isOld) {
-                    const isRegistering = localStorage.getItem("registering_active") === "true";
-                    if (!isRegistering) {
-                        try {
-                            await signOut(auth);
-                        } catch (err) {}
-                        localStorage.clear();
-                        location.reload();
-                        return;
+                    // Let's check Firestore bypass first before signing out
+                    let isDbVerified = false;
+                    try {
+                        const userDoc = await getDoc(doc(db, "users", user.uid));
+                        if (userDoc.exists()) {
+                            const data = userDoc.data();
+                            if (data.emailVerified === true || data.verified === true || data.bypassVerification === true || data.role === "admin" || data.role === "mod") {
+                                isDbVerified = true;
+                            }
+                        }
+                    } catch (err) {
+                        console.warn("Could not check db verification status:", err);
+                    }
+
+                    if (!isDbVerified) {
+                        const isRegistering = localStorage.getItem("registering_active") === "true";
+                        if (!isRegistering) {
+                            try {
+                                await signOut(auth);
+                            } catch (err) {}
+                            localStorage.clear();
+                            location.reload();
+                            return;
+                        }
                     }
                 }
             }
@@ -10605,6 +10775,99 @@
             document.getElementById("noticeBoardModal").style.display = "none";
         };
 
+        // Self-Verification Implementation Logic
+        let selfVerifyCaptchaResult = 0;
+
+        window.showSelfVerificationModal = function() {
+            const num1 = Math.floor(Math.random() * 9) + 1;
+            const num2 = Math.floor(Math.random() * 9) + 1;
+            selfVerifyCaptchaResult = num1 + num2;
+            const verifyCaptchaQuestion = document.getElementById("verifyCaptchaQuestion");
+            if (verifyCaptchaQuestion) {
+                verifyCaptchaQuestion.innerText = `হিউম্যান ভেরিফিকেশন: ${num1} + ${num2} = কত?`;
+            }
+            const modal = document.getElementById("selfVerificationModal");
+            if (modal) {
+                modal.style.display = "flex";
+            }
+        };
+
+        window.closeSelfVerificationModal = function() {
+            const modal = document.getElementById("selfVerificationModal");
+            if (modal) {
+                modal.style.display = "none";
+            }
+            const verifyEmailInput = document.getElementById("verifyEmailInput");
+            const verifyPasswordInput = document.getElementById("verifyPasswordInput");
+            const verifyCaptchaAnswer = document.getElementById("verifyCaptchaAnswer");
+            if (verifyEmailInput) verifyEmailInput.value = "";
+            if (verifyPasswordInput) verifyPasswordInput.value = "";
+            if (verifyCaptchaAnswer) verifyCaptchaAnswer.value = "";
+        };
+
+        window.submitInstantSelfVerify = async function() {
+            const email = document.getElementById("verifyEmailInput").value.trim();
+            const password = document.getElementById("verifyPasswordInput").value;
+            const captchaAnsVal = document.getElementById("verifyCaptchaAnswer").value;
+            const captchaAns = parseInt(captchaAnsVal);
+
+            if (!email || !password) {
+                alert("অনুগ্রহ করে আপনার অ্যাকাউন্টের ইমেইল ও পাসওয়ার্ড প্রদান করুন।");
+                return;
+            }
+
+            if (captchaAnsVal === "" || isNaN(captchaAns) || captchaAns !== selfVerifyCaptchaResult) {
+                alert("ভুল হিউম্যান ভেরিফিকেশন ক্যাপচা! অনুগ্রহ করে সঠিক উত্তর দিন।");
+                return;
+            }
+
+            const loader = document.getElementById("globalSubmitLoader");
+            if (loader) {
+                loader.style.display = "flex";
+                document.getElementById("globalLoaderTitle").innerText = "⏳ Verifying Account";
+                document.getElementById("loaderText").innerText = "Performing Instant Self-Verification...";
+            }
+
+            try {
+                // Sign in temporarily to prove ownership of authentic credentials
+                const userCred = await signInWithEmailAndPassword(auth, email, password);
+                const uid = userCred.user.uid;
+
+                // Update Firestore verified status
+                await setDoc(doc(db, "users", uid), {
+                    emailVerified: true,
+                    verified: true,
+                    bypassVerification: true
+                }, { merge: true });
+
+                if (loader) loader.style.display = "none";
+                alert("🎉 অভিনন্দন! আপনার MCQ HERO অ্যাকাউন্ট ৩ সেকেন্ডের মধ্যে সফলভাবে ভেরিফাই ও অ্যাক্টিভেট করা হয়েছে। এখন আপনি সরাসরি লগইন করতে পারবেন।");
+                
+                window.closeSelfVerificationModal();
+
+                // Clear temporary signin session so the user gets clean and explicit flow
+                await signOut(auth);
+                localStorage.clear();
+                
+                // Prefill login input values for a super delightful experience
+                const loginEmail = document.getElementById("loginEmail");
+                const loginPassword = document.getElementById("loginPassword");
+                if (loginEmail) loginEmail.value = email;
+                if (loginPassword) loginPassword.value = password;
+
+            } catch (authErr) {
+                if (loader) loader.style.display = "none";
+                console.error("Self verification failure:", authErr);
+                let message = "ভেরিফিকেশন ব্যর্থ হয়েছে! ইমেইল অথবা পাসওয়ার্ডটি পুনরায় চেক করুন।";
+                if (authErr.code === "auth/invalid-credential" || authErr.code === "auth/wrong-password" || authErr.code === "auth/user-not-found") {
+                    message = "ভুল ইমেইল অথবা পাসওয়ার্ড! অনুগ্রহ করে সঠিক তথ্য প্রদান করুন।";
+                } else if (authErr.code === "auth/network-request-failed") {
+                    message = "ইন্টারনেট সংযোগে সমস্যা! আপনার কানেকশন চেক করুন।";
+                }
+                alert(message);
+            }
+        };
+
         window.openNoticeBoardModal = async function() {
             // Dismiss/Hide the top-bar notification count badge upon review
             const topBadge = document.getElementById("topNoticeCountBadge");
@@ -12472,6 +12735,244 @@
             if (allQuestionsMessage) allQuestionsMessage.style.display = type === "all" ? "block" : "none";
 
             window.updatePDFPreviewCount();
+        };
+
+        // --- Job Circulars Page (জব সার্কুলার) JS Controller ---
+        window.allJobCircularsCompiled = [];
+
+        // Global states for image zoom and dragging
+        window.jobCircularZoomScale = 1;
+        window.isDraggingJobCircularImg = false;
+        window.jobCircularImgStartX = 0;
+        window.jobCircularImgStartY = 0;
+        window.jobCircularImgScrollLeft = 0;
+        window.jobCircularImgScrollTop = 0;
+
+        window.initJobCircularsPage = async function() {
+            console.log("Initializing Job Circulars Page...");
+            const container = document.getElementById("jobCircularsContainer");
+            if (!container) return;
+            
+            // Show responsive loading spinner state
+            container.innerHTML = `
+                <div style="text-align: center; padding: 50px 20px;">
+                    <div style="border: 3.5px solid #F1F5F9; border-top: 3.5px solid #1565FF; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin: 0 auto 14px auto;"></div>
+                    <p style="font-size: 13px; color: #475569; font-weight: 800; margin: 0;">সার্কুলারসমূহ লোড হচ্ছে...</p>
+                </div>
+            `;
+            
+            try {
+                const jobCol = collection(db, "job_circulars");
+                let snap;
+                try {
+                    const q = query(jobCol, orderBy("createdAt", "desc"));
+                    snap = await getDocs(q);
+                } catch (orderByErr) {
+                    console.warn("Firebase query with orderBy failed (or index not created yet), falling back to client-side sort:", orderByErr);
+                    snap = await getDocs(jobCol);
+                }
+                
+                let circulars = [];
+                snap.forEach(docSnap => {
+                    const data = docSnap.data();
+                    circulars.push({
+                        id: docSnap.id,
+                        title: data.title || "",
+                        vacancies: data.vacancies || "",
+                        deadline: data.deadline || "",
+                        pdfUrl: data.pdfUrl || "",
+                        imgUrl: data.imgUrl || "",
+                        createdAt: data.createdAt ? (typeof data.createdAt.toDate === "function" ? data.createdAt.toDate() : new Date(data.createdAt)) : null
+                    });
+                });
+
+                // Client-side fallback sorting just in case orderBy was bypassed or failed
+                circulars.sort((a, b) => {
+                    const timeA = a.createdAt ? a.createdAt.getTime() : 0;
+                    const timeB = b.createdAt ? b.createdAt.getTime() : 0;
+                    return timeB - timeA; // Descending
+                });
+                
+                window.allJobCircularsCompiled = circulars;
+                window.renderJobCirculars(circulars);
+                
+            } catch (err) {
+                console.error("Failed to fetch job circulars:", err);
+                container.innerHTML = `
+                    <div style="background: #FEF2F2; border: 1.5px solid #FECACA; border-radius: 16px; padding: 16px; display: flex; gap: 10px; align-items: flex-start; text-align: left; margin: 20px 0;">
+                        <span style="font-size: 20px;">⚠️</span>
+                        <div>
+                            <h5 style="font-size: 14px; font-weight: 800; color: #991B1B; margin: 0 0 4px 0;">ডাটা লোড হতে ত্রুটি হয়েছে</h5>
+                            <p style="font-size: 12px; color: #7F1D1D; font-weight: 600; margin: 0; line-height: 1.45;">নেটওয়ার্ক অথবা সার্ভার সমস্যার কারণে সার্কুলারসমূহ এই মুহূর্তে লোড করা সম্ভব হয়নি। অনুগ্রহ করে ইন্টারনেট কানেকশন চেক করুন।</p>
+                        </div>
+                    </div>
+                    <div id="jobCircularsEmptyState" style="display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 40px 24px; text-align: center; background: white; border-radius: 20px; border: 1.5px solid #F1F5F9;">
+                        <span style="font-size: 40px; margin-bottom: 12px;">🚫</span>
+                        <h4 style="font-size: 15px; font-weight: 850; color: #0F172A; margin: 0 0 6px 0;">সার্কুলার ডাটা খালি</h4>
+                        <p style="font-size: 12px; color: #64748B; font-weight: 600; max-width: 320px; margin: 0;">অ্যাডমিন প্যানেল থেকে সার্কুলার যুক্ত করার পর এখানে স্বয়ংক্রিয়ভাবে প্রদর্শিত হবে।</p>
+                    </div>
+                `;
+            }
+        };
+
+        window.renderJobCirculars = function(circulars) {
+            const container = document.getElementById("jobCircularsContainer");
+            if (!container) return;
+            
+            if (circulars.length === 0) {
+                container.innerHTML = `
+                    <div id="jobCircularsEmptyState" style="display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 50px 24px; text-align: center; background: white; border-radius: 20px; border: 1.5px solid #F1F5F9; box-shadow: 0 4px 12px rgba(0,0,0,0.015);">
+                        <span style="font-size: 48px; margin-bottom: 12px;">💼</span>
+                        <h4 style="font-size: 16px; font-weight: 850; color: #0F172A; margin: 0 0 6px 0;">কোনো জব সার্কুলার পাওয়া যায়নি!</h4>
+                        <p style="font-size: 12.5px; color: #64748B; font-weight: 600; max-width: 320px; margin: 0; line-height: 1.5;">আমাদের রেকর্ডে বর্তমানে কোনো সক্রিয় চাকরির বিজ্ঞপ্তি নেই। নিয়মিত চেক করুন!</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            let htmlContent = "";
+            circulars.forEach((circ, index) => {
+                // Action Buttons Logic
+                let pdfBtn = "";
+                if (circ.pdfUrl && circ.pdfUrl.trim() !== "") {
+                    pdfBtn = `
+                        <a href="${circ.pdfUrl.trim()}" target="_blank" style="flex: 1; display: inline-flex; align-items: center; justify-content: center; gap: 6px; background: #EF4444; color: white; text-decoration: none; font-size: 12.5px; font-weight: 800; border-radius: 12px; height: 42px; transition: all 0.2s; border: none; outline: none; cursor: pointer; box-shadow: 0 4px 10px rgba(239, 68, 68, 0.15);" onmouseover="this.style.background='#DC2626'; this.style.transform='translateY(-1px)'" onmouseout="this.style.background='#EF4444'; this.style.transform='none'">
+                            <span>📥 সার্কুলার PDF ডাউনলোড</span>
+                        </a>
+                    `;
+                }
+                
+                let imgBtn = "";
+                if (circ.imgUrl && circ.imgUrl.trim() !== "") {
+                    imgBtn = `
+                        <button onclick="window.openJobCircularImgModal('${circ.imgUrl.trim().replace(/'/g, "\\'")}')" style="flex: 1; display: inline-flex; align-items: center; justify-content: center; gap: 6px; background: #1565FF; color: white; border: none; font-size: 12.5px; font-weight: 800; border-radius: 12px; height: 42px; transition: all 0.2s; outline: none; cursor: pointer; box-shadow: 0 4px 10px rgba(21, 101, 255, 0.15);" onmouseover="this.style.background='#004AE0'; this.style.transform='translateY(-1px)'" onmouseout="this.style.background='#1565FF'; this.style.transform='none'">
+                            <span>👁️ সার্কুলার নোটিশ ছবি</span>
+                        </button>
+                    `;
+                }
+                
+                htmlContent += `
+                    <div class="job-circular-card" data-title="${circ.title.replace(/"/g, '&quot;')}" style="background: white; border: 1.5px solid #F1F5F9; border-radius: 20px; padding: 18px; text-align: left; transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1); box-shadow: 0 4px 12px rgba(0,0,0,0.015); animation: popupIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) ${index * 0.05}s both; position: relative; overflow: hidden;" onmouseover="this.style.borderColor='#1565FF'; this.style.transform='translateY(-2px)'" onmouseout="this.style.borderColor='#F1F5F9'; this.style.transform='none'">
+                        
+                        <!-- Left vertical bar for visual aesthetics -->
+                        <div style="position: absolute; left: 0; top: 0; bottom: 0; width: 4.5px; background: #0A2F6B;"></div>
+
+                        <!-- Card Header -->
+                        <div style="display: flex; gap: 12px; align-items: flex-start; margin-bottom: 14px; padding-left: 4px;">
+                            <div style="width: 44px; height: 44px; min-width: 44px; border-radius: 12px; background: rgba(10, 47, 107, 0.06); display: flex; align-items: center; justify-content: center; font-size: 20px; color: #0A2F6B;">
+                                💼
+                            </div>
+                            <div style="flex: 1;">
+                                <h4 style="margin: 0; font-size: 15px; font-weight: 850; color: #0F172A; line-height: 1.45; letter-spacing: -0.15px;">${circ.title}</h4>
+                            </div>
+                        </div>
+
+                        <!-- Badges Multi-grid layout -->
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px; padding-left: 4px;">
+                            <div style="background: #F8FAFC; border: 1px solid #F1F5F9; border-radius: 12px; padding: 8px 10px; display: flex; flex-direction: column; gap: 2px;">
+                                <span style="font-size: 10px; color: #64748B; font-weight: 750; text-transform: uppercase; letter-spacing: 0.3px;">👥 মোট পদ সংখ্যা</span>
+                                <span style="font-size: 12.5px; color: #0A2F6B; font-weight: 800;">${circ.vacancies || "উল্লেখ নেই"}</span>
+                            </div>
+                            <div style="background: #FFFBEB; border: 1px solid #FEF3C7; border-radius: 12px; padding: 8px 10px; display: flex; flex-direction: column; gap: 2px;">
+                                <span style="font-size: 10px; color: #B45309; font-weight: 750; text-transform: uppercase; letter-spacing: 0.3px;">📅 আবেদনের শেষ তারিখ</span>
+                                <span style="font-size: 12.5px; color: #D97706; font-weight: 800;">${circ.deadline || "তথ্য নেই"}</span>
+                            </div>
+                        </div>
+
+                        <!-- Action Controls Button Tray -->
+                        <div style="display: flex; gap: 10px; margin-top: 4px; padding-left: 4px;">
+                            ${pdfBtn}
+                            ${imgBtn}
+                        </div>
+
+                    </div>
+                `;
+            });
+            
+            htmlContent += `
+                <div id="jobCircularsEmptyState" style="display: none; flex-direction: column; align-items: center; justify-content: center; padding: 50px 24px; text-align: center; background: white; border-radius: 20px; border: 1.5px solid #F1F5F9; box-shadow: 0 4px 12px rgba(0,0,0,0.015);">
+                    <span style="font-size: 48px; margin-bottom: 12px;">🔍</span>
+                    <h4 style="font-size: 16px; font-weight: 850; color: #0F172A; margin: 0 0 6px 0;">কোনো জব সার্কুলার পাওয়া যায়নি!</h4>
+                    <p style="font-size: 12.5px; color: #64748B; font-weight: 600; max-width: 320px; margin: 0; line-height: 1.5;">অনুগ্রহ করে আপনার অনুসন্ধানের বানান চেক করুন অথবা অন্য কি-ওয়ার্ড দিয়ে আবার চেষ্টা করুন।</p>
+                </div>
+            `;
+            
+            container.innerHTML = htmlContent;
+        };
+
+        window.filterJobCirculars = function() {
+            const queryStr = document.getElementById("jobCircularSearchInput").value.trim().toLowerCase();
+            const cards = document.querySelectorAll(".job-circular-card");
+            let visibleCount = 0;
+            
+            cards.forEach(card => {
+                const titleText = card.getAttribute("data-title").toLowerCase();
+                if (titleText.includes(queryStr)) {
+                    card.style.display = "block";
+                    visibleCount++;
+                } else {
+                    card.style.display = "none";
+                }
+            });
+            
+            const emptyEl = document.getElementById("jobCircularsEmptyState");
+            if (emptyEl) {
+                emptyEl.style.display = (visibleCount === 0) ? "flex" : "none";
+            }
+        };
+
+        window.openJobCircularImgModal = function(imgUrl) {
+            const modal = document.getElementById("jobCircularImgModal");
+            const img = document.getElementById("jobCircularLightboxImg");
+            if (!modal || !img) return;
+            
+            img.src = imgUrl;
+            window.jobCircularZoomScale = 1;
+            img.style.transform = "scale(1)";
+            modal.style.display = "flex";
+        };
+
+        window.closeJobCircularImgModal = function() {
+            const modal = document.getElementById("jobCircularImgModal");
+            if (modal) modal.style.display = "none";
+        };
+
+        window.zoomJobCircularImg = function(factor) {
+            const img = document.getElementById("jobCircularLightboxImg");
+            if (!img) return;
+            
+            window.jobCircularZoomScale = Math.max(0.5, Math.min(4, window.jobCircularZoomScale * factor));
+            img.style.transform = `scale(${window.jobCircularZoomScale})`;
+        };
+
+        window.startDragJobCircularImg = function(e) {
+            const wrapper = document.getElementById("jobCircularImgWrapper");
+            if (!wrapper) return;
+            window.isDraggingJobCircularImg = true;
+            wrapper.style.cursor = "grabbing";
+            window.jobCircularImgStartX = e.pageX - wrapper.offsetLeft;
+            window.jobCircularImgStartY = e.pageY - wrapper.offsetTop;
+            window.jobCircularImgScrollLeft = wrapper.scrollLeft;
+            window.jobCircularImgScrollTop = wrapper.scrollTop;
+        };
+
+        window.dragJobCircularImg = function(e) {
+            if (!window.isDraggingJobCircularImg) return;
+            e.preventDefault();
+            const wrapper = document.getElementById("jobCircularImgWrapper");
+            if (!wrapper) return;
+            const x = e.pageX - wrapper.offsetLeft;
+            const y = e.pageY - wrapper.offsetTop;
+            const walkX = (x - window.jobCircularImgStartX) * 1.5;
+            const walkY = (y - window.jobCircularImgStartY) * 1.5;
+            wrapper.scrollLeft = window.jobCircularImgScrollLeft - walkX;
+            wrapper.scrollTop = window.jobCircularImgScrollTop - walkY;
+        };
+
+        window.endDragJobCircularImg = function() {
+            window.isDraggingJobCircularImg = false;
+            const wrapper = document.getElementById("jobCircularImgWrapper");
+            if (wrapper) wrapper.style.cursor = "grab";
         };
 
         window.initPDFPage = function() {

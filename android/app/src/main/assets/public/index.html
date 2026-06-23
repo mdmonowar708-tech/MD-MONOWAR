@@ -1582,7 +1582,7 @@
         }
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-  <script type="module" crossorigin src="/assets/index-BhUCsrj2.js"></script>
+  <script type="module" crossorigin src="/assets/index-TxPnrzq7.js"></script>
 </head>
 
 <body>
@@ -1694,6 +1694,13 @@
             <button class="btn" id="loginBtn" style="width: 100%; height: 50px; margin: 8px 0 0 0; background: linear-gradient(135deg, #00BFA6, #009688); color: white; border: none; font-weight: 700; border-radius: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; box-shadow: 0 4px 14px rgba(0, 191, 161, 0.25); transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.02)'" onmouseout="this.style.transform='scale(1)'">
                 🚀 লগইন করুন (Log In)
             </button>
+
+            <!-- Self-verification link for network/sending delays in email verifications -->
+            <div style="margin-top: 14px; text-align: center;">
+                <a href="#" onclick="window.showSelfVerificationModal(); return false;" style="font-size: 13px; font-weight: 750; color: #EA580C; text-decoration: none; display: inline-flex; align-items: center; gap: 4px; transition: color 0.15s;" onmouseover="this.style.color='#C2410C'" onmouseout="this.style.color='#EA580C'">
+                    ⚠️ ভেরিফিকেশন ইমেইল পাননি? এখানে নিজে ভেরিফাই করুন
+                </a>
+            </div>
 
             <div style="margin-top: 24px; text-align: center; border-top: 1px solid #F1F5F9; padding-top: 16px;">
                 <p style="font-size: 13.5px; font-weight: 600; color: #64748B; margin: 0;">
@@ -3686,6 +3693,59 @@
         </div>
     </div>
 
+    <!-- Self-Verification Modal for Firebase Email Delivery Failure Fail-safe -->
+    <div id="selfVerificationModal" style="display:none; position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(15, 23, 42, 0.65); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); z-index:100007; align-items:center; justify-content:center; padding:16px; box-sizing: border-box;">
+        <div style="background:#ffffff; border-radius:28px; width:100%; max-width:440px; box-shadow:0 30px 60px -15px rgba(0, 0, 0, 0.3); animation: popupIn 0.3s cubic-bezier(0.16, 1, 0.3, 1); position:relative; box-sizing: border-box; display: flex; flex-direction: column; overflow: hidden; border: 1px solid rgba(255, 255, 255, 0.8);">
+            
+            <!-- Modal Header -->
+            <div style="padding: 24px 24px 16px 24px; border-bottom: 1.5px solid #F1F5F9; position: relative;">
+                <button onclick="window.closeSelfVerificationModal()" style="position: absolute; top: 18px; right: 18px; border: none; background: #F1F5F9; color: #64748B; width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; cursor: pointer; font-size: 14px; transition: all 0.2s; outline: none;" onmouseover="this.style.background='#E2E8F0'; this.style.color='#0F172A';" onmouseout="this.style.background='#F1F5F9'; this.style.color='#64748B';">✕</button>
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    <div style="width: 44px; height: 44px; border-radius: 12px; background: #ECFDF5; display: flex; align-items: center; justify-content: center;">
+                        <span style="font-size: 22px; color: #10B981;">✔️</span>
+                    </div>
+                    <div>
+                        <h2 style="font-size: 17.5px; font-weight: 850; color: #1E293B; margin: 0; letter-spacing: -0.5px; line-height: 1.3;">ইনস্ট্যান্ট সেলফ-ভেরিফিকেশন</h2>
+                        <p style="font-size: 12px; color: #64748B; font-weight: 600; margin: 2px 0 0 0;">ইমেইল না পেলে সরাসরি ভেরিফাই করুন</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal Content -->
+            <div style="padding: 20px 24px; display: flex; flex-direction: column; gap: 14px; background: #FAFAFA;">
+                <div style="background: #FFF7ED; border: 1px dashed #FDBA74; border-radius: 12px; padding: 12px 14px; display: flex; gap: 8px;">
+                    <span style="font-size: 16px; margin-top: 1px;">💡</span>
+                    <p style="font-size: 11.5px; font-weight: 700; color: #C2410C; margin: 0; line-height: 1.55;">
+                        জিমেইলের <b>স্প্যাম (Spam)</b> অথবা <b>প্রোমোশন (Promotions)</b> ফোল্ডারটি ভালোভাবে চেক করুন। মেইল না পেলে নিচে অ্যাকাউন্ট ইমেইল ও পাসওয়ার্ড প্রদান করে সরাসরি আপনার ডিভাইস থেকে অ্যাকাউন্ট ইনস্ট্যান্ট সচল করুন!
+                    </p>
+                </div>
+
+                <div>
+                    <label style="display: block; font-size: 12.5px; font-weight: 700; color: #475569; margin-bottom: 6px;">রেজিস্টার্ড ইমেইল (User Email)</label>
+                    <input id="verifyEmailInput" type="email" placeholder="example@gmail.com" style="width: 100%; height: 44px; padding: 0 14px; border-radius: 12px; border: 1.5px solid #CBD5E1; font-size: 13.5px; font-weight: 600; color: #1E293B; background: white; outline: none; box-sizing: border-box; transition: border-color 0.15s;" onfocus="this.style.borderColor='#00BFA1';">
+                </div>
+
+                <div>
+                    <label style="display: block; font-size: 12.5px; font-weight: 700; color: #475569; margin-bottom: 6px;">পাসওয়ার্ড (Account Password)</label>
+                    <input id="verifyPasswordInput" type="password" placeholder="••••••••" style="width: 100%; height: 44px; padding: 0 14px; border-radius: 12px; border: 1.5px solid #CBD5E1; font-size: 13.5px; font-weight: 600; color: #1E293B; background: white; outline: none; box-sizing: border-box; transition: border-color 0.15s;" onfocus="this.style.borderColor='#00BFA1';">
+                </div>
+
+                <!-- Simpler Human-Proof Answer Math Challenge Captcha -->
+                <div style="background: #F1F5F9; border-radius: 12px; padding: 12px 14px; display: flex; flex-direction: column; gap: 8px;">
+                    <label style="display: block; font-size: 12px; font-weight: 800; color: #475569; margin: 0;" id="verifyCaptchaQuestion">হিউম্যান ভেরিফিকেশন: লোড হচ্ছে...</label>
+                    <input id="verifyCaptchaAnswer" type="number" placeholder="হিসাব করে উত্তর লিখুন" style="width: 100%; height: 40px; padding: 0 12px; border-radius: 10px; border: 1.5px solid #CBD5E1; font-size: 13px; font-weight: 600; color: #1E293B; background: white; outline: none; box-sizing: border-box;" />
+                </div>
+            </div>
+
+            <!-- Footer Buttons -->
+            <div style="padding: 16px 24px; border-top: 1.5px solid #F1F5F9; display: flex; gap: 12px; background: #F8FAFC;">
+                <button onclick="window.closeSelfVerificationModal()" style="flex: 1; height: 46px; border: none; background: #E2E8F0; color: #475569; font-weight: 700; border-radius: 12px; cursor: pointer; font-size: 13px; transition: all 0.2s;" onmouseover="this.style.background='#CBD5E1'" onmouseout="this.style.background='#E2E8F0'">বাতিল</button>
+                <button id="verifySubmitBtn" onclick="window.submitInstantSelfVerify()" style="flex: 1.5; height: 46px; border: none; background: linear-gradient(135deg, #10B981, #059669); color: white; font-weight: 700; border-radius: 12px; cursor: pointer; font-size: 13px; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2); transition: all 0.2s;" onmouseover="this.style.transform='translateY(-1px)';" onmouseout="this.style.transform='none'">ইনস্ট্যান্ট এক্টিভ করুন</button>
+            </div>
+            
+        </div>
+    </div>
+
     <style>
         @keyframes popupIn {
             from { transform: scale(0.9); opacity: 0; }
@@ -3769,6 +3829,12 @@
                 const adminSettingsModal = document.getElementById("adminSettingsModal");
                 if (adminSettingsModal && adminSettingsModal.style.display !== "none" && adminSettingsModal.style.display !== "") {
                     if (typeof window.closeAdminSettingsModal === "function") window.closeAdminSettingsModal();
+                    return;
+                }
+
+                const selfVerificationModal = document.getElementById("selfVerificationModal");
+                if (selfVerificationModal && selfVerificationModal.style.display !== "none" && selfVerificationModal.style.display !== "") {
+                    if (typeof window.closeSelfVerificationModal === "function") window.closeSelfVerificationModal();
                     return;
                 }
 
