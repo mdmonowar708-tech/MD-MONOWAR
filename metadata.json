@@ -1,0 +1,6 @@
+{
+  "name": "MCQ HERO",
+  "description": "BCS ও অন্যান্য চাকুরীর MCQ মডেল টেস্ট ও প্রস্তুতি অ্যাপ",
+  "requestFramePermissions": ["camera"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
