@@ -1004,6 +1004,22 @@
         }
 
         /* Dark Mode Toggle Switch & Core CSS Overrides */
+        /* Smooth Dark Mode Transition Effect */
+        body,
+        body * {
+            transition: background-color 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+                        color 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+                        border-color 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+                        box-shadow 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+                        background 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* Ensure sliders and toggle components keep fast snappy response */
+        .switch .slider,
+        .switch .slider:before {
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.3s ease !important;
+        }
+
         .switch input:checked + .slider {
             background-color: var(--primary) !important;
         }
@@ -1580,9 +1596,48 @@
             border-color: #334155 !important;
             color: #94A3B8 !important;
         }
+
+        /* Recent Result dynamic component styles */
+        .recent-result-item-card {
+            transition: all 0.3s ease;
+        }
+        body.dark-mode .recent-result-item-card {
+            background: #111A2E !important;
+            border-color: #1E293B !important;
+        }
+        body.dark-mode .metric-block {
+            background: #151D30 !important;
+            border-color: #232E4A !important;
+        }
+        body.dark-mode .recent-result-item-card h4 {
+            color: #F8FAFC !important;
+        }
+
+        /* iOS-style slider toggle for speed training */
+        .switch input:checked + .slider {
+            background-color: #00BFA1 !important;
+        }
+        .switch input:checked + .slider:before {
+            transform: translateX(20px) !important;
+        }
+        .slider {
+            border: 1px solid rgba(0,0,0,0.05);
+        }
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 2px;
+            bottom: 2px;
+            background-color: white;
+            transition: .3s ease;
+            border-radius: 50%;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+        }
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-  <script type="module" crossorigin src="/assets/index-TxPnrzq7.js"></script>
+  <script type="module" crossorigin src="/assets/index-DMqfQfgl.js"></script>
 </head>
 
 <body>
@@ -1682,7 +1737,7 @@
             <div style="margin-bottom: 22px;">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
                     <label style="font-size: 13.5px; font-weight: 700; color: #475569; margin: 0;">পাসওয়ার্ড (Password)</label>
-                    <a href="#" onclick="window.handleForgotPassword()" style="font-size: 12px; font-weight: 700; color: #00BFA1; text-decoration: none; transition: color 0.2s;" onmouseover="this.style.color='#009688'" onmouseout="this.style.color='#00BFA1'">পাসওয়ার্ড ভুলে গেছেন?</a>
+                    <a href="#" onclick="window.handleForgotPassword(event); return false;" style="font-size: 12px; font-weight: 700; color: #00BFA1; text-decoration: none; transition: color 0.2s;" onmouseover="this.style.color='#009688'" onmouseout="this.style.color='#00BFA1'">পাসওয়ার্ড ভুলে গেছেন?</a>
                 </div>
                 <div style="position: relative; display: flex; align-items: center;">
                     <span style="position: absolute; left: 14px; font-size: 16px; color: #94A3B8;">🔒</span>
@@ -1772,6 +1827,7 @@
         <a href="#" onclick="showPage('question-bank-page', document.getElementById('nav-qbank')); closeSidebar();">📖 Question Bank</a>
         <a href="#" onclick="showPage('pdf-page', this); closeSidebar();">📄 PDF বুকলেটসমূহ</a>
         <a href="#" onclick="showPage('routine-details-page', this); closeSidebar();">📅 পরীক্ষা রুটিন ও লেকচার শিট</a>
+        <a href="#" onclick="showPage('job-circulars-page', this); closeSidebar();">💼 জব সার্কুলার</a>
         <a href="#" onclick="showPage('exam-history-page', document.getElementById('nav-results')); closeSidebar();">🏆 Results</a>
         <a href="#" onclick="showPage('profile-page', this); closeSidebar();">👤 Profile</a>
         <a href="#" id="sidebarAdminPortalLink" onclick="window.openAdminSettingsModal(); closeSidebar();" style="display: none; color: #7C3AED; background: rgba(124, 58, 237, 0.08); font-weight: 750; border-radius: 8px;">🛡️ অ্যাডমিন প্যানেল</a>
@@ -2022,6 +2078,15 @@
                 <span style="color: #047857; font-weight: 750;">রুটিন</span>
             </div>
 
+            <!-- Job Circular Card -->
+            <div onclick="showPage('job-circulars-page');" style="cursor: pointer; background: #EEF2FF; border: 1.5px solid #E0E7FF;" onmouseover="this.style.backgroundColor='#E0E7FF'" onmouseout="this.style.backgroundColor='#EEF2FF'">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#4F46E5" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="margin: 0 auto; display: block;">
+                    <rect x="2" y="7" width="20" height="14" rx="2" ry="2" fill="#4F46E5" fill-opacity="0.1" stroke="#4F46E5" stroke-width="2.2"></rect>
+                    <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16" stroke="#4F46E5" stroke-width="2.2"></path>
+                </svg>
+                <span style="color: #4338CA; font-weight: 750;">জব সার্কুলার</span>
+            </div>
+
             <!-- PDF Card -->
             <div onclick="showPage('pdf-page', this)" style="cursor: pointer; background: #FFF7ED; border: 1.5px solid #FFEDD5;" onmouseover="this.style.backgroundColor='#FFEBE3'" onmouseout="this.style.backgroundColor='#FFF7ED'">
                 <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#EA580C" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="margin: 0 auto; display: block;">
@@ -2136,11 +2201,14 @@
         </div>
 
         <!-- Result section preview -->
-        <div class="card">
-            <h3>🏆 Recent Result</h3>
-            <p>BCS Mock Test #04</p>
-            <p>Score: 42/50</p>
-            <p>Rank: #11</p>
+        <div class="card" id="homeRecentResultCard">
+            <h3 style="display: flex; align-items: center; gap: 8px; font-size: 16.5px; font-weight: 800; margin-top: 0; margin-bottom: 12px; color: #1E293B;">🏆 Recent Result (সর্বশেষ ফলাফল)</h3>
+            <div id="homeRecentResultContent">
+                <div style="text-align: center; padding: 25px 10px; color: #64748B;">
+                    <span style="display:inline-block; animation: spin-loader 1s linear infinite; margin-bottom: 8px; font-size: 20px;">⏳</span>
+                    <p style="margin: 0; font-size: 13.5px; font-weight: 600;">লোডিং হচ্ছে...</p>
+                </div>
+            </div>
         </div>
 
         <!-- Upgrade -->
@@ -2279,6 +2347,62 @@
                     <span id="qbankCurrentBreadcrumb" style="font-size: 13.5px; font-weight: 800; color: #0F172A; text-overflow: ellipsis; overflow: hidden; white-space: nowrap; max-width: 170px;">বিষয়</span>
                 </div>
 
+                <!-- Qbank Practice vs Exam Mode & Optional Speed Countdown Timer Control Panel -->
+                <div style="background: white; border: 1.5px solid #E2E8F0; border-radius: 20px; padding: 16px; margin-bottom: 16px; box-shadow: 0 4px 10px rgba(0,0,0,0.015);" class="metric-block">
+                    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
+                        <span style="font-size: 13.5px; font-weight: 800; color: #475569; display: flex; align-items: center; gap: 6px;" class="dark:text-slate-300">
+                            ⚙️ অনুশীলন অপশন (Options)
+                        </span>
+                        
+                        <!-- Mode Buttons (Grouped) -->
+                        <div style="background: #F1F5F9; border: 1.5px solid #E2E8F0; padding: 3.5px; border-radius: 14px; display: inline-flex; gap: 4px;" class="metric-block">
+                            <button id="qbankModePracticeBtn" onclick="window.setQbankMode('practice')" style="border: none; outline: none; padding: 6px 14px; border-radius: 10px; font-size: 12px; font-weight: 800; cursor: pointer; transition: all 0.2s; background: #00BFA1; color: white;">
+                                📝 অনুশীলন মোড (Practice)
+                            </button>
+                            <button id="qbankModeExamBtn" onclick="window.setQbankMode('exam')" style="border: none; outline: none; padding: 6px 14px; border-radius: 10px; font-size: 12px; font-weight: 800; cursor: pointer; transition: all 0.2s; background: transparent; color: #475569;" class="dark:text-slate-300">
+                                🏆 পরীক্ষা মোড (Exam)
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Speed Training countdown timer toggle (Practice Mode exclusive) -->
+                    <div id="qbankSpeedTimerPanel" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; padding-top: 12px; margin-top: 12px; border-top: 1px dashed #E2E8F0; transition: all 0.3s ease;">
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <div style="background: rgba(255, 107, 107, 0.1); width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px;">
+                                🔥
+                            </div>
+                            <div>
+                                <div style="font-size: 13px; font-weight: 800; color: #1E293B; display: flex; align-items: center; gap: 4px;" class="dark:text-white">
+                                    স্পিড ট্রেইনিং টাইমার (Speed Trainer)
+                                    <span style="background: #FF6B6B; color: white; font-size: 9px; font-weight: 800; padding: 2px 6px; border-radius: 30px; text-transform: uppercase;">Optional</span>
+                                </div>
+                                <p style="margin: 2px 0 0 0; font-size: 11px; color: #64748B; font-weight: 600;" class="dark:text-slate-400">প্রতিটি প্রশ্নের জন্য সেকেন্ডের গতিশীল কাউন্টডাউন চালু করুন</p>
+                            </div>
+                        </div>
+
+                        <div style="display: flex; align-items: center; gap: 12px;">
+                            <!-- Time selector -->
+                            <div style="display: flex; align-items: center; gap: 6px;">
+                                <label for="qbankSpeedSeconds" style="font-size: 11.5px; font-weight: 700; color: #475569;" class="dark:text-slate-300">সময়সীমা:</label>
+                                <select id="qbankSpeedSeconds" onchange="window.updateQbankSpeedSeconds()" style="background: #F8FAFC; border: 1.5px solid #CBD5E1; border-radius: 8px; padding: 4px 8px; font-size: 12px; font-weight: 700; color: #334155; outline: none; cursor: pointer;" class="dark:bg-slate-800 dark:border-slate-700 dark:text-white">
+                                    <option value="10">১০ সেকেন্ড</option>
+                                    <option value="15">১৫ সেকেন্ড</option>
+                                    <option value="20">২০ সেকেন্ড</option>
+                                    <option value="30" selected>৩০ সেকেন্ড</option>
+                                    <option value="45">৪৫ সেকেন্ড</option>
+                                    <option value="60">৬০ সেকেন্ড</option>
+                                </select>
+                            </div>
+
+                            <!-- Elegant Switch -->
+                            <label class="switch" style="position: relative; display: inline-block; width: 44px; height: 24px;">
+                                <input type="checkbox" id="qbankSpeedTimerToggle" onchange="window.toggleQbankSpeedTimer(this.checked)" style="opacity: 0; width: 0; height: 0;">
+                                <span class="slider" style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #CBD5E1; transition: .3s; border-radius: 34px;"></span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Search inside selected subject -->
                 <div style="background: white; border: 1.5px solid #E2E8F0; border-radius: 20px; padding: 14px; margin-bottom: 16px; box-shadow: 0 2px 6px rgba(0,0,0,0.015);">
                     <div style="position: relative;">
@@ -2372,6 +2496,64 @@
                     </div>
                 </div>
             </div>
+        </div>
+    </div>
+
+    <!-- Job Circulars Page (জব সার্কুলার) -->
+    <div id="job-circulars-page" style="display:none; background: #F8FAFC; min-height: 100vh;">
+        <!-- Top bar header -->
+        <div class="hero-header" style="background: white; padding: 0; border-bottom: 1.5px solid #F1F5F9; margin-bottom: 16px;">
+            <div class="topbar" style="display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: white; margin-bottom: 0;">
+                <button onclick="showPage('home-page')" style="background: #EBFDF9; border: none; border-radius: 12px; width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: #00BFA1; font-size: 18px; font-weight: bold; transition: all 0.2s;" onmouseover="this.style.background='#D1F2EB'" onmouseout="this.style.background='#EBFDF9'">
+                    ←
+                </button>
+                <div style="font-size: 18px; font-weight: 850; color: #0A2F6B; text-align: center; display: flex; align-items: center; gap: 8px;">
+                     <span>💼 জব সার্কুলার</span>
+                </div>
+                <div style="width: 44px;"></div>
+            </div>
+        </div>
+
+        <div style="padding: 0 16px 100px 16px; max-width: 850px; margin: 0 auto; box-sizing: border-box;">
+            <!-- Informative Banner card -->
+            <div style="background: linear-gradient(135deg, rgba(10, 47, 107, 0.05), rgba(21, 101, 255, 0.05)); border: 1.5px solid rgba(10, 47, 107, 0.15); border-radius: 20px; padding: 18px; margin-bottom: 20px; box-shadow: 0 4px 12px rgba(10, 47, 107, 0.03); display: flex; gap: 14px; align-items: center;">
+                <div style="font-size: 32px; background: white; width: 54px; height: 54px; border-radius: 16px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 10px rgba(0,0,0,0.05);">💼</div>
+                <div style="text-align: left; flex: 1;">
+                    <h3 style="font-size: 15.5px; font-weight: 850; color: #0A2F6B; margin: 0 0 4px 0;">চাকরির খবর ও সার্কুলার</h3>
+                    <p style="font-size: 12 px; color: #1E3A8A; margin: 0; line-height: 1.5; font-weight: 600;">সরকারী, বেসরকারী এবং ব্যাংকসহ সকল চাকুরীর আপডেট সার্কুলার ও নোটিশসমূহ এখানে পাবেন। PDF ডাউনলোড করুন অথবা ছবি জুম করে সহজে পড়ুন।</p>
+                </div>
+            </div>
+
+            <!-- Search Area -->
+            <div style="position: relative; margin-bottom: 20px;">
+                <input type="text" id="jobCircularSearchInput" oninput="window.filterJobCirculars()" placeholder="সার্কুলারের শিরোনাম লিখে খুঁজুন..." style="width:100%; height: 48px; padding: 0 16px 0 44px; border-radius: 14px; border: 1.5px solid #CBD5E1; font-size: 13.5px; font-weight: 600; outline: none; background: white; color: #1E293B; box-shadow: inset 0 2px 4px rgba(0,0,0,0.02); transition: border-color 0.15s, box-shadow 0.15s; box-sizing: border-box;" onfocus="this.style.borderColor='#1565FF'; this.style.boxShadow='0 0 0 3px rgba(21, 101, 255, 0.1)';" onblur="this.style.borderColor='#CBD5E1'; this.style.boxShadow='none';" />
+                <span style="position: absolute; left: 16px; top: 14px; font-size: 16px; color: #94A3B8; pointer-events: none;">🔍</span>
+                <button onclick="document.getElementById('jobCircularSearchInput').value = ''; window.filterJobCirculars();" style="position: absolute; right: 14px; top: 12px; border: none; background: #F1F5F9; color: #64748B; width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; cursor: pointer; font-weight: bold; transition: all 0.15s;" onmouseover="this.style.background='#E2E8F0'" onmouseout="this.style.background='#F1F5F9'">✕</button>
+            </div>
+
+            <!-- Main circulars container -->
+            <div id="jobCircularsContainer" style="display: flex; flex-direction: column; gap: 14px;">
+                <div style="text-align: center; padding: 40px 20px;">
+                    <div style="border: 3.5px solid #F1F5F9; border-top: 3.5px solid #1565FF; border-radius: 50%; width: 36px; height: 36px; animation: spin 1s linear infinite; margin: 0 auto 12px auto;"></div>
+                    <p style="font-size: 13px; color: #64748B; font-weight: 700; margin: 0;">সার্কুলার ডাটাবেজ লোড হচ্ছে, অনুগ্রহপূর্বক অপেক্ষা করুন...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Job Circular Image Lightbox Modal Wrapper (Fully Zoomable) -->
+    <div id="jobCircularImgModal" style="display:none; position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(15, 23, 42, 0.95); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); z-index:100008; align-items:center; justify-content:center; padding:16px; box-sizing: border-box;" onclick="window.closeJobCircularImgModal()">
+        <div style="position: absolute; top: 18px; right: 18px; display: flex; gap: 12px; z-index: 100009;">
+            <!-- Zoom Buttons -->
+            <button onclick="event.stopPropagation(); window.zoomJobCircularImg(1.25)" style="border: none; background: rgba(255, 255, 255, 0.15); color: white; width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-weight: bold; cursor: pointer; font-size: 20px; transition: all 0.2s; box-shadow: 0 4px 12px rgba(0,0,0,0.3);" onmouseover="this.style.background='rgba(255,255,255,0.3)'" onmouseout="this.style.background='rgba(255,255,255,0.15)'">➕</button>
+            <button onclick="event.stopPropagation(); window.zoomJobCircularImg(0.8)" style="border: none; background: rgba(255, 255, 255, 0.15); color: white; width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-weight: bold; cursor: pointer; font-size: 20px; transition: all 0.2s; box-shadow: 0 4px 12px rgba(0,0,0,0.3);" onmouseover="this.style.background='rgba(255,255,255,0.3)'" onmouseout="this.style.background='rgba(255,255,255,0.15)'">➖</button>
+            <button onclick="window.closeJobCircularImgModal()" style="border: none; background: #EF4444; color: white; width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-weight: bold; cursor: pointer; font-size: 16px; transition: all 0.2s; box-shadow: 0 4px 12px rgba(0,0,0,0.3);" onmouseover="this.style.background='#DC2626'" onmouseout="this.style.background='#EF4444'">✕</button>
+        </div>
+        <div style="width: 100%; height: 100%; overflow: auto; display: flex; justify-content: center; align-items: center; cursor: grab;" onclick="event.stopPropagation()" id="jobCircularImgWrapper" onmousedown="window.startDragJobCircularImg(event)" onmousemove="window.dragJobCircularImg(event)" onmouseup="window.endDragJobCircularImg()" onmouseleave="window.endDragJobCircularImg()">
+            <img id="jobCircularLightboxImg" src="" style="max-width: 95%; max-height: 90%; object-fit: contain; transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1); border-radius: 12px; transform: scale(1); transform-origin: center; box-shadow: 0 20px 50px rgba(0,0,0,0.5);" />
+        </div>
+        <div style="position: absolute; bottom: 24px; left: 50%; transform: translateX(-50%); background: rgba(15, 23, 42, 0.85); border: 1px solid rgba(255,255,255,0.1); padding: 10px 20px; border-radius: 20px; color: rgba(255, 255, 255, 0.9); font-size: 12.5px; font-weight: 700; pointer-events: none; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.3); letter-spacing: -0.1px;">
+            👆 মাউস দিয়ে ড্র্যাগ করে বা স্ক্রোল করে ছবিটি জুম করে দেখতে পারেন
         </div>
     </div>
 
@@ -2618,6 +2800,46 @@
             </div>
         </div>
 
+        <!-- Referral and Bonus Card (Topic 5: Invite & Earn) -->
+        <div class="card" id="referralCard" style="text-align: left; background: linear-gradient(135deg, #F0FDF4, #DCFCE7); border: 1.5px solid #86EFAC; display: none; margin-bottom: 16px;">
+            <h3 style="font-size: 15px; font-weight: 800; color: #166534; margin: 0 0 10px 0; border-bottom: 1.5px solid rgba(134, 239, 172, 0.4); padding-bottom: 8px; display: flex; align-items: center; gap: 6px;">🎁 আমন্ত্রণ ও ফ্রি লিমিট বোনাস (Refer & Earn)</h3>
+            
+            <p style="font-size: 12.5px; color: #14532D; font-weight: 600; margin: 0 0 14px 0; line-height: 1.55;">
+                আপনার বন্ধুদের এই অ্যাপে আমন্ত্রণ জানান! তারা আপনার রেফারেল কোড ব্যবহার করলে আপনারা <strong>উভয়েই পাবেন অতিরিক্ত দৈনিক প্রশ্ন ফ্রি লিমিট!</strong>
+            </p>
+
+            <div style="background: white; border: 1.5px solid #A7F3D0; border-radius: 12px; padding: 12px; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; gap: 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.02);">
+                <div>
+                    <span style="font-size: 11px; color: #047857; font-weight: 700; display: block; margin-bottom: 2px;">আপনার রেফারেল কোড (Your Referral Code)</span>
+                    <strong id="myReferralCode" style="font-size: 16px; font-family: monospace; color: #065F46; font-weight: 800;">MHERO-XXXX</strong>
+                </div>
+                <button onclick="window.copyReferralCode()" style="background: #10B981; color: white; border: none; padding: 6px 12px; font-size: 12.5px; font-weight: 800; border-radius: 8px; cursor: pointer; transition: background 0.2s;" onmouseover="this.style.background='#059669'" onmouseout="this.style.background='#10B981'">📋 কপি করুন</button>
+            </div>
+
+            <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 14px; background: white; border-radius: 12px; padding: 12px; border: 1.5px solid #E2E8F0; justify-content: space-between; box-shadow: 0 2px 4px rgba(0,0,0,0.02);">
+                <div style="text-align: center; flex: 1; border-right: 1.5px solid #F1F5F9; padding-right: 4px;">
+                    <span style="font-size: 11px; color: #64748B; font-weight: 700; display: block; margin-bottom: 2px;">সফল আমন্ত্রণ</span>
+                    <strong id="referralCount" style="font-size: 17px; color: #1E293B; font-weight: 800;">০ জন</strong>
+                </div>
+                <div style="text-align: center; flex: 1;">
+                    <span style="font-size: 11px; color: #64748B; font-weight: 700; display: block; margin-bottom: 2px;">অর্জিত অতিরিক্ত লিমিট</span>
+                    <strong id="referralBonusLimitDisplay" style="font-size: 17px; color: #10B981; font-weight: 800;">+০টি</strong>
+                </div>
+            </div>
+
+            <!-- Apply referral code form -->
+            <div id="referralApplyBox" style="border-top: 1.5px dashed rgba(134, 239, 172, 0.4); padding-top: 14px; margin-top: 8px;">
+                <span id="referralAppliedStatus" style="font-size: 12.5px; color: #15803D; font-weight: 750; display: none; line-height: 1.4;">✅ আপনি ইতিমধ্যে একটি রেফারেল কোড ব্যবহার করেছেন!</span>
+                <div id="referralInputGroup">
+                    <label for="inputFriendReferralCode" style="font-size: 12px; font-weight: 750; color: #1E293B; display: block; margin-bottom: 6px;">বন্ধুর রেফারেল কোড দিন (Use Friend's Code):</label>
+                    <div style="display: flex; gap: 8px;">
+                        <input type="text" id="inputFriendReferralCode" placeholder="যেমন: MHERO-XXXX" style="flex: 2; height: 38px; border-radius: 8px; border: 1.5px solid #86EFAC; padding: 0 10px; font-size: 13px; font-family: monospace; font-weight: 700; outline: none; box-sizing: border-box; background: white;" onfocus="this.style.borderColor='#10B981'" onblur="this.style.borderColor='#86EFAC'">
+                        <button id="applyReferralBtn" onclick="window.applyFriendReferral()" style="flex: 1; height: 38px; background: #10B981; color: white; border: none; font-weight: 800; border-radius: 8px; cursor: pointer; transition: background 0.15s; font-size: 12.5px;" onmouseover="this.style.background='#059669'" onmouseout="this.style.background='#10B981'">প্রয়োগ করুন</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <div class="card">
             <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid #E5E7EB;">
                 <div style="text-align: left;">
@@ -2627,6 +2849,17 @@
                 <!-- Toggle Switch -->
                 <label id="prefDarkModeLabel" class="switch" style="position: relative; display: inline-block; width: 44px; height: 24px; flex-shrink: 0; cursor: pointer; user-select: none;">
                     <input type="checkbox" id="darkModeToggle" onchange="toggleDarkMode(this.checked)" style="opacity: 0; width: 0; height: 0;">
+                    <span class="slider round" style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #CBD5E1; transition: .3s; border-radius: 34px;"></span>
+                </label>
+            </div>
+            <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid #E5E7EB;">
+                <div style="text-align: left;">
+                    <span style="font-size: 14.5px; font-weight: 700; color: #1E293B; display: block; margin-bottom: 2px;">🔊 সাউন্ড ইফেক্টস (Sound Effects)</span>
+                    <span style="font-size: 12px; color: #64748B; font-weight: 500; display: block;">সঠিক/ভুল উত্তরের জন্য শব্দ বাজান</span>
+                </div>
+                <!-- Toggle Switch -->
+                <label id="prefSoundEffectsLabel" class="switch" style="position: relative; display: inline-block; width: 44px; height: 24px; flex-shrink: 0; cursor: pointer; user-select: none;">
+                    <input type="checkbox" id="soundEffectsToggle" onchange="toggleSoundEffects(this.checked)" style="opacity: 0; width: 0; height: 0;">
                     <span class="slider round" style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #CBD5E1; transition: .3s; border-radius: 34px;"></span>
                 </label>
             </div>
@@ -3038,6 +3271,35 @@
 
             <!-- Dynamic Download action panel -->
             <div id="summaryDownloadContainer" style="margin-bottom: 16px; width: 100%;"></div>
+
+            <!-- MCQ Speed Training Option in Exam Summary -->
+            <div id="examSpeedTimerSettingBox" style="background: #F8FAFC; border: 1.5px solid #E2E8F0; border-radius: 16px; padding: 12px; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; box-sizing: border-box;" class="metric-block">
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <div style="background: rgba(0, 191, 161, 0.1); width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 16px;">
+                        🔥
+                    </div>
+                    <div style="text-align: left;">
+                        <div style="font-size: 12.5px; font-weight: 800; color: #1E293B;">স্পিড ট্রেইনিং টাইমার (Speed Trainer)</div>
+                        <p style="margin: 0; font-size: 10.5px; color: #64748B; font-weight: 600;">প্রতিটি প্রশ্নের জন্য সময় নির্ধারণ করুন</p>
+                    </div>
+                </div>
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <!-- Select seconds -->
+                    <select id="examSpeedSeconds" onchange="window.updateExamSpeedSeconds()" style="background: white; border: 1.5px solid #CBD5E1; border-radius: 6px; padding: 3px 6px; font-size: 11px; font-weight: 700; color: #334155; outline: none; cursor: pointer;">
+                        <option value="10">১০ সেকেন্ড</option>
+                        <option value="15">১৫ সেকেন্ড</option>
+                        <option value="20">২০ সেকেন্ড</option>
+                        <option value="30" selected>৩০ সেকেন্ড</option>
+                        <option value="45">৪৫ সেকেন্ড</option>
+                        <option value="60">৬০ সেকেন্ড</option>
+                    </select>
+                    <!-- Toggle switch -->
+                    <label class="switch" style="position: relative; display: inline-block; width: 44px; height: 24px; margin: 0;">
+                        <input type="checkbox" id="examSpeedTimerToggle" onchange="window.toggleExamSpeedTimer(this.checked)" style="opacity: 0; width: 0; height: 0;">
+                        <span class="slider" style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #CBD5E1; transition: .3s; border-radius: 34px;"></span>
+                    </label>
+                </div>
+            </div>
             
             <div style="display: flex; gap: 10px; margin-top: 10px;">
                 <button onclick="closeExamSummary()" style="flex: 1; height: 48px; border: none; background: #F3F4F6; color: #4B5563; font-weight: 700; border-radius: 12px; cursor: pointer; transition: background 0.2s;" onmouseover="this.style.background='#E5E7EB'" onmouseout="this.style.background='#F3F4F6'">বন্ধ করুন</button>
@@ -3051,6 +3313,21 @@
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
             <h3 id="examTitle">Syllabus Quiz</h3>
             <div style="font-weight:bold;color:red;" id="timerBox">60:00</div>
+        </div>
+
+        <!-- MCQ Speed Training Question-level Timer Panel -->
+        <div id="mcqSpeedTimerPanel" style="display: none; background: #F8FAFC; border: 1.5px solid #E2E8F0; border-radius: 16px; padding: 12px; margin-bottom: 16px; box-sizing: border-box;" class="metric-block">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                <span id="mcq_countdown_value" style="font-size: 13px; font-weight: 700; color: #475569; display: flex; align-items: center; gap: 4px; transition: transform 0.15s ease;" class="dark:text-slate-300">
+                    ⏱️ লোড হচ্ছে...
+                </span>
+                <span style="font-size: 11.5px; font-weight: 800; color: #00BFA1; background: #EBFDF9; padding: 2px 8px; border-radius: 30px;" class="dark:bg-teal-950/40 dark:text-teal-400">
+                    স্পিড ট্রেইনিং
+                </span>
+            </div>
+            <div style="width: 100%; height: 6px; background: #E2E8F0; border-radius: 30px; overflow: hidden; border: 1px solid #F1F5F9;" class="dark:bg-slate-800 dark:border-slate-700">
+                <div id="mcq_countdown_progress" style="width: 100%; height: 100%; background: #00BFA1; border-radius: 30px; transition: width 1s linear, background-color 0.3s;"></div>
+            </div>
         </div>
 
         <div class="card">
@@ -3870,7 +4147,7 @@
 
                 // 5. Normal page routing back to home page
                 const curPage = window.activePageId || "home-page";
-                if (curPage === "routine-details-page" || curPage === "pdf-page" || curPage === "global-leaderboard-page" || curPage === "final-result-page" || curPage === "solution-page" || curPage === "leaderboard-page" || curPage === "question-bank-page" || curPage === "exam-page" || curPage === "exam-history-page" || curPage === "profile-page" || curPage === "courses-page") {
+                if (curPage === "routine-details-page" || curPage === "job-circulars-page" || curPage === "pdf-page" || curPage === "global-leaderboard-page" || curPage === "final-result-page" || curPage === "solution-page" || curPage === "leaderboard-page" || curPage === "question-bank-page" || curPage === "exam-page" || curPage === "exam-history-page" || curPage === "profile-page" || curPage === "courses-page") {
                     if (typeof window.showPage === "function") {
                         window.showPage("home-page", document.getElementById("nav-home"));
                     } else {
@@ -3926,6 +4203,13 @@
 
         function showPage(pageId, el) {
             window.activePageId = pageId; // Update tracking state for back button navigation
+            
+            if (pageId !== "mcq-page") {
+                if (typeof window.clearMcqQuestionTimer === "function") {
+                    window.clearMcqQuestionTimer();
+                }
+            }
+            
             if (window.isMaintenanceActive) {
                 const maintenanceOverlay = document.getElementById("maintenance-overlay");
                 if (maintenanceOverlay) {
@@ -3985,9 +4269,15 @@
                 if (typeof window.syncDarkModeUI === "function") {
                     window.syncDarkModeUI();
                 }
+                if (typeof window.syncSoundEffectsUI === "function") {
+                    window.syncSoundEffectsUI();
+                }
             }
             if (pageId === "routine-details-page" && typeof window.initRoutinePage === "function") {
                 window.initRoutinePage();
+            }
+            if (pageId === "job-circulars-page" && typeof window.initJobCircularsPage === "function") {
+                window.initJobCircularsPage();
             }
 
             // Bottom Nav Active status tracking
@@ -4040,6 +4330,95 @@
             const toggle = document.getElementById("darkModeToggle");
             if (toggle) {
                 toggle.checked = document.body.classList.contains("dark-mode");
+            }
+        };
+
+        // Sound Effects (Web Audio API Synthesizer)
+        window.soundEffectsEnabled = localStorage.getItem("soundEffectsEnabled") !== "false";
+
+        window.toggleSoundEffects = function(enable) {
+            window.soundEffectsEnabled = enable;
+            localStorage.setItem("soundEffectsEnabled", enable ? "true" : "false");
+            const toggle = document.getElementById("soundEffectsToggle");
+            if (toggle) toggle.checked = enable;
+        };
+
+        window.syncSoundEffectsUI = function() {
+            const toggle = document.getElementById("soundEffectsToggle");
+            if (toggle) {
+                toggle.checked = window.soundEffectsEnabled;
+            }
+        };
+
+        window.playCorrectSound = function() {
+            if (!window.soundEffectsEnabled) return;
+            try {
+                const AudioContext = window.AudioContext || window.webkitAudioContext;
+                if (!AudioContext) return;
+                const ctx = new AudioContext();
+                
+                // Soft elegant chime tone (C5 to E5 arpeggio)
+                const osc1 = ctx.createOscillator();
+                const osc2 = ctx.createOscillator();
+                const gainNode = ctx.createGain();
+                
+                osc1.type = 'sine';
+                osc1.frequency.setValueAtTime(523.25, ctx.currentTime); // C5
+                osc1.frequency.exponentialRampToValueAtTime(880.00, ctx.currentTime + 0.15); // A5
+                
+                osc2.type = 'sine';
+                osc2.frequency.setValueAtTime(659.25, ctx.currentTime); // E5
+                osc2.frequency.exponentialRampToValueAtTime(1046.50, ctx.currentTime + 0.15); // C6
+                
+                gainNode.gain.setValueAtTime(0, ctx.currentTime);
+                gainNode.gain.linearRampToValueAtTime(0.12, ctx.currentTime + 0.05); // low volume
+                gainNode.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.35);
+                
+                osc1.connect(gainNode);
+                osc2.connect(gainNode);
+                gainNode.connect(ctx.destination);
+                
+                osc1.start(ctx.currentTime);
+                osc2.start(ctx.currentTime);
+                
+                osc1.stop(ctx.currentTime + 0.4);
+                osc2.stop(ctx.currentTime + 0.4);
+            } catch (e) {
+                console.warn("Audio Context Error", e);
+            }
+        };
+
+        window.playIncorrectSound = function() {
+            if (!window.soundEffectsEnabled) return;
+            try {
+                const AudioContext = window.AudioContext || window.webkitAudioContext;
+                if (!AudioContext) return;
+                const ctx = new AudioContext();
+                
+                const osc = ctx.createOscillator();
+                const gainNode = ctx.createGain();
+                
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(180, ctx.currentTime);
+                osc.frequency.linearRampToValueAtTime(110, ctx.currentTime + 0.25);
+                
+                gainNode.gain.setValueAtTime(0, ctx.currentTime);
+                gainNode.gain.linearRampToValueAtTime(0.15, ctx.currentTime + 0.05);
+                gainNode.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.3);
+                
+                // Low pass filter to make it warmer/subtler
+                const filter = ctx.createBiquadFilter();
+                filter.type = 'lowpass';
+                filter.frequency.setValueAtTime(400, ctx.currentTime);
+                
+                osc.connect(filter);
+                filter.connect(gainNode);
+                gainNode.connect(ctx.destination);
+                
+                osc.start(ctx.currentTime);
+                osc.stop(ctx.currentTime + 0.35);
+            } catch (e) {
+                console.warn("Audio Context Error", e);
             }
         };
 

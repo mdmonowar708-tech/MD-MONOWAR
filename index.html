@@ -4459,6 +4459,95 @@
         window.auth = auth;
         window.firebaseSignOut = signOut;
 
+        // --- Capacitor Push Notifications Integration ---
+        window.isPushNotificationConfigured = false;
+        window.pushNotificationToken = "";
+
+        async function setupPushNotifications() {
+            if (!window.Capacitor) {
+                console.log("Push notifications skipped: Not running in a Capacitor mobile environment.");
+                return;
+            }
+
+            const { PushNotifications } = window.Capacitor.Plugins;
+            if (!PushNotifications) {
+                console.log("Push notifications skipped: PushNotifications plugin not available.");
+                return;
+            }
+
+            try {
+                let permStatus = await PushNotifications.checkPermissions();
+                if (permStatus.receive === 'prompt') {
+                    permStatus = await PushNotifications.requestPermissions();
+                }
+
+                if (permStatus.receive === 'granted') {
+                    // Register with Apple / Google to receive push via APNS/FCM
+                    await PushNotifications.register();
+                } else {
+                    console.warn("Push notifications permission denied.");
+                }
+
+                // Listeners
+                if (!window.isPushNotificationConfigured) {
+                    PushNotifications.addListener('registration', async (token) => {
+                        console.log('Push registration success, token:', token.value);
+                        window.pushNotificationToken = token.value;
+                        localStorage.setItem("fcm_token", token.value);
+                        await saveTokenToUserDoc(token.value);
+                    });
+
+                    PushNotifications.addListener('registrationError', (error) => {
+                        console.error('Push registration error:', JSON.stringify(error));
+                    });
+
+                    PushNotifications.addListener('pushNotificationReceived', (notification) => {
+                        console.log('Push notification received in foreground:', notification);
+                        
+                        // Show a beautiful custom native-like visual alert in the app
+                        if (typeof window.showMiniToast === "function") {
+                            window.showMiniToast(`🔔 ${notification.title || "নতুন নোটিফিকেশন"}: ${notification.body || ""}`);
+                        } else {
+                            alert(`${notification.title || "নতুন নোটিফিকেশন"}\n${notification.body || ""}`);
+                        }
+                    });
+
+                    PushNotifications.addListener('pushNotificationActionPerformed', (notification) => {
+                        console.log('Push notification action performed:', notification);
+                        // Redirect to notice board or open NoticeBoard modal!
+                        setTimeout(() => {
+                            if (typeof window.openNoticeBoardModal === "function") {
+                                window.openNoticeBoardModal();
+                            }
+                        }, 1000);
+                    });
+
+                    window.isPushNotificationConfigured = true;
+                }
+            } catch (err) {
+                console.error("Error setting up Push Notifications:", err);
+            }
+        }
+
+        async function saveTokenToUserDoc(token) {
+            const user = auth.currentUser;
+            if (user && token) {
+                try {
+                    await updateDoc(doc(db, "users", user.uid), {
+                        fcmToken: token,
+                        lastActive: serverTimestamp()
+                    });
+                    console.log("FCM Token successfully saved to Firestore for user:", user.uid);
+                } catch (e) {
+                    console.warn("Failed to save FCM Token to user document:", e);
+                }
+            }
+        }
+
+        // Expose functions globally
+        window.setupPushNotifications = setupPushNotifications;
+        window.saveTokenToUserDoc = saveTokenToUserDoc;
+
         // --- Real-time Maintenance Mode Listener & Automatic Logout ---
         window.isMaintenanceStatusLoaded = false;
         window.isMaintenanceActive = false;
@@ -8329,6 +8418,11 @@
                 if (cachedRegName) {
                     localStorage.setItem("registeredName", cachedRegName);
                     localStorage.setItem("userName", cachedRegName);
+                }
+
+                // Register and configure push notifications on mobile
+                if (typeof window.setupPushNotifications === "function") {
+                    window.setupPushNotifications();
                 }
                 
                 // Reset cache to allow fresh fetches on logging in
