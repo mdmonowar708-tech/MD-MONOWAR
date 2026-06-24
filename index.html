@@ -1004,6 +1004,22 @@
         }
 
         /* Dark Mode Toggle Switch & Core CSS Overrides */
+        /* Smooth Dark Mode Transition Effect */
+        body,
+        body * {
+            transition: background-color 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+                        color 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+                        border-color 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+                        box-shadow 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+                        background 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* Ensure sliders and toggle components keep fast snappy response */
+        .switch .slider,
+        .switch .slider:before {
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.3s ease !important;
+        }
+
         .switch input:checked + .slider {
             background-color: var(--primary) !important;
         }
@@ -1580,6 +1596,45 @@
             border-color: #334155 !important;
             color: #94A3B8 !important;
         }
+
+        /* Recent Result dynamic component styles */
+        .recent-result-item-card {
+            transition: all 0.3s ease;
+        }
+        body.dark-mode .recent-result-item-card {
+            background: #111A2E !important;
+            border-color: #1E293B !important;
+        }
+        body.dark-mode .metric-block {
+            background: #151D30 !important;
+            border-color: #232E4A !important;
+        }
+        body.dark-mode .recent-result-item-card h4 {
+            color: #F8FAFC !important;
+        }
+
+        /* iOS-style slider toggle for speed training */
+        .switch input:checked + .slider {
+            background-color: #00BFA1 !important;
+        }
+        .switch input:checked + .slider:before {
+            transform: translateX(20px) !important;
+        }
+        .slider {
+            border: 1px solid rgba(0,0,0,0.05);
+        }
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 2px;
+            bottom: 2px;
+            background-color: white;
+            transition: .3s ease;
+            border-radius: 50%;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+        }
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 </head>
@@ -1681,7 +1736,7 @@
             <div style="margin-bottom: 22px;">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
                     <label style="font-size: 13.5px; font-weight: 700; color: #475569; margin: 0;">পাসওয়ার্ড (Password)</label>
-                    <a href="#" onclick="window.handleForgotPassword()" style="font-size: 12px; font-weight: 700; color: #00BFA1; text-decoration: none; transition: color 0.2s;" onmouseover="this.style.color='#009688'" onmouseout="this.style.color='#00BFA1'">পাসওয়ার্ড ভুলে গেছেন?</a>
+                    <a href="#" onclick="window.handleForgotPassword(event); return false;" style="font-size: 12px; font-weight: 700; color: #00BFA1; text-decoration: none; transition: color 0.2s;" onmouseover="this.style.color='#009688'" onmouseout="this.style.color='#00BFA1'">পাসওয়ার্ড ভুলে গেছেন?</a>
                 </div>
                 <div style="position: relative; display: flex; align-items: center;">
                     <span style="position: absolute; left: 14px; font-size: 16px; color: #94A3B8;">🔒</span>
@@ -2145,11 +2200,14 @@
         </div>
 
         <!-- Result section preview -->
-        <div class="card">
-            <h3>🏆 Recent Result</h3>
-            <p>BCS Mock Test #04</p>
-            <p>Score: 42/50</p>
-            <p>Rank: #11</p>
+        <div class="card" id="homeRecentResultCard">
+            <h3 style="display: flex; align-items: center; gap: 8px; font-size: 16.5px; font-weight: 800; margin-top: 0; margin-bottom: 12px; color: #1E293B;">🏆 Recent Result (সর্বশেষ ফলাফল)</h3>
+            <div id="homeRecentResultContent">
+                <div style="text-align: center; padding: 25px 10px; color: #64748B;">
+                    <span style="display:inline-block; animation: spin-loader 1s linear infinite; margin-bottom: 8px; font-size: 20px;">⏳</span>
+                    <p style="margin: 0; font-size: 13.5px; font-weight: 600;">লোডিং হচ্ছে...</p>
+                </div>
+            </div>
         </div>
 
         <!-- Upgrade -->
@@ -2286,6 +2344,62 @@
                     </button>
                     <span style="font-size: 14px; font-weight: 800; color: #64748B;">/</span>
                     <span id="qbankCurrentBreadcrumb" style="font-size: 13.5px; font-weight: 800; color: #0F172A; text-overflow: ellipsis; overflow: hidden; white-space: nowrap; max-width: 170px;">বিষয়</span>
+                </div>
+
+                <!-- Qbank Practice vs Exam Mode & Optional Speed Countdown Timer Control Panel -->
+                <div style="background: white; border: 1.5px solid #E2E8F0; border-radius: 20px; padding: 16px; margin-bottom: 16px; box-shadow: 0 4px 10px rgba(0,0,0,0.015);" class="metric-block">
+                    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
+                        <span style="font-size: 13.5px; font-weight: 800; color: #475569; display: flex; align-items: center; gap: 6px;" class="dark:text-slate-300">
+                            ⚙️ অনুশীলন অপশন (Options)
+                        </span>
+                        
+                        <!-- Mode Buttons (Grouped) -->
+                        <div style="background: #F1F5F9; border: 1.5px solid #E2E8F0; padding: 3.5px; border-radius: 14px; display: inline-flex; gap: 4px;" class="metric-block">
+                            <button id="qbankModePracticeBtn" onclick="window.setQbankMode('practice')" style="border: none; outline: none; padding: 6px 14px; border-radius: 10px; font-size: 12px; font-weight: 800; cursor: pointer; transition: all 0.2s; background: #00BFA1; color: white;">
+                                📝 অনুশীলন মোড (Practice)
+                            </button>
+                            <button id="qbankModeExamBtn" onclick="window.setQbankMode('exam')" style="border: none; outline: none; padding: 6px 14px; border-radius: 10px; font-size: 12px; font-weight: 800; cursor: pointer; transition: all 0.2s; background: transparent; color: #475569;" class="dark:text-slate-300">
+                                🏆 পরীক্ষা মোড (Exam)
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Speed Training countdown timer toggle (Practice Mode exclusive) -->
+                    <div id="qbankSpeedTimerPanel" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; padding-top: 12px; margin-top: 12px; border-top: 1px dashed #E2E8F0; transition: all 0.3s ease;">
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <div style="background: rgba(255, 107, 107, 0.1); width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px;">
+                                🔥
+                            </div>
+                            <div>
+                                <div style="font-size: 13px; font-weight: 800; color: #1E293B; display: flex; align-items: center; gap: 4px;" class="dark:text-white">
+                                    স্পিড ট্রেইনিং টাইমার (Speed Trainer)
+                                    <span style="background: #FF6B6B; color: white; font-size: 9px; font-weight: 800; padding: 2px 6px; border-radius: 30px; text-transform: uppercase;">Optional</span>
+                                </div>
+                                <p style="margin: 2px 0 0 0; font-size: 11px; color: #64748B; font-weight: 600;" class="dark:text-slate-400">প্রতিটি প্রশ্নের জন্য সেকেন্ডের গতিশীল কাউন্টডাউন চালু করুন</p>
+                            </div>
+                        </div>
+
+                        <div style="display: flex; align-items: center; gap: 12px;">
+                            <!-- Time selector -->
+                            <div style="display: flex; align-items: center; gap: 6px;">
+                                <label for="qbankSpeedSeconds" style="font-size: 11.5px; font-weight: 700; color: #475569;" class="dark:text-slate-300">সময়সীমা:</label>
+                                <select id="qbankSpeedSeconds" onchange="window.updateQbankSpeedSeconds()" style="background: #F8FAFC; border: 1.5px solid #CBD5E1; border-radius: 8px; padding: 4px 8px; font-size: 12px; font-weight: 700; color: #334155; outline: none; cursor: pointer;" class="dark:bg-slate-800 dark:border-slate-700 dark:text-white">
+                                    <option value="10">১০ সেকেন্ড</option>
+                                    <option value="15">১৫ সেকেন্ড</option>
+                                    <option value="20">২০ সেকেন্ড</option>
+                                    <option value="30" selected>৩০ সেকেন্ড</option>
+                                    <option value="45">৪৫ সেকেন্ড</option>
+                                    <option value="60">৬০ সেকেন্ড</option>
+                                </select>
+                            </div>
+
+                            <!-- Elegant Switch -->
+                            <label class="switch" style="position: relative; display: inline-block; width: 44px; height: 24px;">
+                                <input type="checkbox" id="qbankSpeedTimerToggle" onchange="window.toggleQbankSpeedTimer(this.checked)" style="opacity: 0; width: 0; height: 0;">
+                                <span class="slider" style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #CBD5E1; transition: .3s; border-radius: 34px;"></span>
+                            </label>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- Search inside selected subject -->
@@ -2685,6 +2799,46 @@
             </div>
         </div>
 
+        <!-- Referral and Bonus Card (Topic 5: Invite & Earn) -->
+        <div class="card" id="referralCard" style="text-align: left; background: linear-gradient(135deg, #F0FDF4, #DCFCE7); border: 1.5px solid #86EFAC; display: none; margin-bottom: 16px;">
+            <h3 style="font-size: 15px; font-weight: 800; color: #166534; margin: 0 0 10px 0; border-bottom: 1.5px solid rgba(134, 239, 172, 0.4); padding-bottom: 8px; display: flex; align-items: center; gap: 6px;">🎁 আমন্ত্রণ ও ফ্রি লিমিট বোনাস (Refer & Earn)</h3>
+            
+            <p style="font-size: 12.5px; color: #14532D; font-weight: 600; margin: 0 0 14px 0; line-height: 1.55;">
+                আপনার বন্ধুদের এই অ্যাপে আমন্ত্রণ জানান! তারা আপনার রেফারেল কোড ব্যবহার করলে আপনারা <strong>উভয়েই পাবেন অতিরিক্ত দৈনিক প্রশ্ন ফ্রি লিমিট!</strong>
+            </p>
+
+            <div style="background: white; border: 1.5px solid #A7F3D0; border-radius: 12px; padding: 12px; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; gap: 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.02);">
+                <div>
+                    <span style="font-size: 11px; color: #047857; font-weight: 700; display: block; margin-bottom: 2px;">আপনার রেফারেল কোড (Your Referral Code)</span>
+                    <strong id="myReferralCode" style="font-size: 16px; font-family: monospace; color: #065F46; font-weight: 800;">MHERO-XXXX</strong>
+                </div>
+                <button onclick="window.copyReferralCode()" style="background: #10B981; color: white; border: none; padding: 6px 12px; font-size: 12.5px; font-weight: 800; border-radius: 8px; cursor: pointer; transition: background 0.2s;" onmouseover="this.style.background='#059669'" onmouseout="this.style.background='#10B981'">📋 কপি করুন</button>
+            </div>
+
+            <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 14px; background: white; border-radius: 12px; padding: 12px; border: 1.5px solid #E2E8F0; justify-content: space-between; box-shadow: 0 2px 4px rgba(0,0,0,0.02);">
+                <div style="text-align: center; flex: 1; border-right: 1.5px solid #F1F5F9; padding-right: 4px;">
+                    <span style="font-size: 11px; color: #64748B; font-weight: 700; display: block; margin-bottom: 2px;">সফল আমন্ত্রণ</span>
+                    <strong id="referralCount" style="font-size: 17px; color: #1E293B; font-weight: 800;">০ জন</strong>
+                </div>
+                <div style="text-align: center; flex: 1;">
+                    <span style="font-size: 11px; color: #64748B; font-weight: 700; display: block; margin-bottom: 2px;">অর্জিত অতিরিক্ত লিমিট</span>
+                    <strong id="referralBonusLimitDisplay" style="font-size: 17px; color: #10B981; font-weight: 800;">+০টি</strong>
+                </div>
+            </div>
+
+            <!-- Apply referral code form -->
+            <div id="referralApplyBox" style="border-top: 1.5px dashed rgba(134, 239, 172, 0.4); padding-top: 14px; margin-top: 8px;">
+                <span id="referralAppliedStatus" style="font-size: 12.5px; color: #15803D; font-weight: 750; display: none; line-height: 1.4;">✅ আপনি ইতিমধ্যে একটি রেফারেল কোড ব্যবহার করেছেন!</span>
+                <div id="referralInputGroup">
+                    <label for="inputFriendReferralCode" style="font-size: 12px; font-weight: 750; color: #1E293B; display: block; margin-bottom: 6px;">বন্ধুর রেফারেল কোড দিন (Use Friend's Code):</label>
+                    <div style="display: flex; gap: 8px;">
+                        <input type="text" id="inputFriendReferralCode" placeholder="যেমন: MHERO-XXXX" style="flex: 2; height: 38px; border-radius: 8px; border: 1.5px solid #86EFAC; padding: 0 10px; font-size: 13px; font-family: monospace; font-weight: 700; outline: none; box-sizing: border-box; background: white;" onfocus="this.style.borderColor='#10B981'" onblur="this.style.borderColor='#86EFAC'">
+                        <button id="applyReferralBtn" onclick="window.applyFriendReferral()" style="flex: 1; height: 38px; background: #10B981; color: white; border: none; font-weight: 800; border-radius: 8px; cursor: pointer; transition: background 0.15s; font-size: 12.5px;" onmouseover="this.style.background='#059669'" onmouseout="this.style.background='#10B981'">প্রয়োগ করুন</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <div class="card">
             <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid #E5E7EB;">
                 <div style="text-align: left;">
@@ -2694,6 +2848,17 @@
                 <!-- Toggle Switch -->
                 <label id="prefDarkModeLabel" class="switch" style="position: relative; display: inline-block; width: 44px; height: 24px; flex-shrink: 0; cursor: pointer; user-select: none;">
                     <input type="checkbox" id="darkModeToggle" onchange="toggleDarkMode(this.checked)" style="opacity: 0; width: 0; height: 0;">
+                    <span class="slider round" style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #CBD5E1; transition: .3s; border-radius: 34px;"></span>
+                </label>
+            </div>
+            <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid #E5E7EB;">
+                <div style="text-align: left;">
+                    <span style="font-size: 14.5px; font-weight: 700; color: #1E293B; display: block; margin-bottom: 2px;">🔊 সাউন্ড ইফেক্টস (Sound Effects)</span>
+                    <span style="font-size: 12px; color: #64748B; font-weight: 500; display: block;">সঠিক/ভুল উত্তরের জন্য শব্দ বাজান</span>
+                </div>
+                <!-- Toggle Switch -->
+                <label id="prefSoundEffectsLabel" class="switch" style="position: relative; display: inline-block; width: 44px; height: 24px; flex-shrink: 0; cursor: pointer; user-select: none;">
+                    <input type="checkbox" id="soundEffectsToggle" onchange="toggleSoundEffects(this.checked)" style="opacity: 0; width: 0; height: 0;">
                     <span class="slider round" style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #CBD5E1; transition: .3s; border-radius: 34px;"></span>
                 </label>
             </div>
@@ -3105,6 +3270,35 @@
 
             <!-- Dynamic Download action panel -->
             <div id="summaryDownloadContainer" style="margin-bottom: 16px; width: 100%;"></div>
+
+            <!-- MCQ Speed Training Option in Exam Summary -->
+            <div id="examSpeedTimerSettingBox" style="background: #F8FAFC; border: 1.5px solid #E2E8F0; border-radius: 16px; padding: 12px; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; box-sizing: border-box;" class="metric-block">
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <div style="background: rgba(0, 191, 161, 0.1); width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 16px;">
+                        🔥
+                    </div>
+                    <div style="text-align: left;">
+                        <div style="font-size: 12.5px; font-weight: 800; color: #1E293B;">স্পিড ট্রেইনিং টাইমার (Speed Trainer)</div>
+                        <p style="margin: 0; font-size: 10.5px; color: #64748B; font-weight: 600;">প্রতিটি প্রশ্নের জন্য সময় নির্ধারণ করুন</p>
+                    </div>
+                </div>
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <!-- Select seconds -->
+                    <select id="examSpeedSeconds" onchange="window.updateExamSpeedSeconds()" style="background: white; border: 1.5px solid #CBD5E1; border-radius: 6px; padding: 3px 6px; font-size: 11px; font-weight: 700; color: #334155; outline: none; cursor: pointer;">
+                        <option value="10">১০ সেকেন্ড</option>
+                        <option value="15">১৫ সেকেন্ড</option>
+                        <option value="20">২০ সেকেন্ড</option>
+                        <option value="30" selected>৩০ সেকেন্ড</option>
+                        <option value="45">৪৫ সেকেন্ড</option>
+                        <option value="60">৬০ সেকেন্ড</option>
+                    </select>
+                    <!-- Toggle switch -->
+                    <label class="switch" style="position: relative; display: inline-block; width: 44px; height: 24px; margin: 0;">
+                        <input type="checkbox" id="examSpeedTimerToggle" onchange="window.toggleExamSpeedTimer(this.checked)" style="opacity: 0; width: 0; height: 0;">
+                        <span class="slider" style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #CBD5E1; transition: .3s; border-radius: 34px;"></span>
+                    </label>
+                </div>
+            </div>
             
             <div style="display: flex; gap: 10px; margin-top: 10px;">
                 <button onclick="closeExamSummary()" style="flex: 1; height: 48px; border: none; background: #F3F4F6; color: #4B5563; font-weight: 700; border-radius: 12px; cursor: pointer; transition: background 0.2s;" onmouseover="this.style.background='#E5E7EB'" onmouseout="this.style.background='#F3F4F6'">বন্ধ করুন</button>
@@ -3118,6 +3312,21 @@
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
             <h3 id="examTitle">Syllabus Quiz</h3>
             <div style="font-weight:bold;color:red;" id="timerBox">60:00</div>
+        </div>
+
+        <!-- MCQ Speed Training Question-level Timer Panel -->
+        <div id="mcqSpeedTimerPanel" style="display: none; background: #F8FAFC; border: 1.5px solid #E2E8F0; border-radius: 16px; padding: 12px; margin-bottom: 16px; box-sizing: border-box;" class="metric-block">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                <span id="mcq_countdown_value" style="font-size: 13px; font-weight: 700; color: #475569; display: flex; align-items: center; gap: 4px; transition: transform 0.15s ease;" class="dark:text-slate-300">
+                    ⏱️ লোড হচ্ছে...
+                </span>
+                <span style="font-size: 11.5px; font-weight: 800; color: #00BFA1; background: #EBFDF9; padding: 2px 8px; border-radius: 30px;" class="dark:bg-teal-950/40 dark:text-teal-400">
+                    স্পিড ট্রেইনিং
+                </span>
+            </div>
+            <div style="width: 100%; height: 6px; background: #E2E8F0; border-radius: 30px; overflow: hidden; border: 1px solid #F1F5F9;" class="dark:bg-slate-800 dark:border-slate-700">
+                <div id="mcq_countdown_progress" style="width: 100%; height: 100%; background: #00BFA1; border-radius: 30px; transition: width 1s linear, background-color 0.3s;"></div>
+            </div>
         </div>
 
         <div class="card">
@@ -3993,6 +4202,13 @@
 
         function showPage(pageId, el) {
             window.activePageId = pageId; // Update tracking state for back button navigation
+            
+            if (pageId !== "mcq-page") {
+                if (typeof window.clearMcqQuestionTimer === "function") {
+                    window.clearMcqQuestionTimer();
+                }
+            }
+            
             if (window.isMaintenanceActive) {
                 const maintenanceOverlay = document.getElementById("maintenance-overlay");
                 if (maintenanceOverlay) {
@@ -4052,6 +4268,9 @@
                 if (typeof window.syncDarkModeUI === "function") {
                     window.syncDarkModeUI();
                 }
+                if (typeof window.syncSoundEffectsUI === "function") {
+                    window.syncSoundEffectsUI();
+                }
             }
             if (pageId === "routine-details-page" && typeof window.initRoutinePage === "function") {
                 window.initRoutinePage();
@@ -4110,6 +4329,95 @@
             const toggle = document.getElementById("darkModeToggle");
             if (toggle) {
                 toggle.checked = document.body.classList.contains("dark-mode");
+            }
+        };
+
+        // Sound Effects (Web Audio API Synthesizer)
+        window.soundEffectsEnabled = localStorage.getItem("soundEffectsEnabled") !== "false";
+
+        window.toggleSoundEffects = function(enable) {
+            window.soundEffectsEnabled = enable;
+            localStorage.setItem("soundEffectsEnabled", enable ? "true" : "false");
+            const toggle = document.getElementById("soundEffectsToggle");
+            if (toggle) toggle.checked = enable;
+        };
+
+        window.syncSoundEffectsUI = function() {
+            const toggle = document.getElementById("soundEffectsToggle");
+            if (toggle) {
+                toggle.checked = window.soundEffectsEnabled;
+            }
+        };
+
+        window.playCorrectSound = function() {
+            if (!window.soundEffectsEnabled) return;
+            try {
+                const AudioContext = window.AudioContext || window.webkitAudioContext;
+                if (!AudioContext) return;
+                const ctx = new AudioContext();
+                
+                // Soft elegant chime tone (C5 to E5 arpeggio)
+                const osc1 = ctx.createOscillator();
+                const osc2 = ctx.createOscillator();
+                const gainNode = ctx.createGain();
+                
+                osc1.type = 'sine';
+                osc1.frequency.setValueAtTime(523.25, ctx.currentTime); // C5
+                osc1.frequency.exponentialRampToValueAtTime(880.00, ctx.currentTime + 0.15); // A5
+                
+                osc2.type = 'sine';
+                osc2.frequency.setValueAtTime(659.25, ctx.currentTime); // E5
+                osc2.frequency.exponentialRampToValueAtTime(1046.50, ctx.currentTime + 0.15); // C6
+                
+                gainNode.gain.setValueAtTime(0, ctx.currentTime);
+                gainNode.gain.linearRampToValueAtTime(0.12, ctx.currentTime + 0.05); // low volume
+                gainNode.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.35);
+                
+                osc1.connect(gainNode);
+                osc2.connect(gainNode);
+                gainNode.connect(ctx.destination);
+                
+                osc1.start(ctx.currentTime);
+                osc2.start(ctx.currentTime);
+                
+                osc1.stop(ctx.currentTime + 0.4);
+                osc2.stop(ctx.currentTime + 0.4);
+            } catch (e) {
+                console.warn("Audio Context Error", e);
+            }
+        };
+
+        window.playIncorrectSound = function() {
+            if (!window.soundEffectsEnabled) return;
+            try {
+                const AudioContext = window.AudioContext || window.webkitAudioContext;
+                if (!AudioContext) return;
+                const ctx = new AudioContext();
+                
+                const osc = ctx.createOscillator();
+                const gainNode = ctx.createGain();
+                
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(180, ctx.currentTime);
+                osc.frequency.linearRampToValueAtTime(110, ctx.currentTime + 0.25);
+                
+                gainNode.gain.setValueAtTime(0, ctx.currentTime);
+                gainNode.gain.linearRampToValueAtTime(0.15, ctx.currentTime + 0.05);
+                gainNode.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.3);
+                
+                // Low pass filter to make it warmer/subtler
+                const filter = ctx.createBiquadFilter();
+                filter.type = 'lowpass';
+                filter.frequency.setValueAtTime(400, ctx.currentTime);
+                
+                osc.connect(filter);
+                filter.connect(gainNode);
+                gainNode.connect(ctx.destination);
+                
+                osc.start(ctx.currentTime);
+                osc.stop(ctx.currentTime + 0.35);
+            } catch (e) {
+                console.warn("Audio Context Error", e);
             }
         };
 
@@ -4212,7 +4520,9 @@
             adImageUrl: "",
             adEmoji: "🎁",
             adRedirectUrl: "premium-store",
-            adVisible: true
+            adVisible: true,
+            referralReward: 10,
+            referralEnabled: true
         };
 
         onSnapshot(doc(db, "app_config", "settings"), (snapshot) => {
@@ -4269,23 +4579,63 @@
         };
 
         // Forgot password implementation
-        window.handleForgotPassword = async function() {
-            let email = document.getElementById("loginEmail").value.trim();
-            if (!email) {
-                email = prompt("আপনার রেজিস্টার্ড ইমেইল ঠিকানাটি লিখুন:");
+        window.handleForgotPassword = async function(e) {
+            if (e && typeof e.preventDefault === "function") {
+                e.preventDefault();
             }
-            if (!email) return;
+            const emailInput = document.getElementById("loginEmail");
+            if (!emailInput) return;
+
+            const email = emailInput.value.trim();
+            if (!email) {
+                emailInput.focus();
+                emailInput.style.borderColor = "#EF4444";
+                emailInput.style.boxShadow = "0 0 0 3px rgba(239, 68, 68, 0.2)";
+                setTimeout(() => {
+                    emailInput.style.borderColor = "#E2E8F0";
+                    emailInput.style.boxShadow = "none";
+                }, 3000);
+
+                if (typeof window.showMiniToast === "function") {
+                    window.showMiniToast("⚠️ পাসওয়ার্ড রিসেট করতে আগে ইমেইল ঠিকানাটি লিখুন!");
+                } else {
+                    alert("⚠️ পাসওয়ার্ড রিসেট করতে আগে ইমেইল ঠিকানাটি লিখুন!");
+                }
+                return;
+            }
+
+            // Simple client-side validation
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(email)) {
+                emailInput.focus();
+                emailInput.style.borderColor = "#EF4444";
+                setTimeout(() => {
+                    emailInput.style.borderColor = "#E2E8F0";
+                }, 3000);
+
+                if (typeof window.showMiniToast === "function") {
+                    window.showMiniToast("⚠️ অনুগ্রহ করে একটি সঠিক ইমেইল ঠিকানা লিখুন!");
+                } else {
+                    alert("⚠️ অনুগ্রহ করে একটি সঠিক ইমেইল ঠিকানা লিখুন!");
+                }
+                return;
+            }
 
             const loader = document.getElementById("globalSubmitLoader");
             if (loader) {
                 loader.style.display = "flex";
-                document.getElementById("globalLoaderTitle").innerText = "⏳ Resetting Password";
-                document.getElementById("loaderText").innerText = "Sending Password Reset Email...";
+                const loaderTitle = document.getElementById("globalLoaderTitle");
+                const loaderText = document.getElementById("loaderText");
+                if (loaderTitle) loaderTitle.innerText = "⏳ Resetting Password";
+                if (loaderText) loaderText.innerText = "Sending Password Reset Email...";
             }
 
             try {
                 await sendPasswordResetEmail(auth, email);
                 if (loader) loader.style.display = "none";
+                if (typeof window.showMiniToast === "function") {
+                    window.showMiniToast("🎉 পাসওয়ার্ড রিসেট লিংক ইমেইলে পাঠানো হয়েছে!");
+                }
                 alert("আপনার ইমেইলে পাসওয়ার্ড রিসেট করার একটি লিংক পাঠানো হয়েছে। অনুগ্রহ করে আপনার ইনবক্স অথবা স্প্যাম ফোল্ডার চেক করুন।");
             } catch (err) {
                 if (loader) loader.style.display = "none";
@@ -5045,6 +5395,47 @@
                     if (userData.createdAt) {
                         const date = userData.createdAt.toDate ? userData.createdAt.toDate() : new Date(userData.createdAt);
                         document.getElementById("memberSince").innerText = date.toLocaleDateString();
+                    }
+
+                    // --- Topic 5: Referral & Bonus Limits Handler ---
+                    const isReferralEnabled = window.adminSettings && window.adminSettings.referralEnabled !== false;
+                    const refCard = document.getElementById("referralCard");
+                    if (refCard) {
+                        if (isReferralEnabled) {
+                            refCard.style.display = "block";
+                            
+                            // Load own referral code, or generate it on-the-fly and save to Firestore
+                            let referralCode = userData.referralCode;
+                            if (!referralCode) {
+                                referralCode = "MHERO-" + uid.substring(0, 6).toUpperCase();
+                                await updateDoc(doc(db, "users", uid), { referralCode: referralCode });
+                            }
+                            
+                            document.getElementById("myReferralCode").innerText = referralCode;
+                            
+                            const refCount = userData.referralCount || 0;
+                            document.getElementById("referralCount").innerText = refCount + " জন";
+                            
+                            const refBonus = userData.referralBonusLimit || 0;
+                            document.getElementById("referralBonusLimitDisplay").innerText = "+" + refBonus + "টি";
+                            
+                            // Check if they already applied a friend's referral code
+                            const referredBy = userData.referredBy || "";
+                            const referralAppliedStatus = document.getElementById("referralAppliedStatus");
+                            const referralInputGroup = document.getElementById("referralInputGroup");
+                            if (referredBy) {
+                                if (referralAppliedStatus) {
+                                    referralAppliedStatus.innerText = `✅ আপনি ইতিমধ্যে ${referredBy} রেফারেল কোডটি ব্যবহার করেছেন!`;
+                                    referralAppliedStatus.style.display = "block";
+                                }
+                                if (referralInputGroup) referralInputGroup.style.display = "none";
+                            } else {
+                                if (referralAppliedStatus) referralAppliedStatus.style.display = "none";
+                                if (referralInputGroup) referralInputGroup.style.display = "block";
+                            }
+                        } else {
+                            refCard.style.display = "none";
+                        }
                     }
                 }
 
@@ -7215,6 +7606,18 @@
         window.openExamSummary = async function(examId) {
             window.selectedExamId = examId;
             
+            // Sync speed training UI controls with global speed training settings
+            setTimeout(() => {
+                const examToggle = document.getElementById("examSpeedTimerToggle");
+                const examSelect = document.getElementById("examSpeedSeconds");
+                if (examToggle) {
+                    examToggle.checked = !!window.qbankSpeedTimerEnabled;
+                }
+                if (examSelect) {
+                    examSelect.value = (window.qbankSpeedTimerSeconds || 30).toString();
+                }
+            }, 50);
+            
             // Set initial state
             document.getElementById("summaryTitle").innerText = "Loading details...";
             document.getElementById("summaryQuestions").innerText = "...";
@@ -7380,6 +7783,9 @@
             window.examSubmitted = true;
 
             clearInterval(window.timerAnswerInterval);
+            if (typeof window.clearMcqQuestionTimer === "function") {
+                window.clearMcqQuestionTimer();
+            }
 
             let score = 0;
             let correct = 0;
@@ -7507,6 +7913,9 @@
         async function loadExam(examId) {
             window.examSubmitted = false;
             window.answers = {};
+            if (typeof window.clearMcqQuestionTimer === "function") {
+                window.clearMcqQuestionTimer();
+            }
             
             let questions = [];
             
@@ -7671,6 +8080,11 @@
             } else {
                 nextBtn.innerText = "Next";
             }
+
+            // Start MCQ Question speed timer if configured
+            if (typeof window.startMcqQuestionTimer === "function") {
+                window.startMcqQuestionTimer();
+            }
         };
 
         window.selectOption = function(el, answer) {
@@ -7681,6 +8095,23 @@
                 questionId: "q" + (window.currentQuestionIndex + 1),
                 answer: answer
             };
+            
+            // Stop question countdown timer and update status
+            if (window.qbankSpeedTimerEnabled) {
+                if (typeof window.clearMcqQuestionTimer === "function") {
+                    window.clearMcqQuestionTimer();
+                }
+                const timerValEl = document.getElementById('mcq_countdown_value');
+                const progressEl = document.getElementById('mcq_countdown_progress');
+                if (timerValEl) {
+                    timerValEl.innerHTML = `<span style="color:#10B981; font-weight:800;">⏱️ উত্তর দেওয়া হয়েছে</span>`;
+                }
+                if (progressEl) {
+                    progressEl.style.width = '100%';
+                    progressEl.style.background = '#10B981';
+                }
+            }
+            
             renderPalette();
         };
 
@@ -10215,10 +10646,29 @@
         // Retrieve historical last attempt
         async function loadLastResult() {
             const uid = localStorage.getItem("uid") || "u1";
+            const recentResultBox = document.getElementById("homeRecentResultContent");
             try {
                 const q = query(collection(db, "results"), where("userId", "==", uid));
                 const snap = await getDocs(q);
-                if (snap.empty) return;
+                
+                if (snap.empty) {
+                    if (recentResultBox) {
+                        recentResultBox.innerHTML = `
+                            <div style="text-align: center; padding: 25px 15px; border-radius: 16px; background: rgba(0, 191, 161, 0.05); border: 1.5px dashed rgba(0, 191, 161, 0.2); margin-top: 8px;" class="metric-block">
+                                <span style="font-size: 32px; display: block; margin-bottom: 8px;">🎯</span>
+                                <p style="margin: 0 0 12px 0; font-size: 13.5px; font-weight: 700; color: #475569;" class="dark:text-slate-300">আপনি এখনও কোনো পরীক্ষায় অংশ নেননি!</p>
+                                <button onclick="showPage('exam-page', document.getElementById('nav-exams'))" style="background: #00BFA1; color: white; border: none; padding: 8px 18px; border-radius: 12px; font-weight: 800; font-size: 12.5px; cursor: pointer; transition: all 0.2s; box-shadow: 0 2px 8px rgba(0, 191, 161, 0.25); display: inline-flex; align-items: center; gap: 6px;" onmouseover="this.style.background='#009688'" onmouseout="this.style.background='#00BFA1'">
+                                    পরীক্ষা শুরু করুন 🚀
+                                </button>
+                            </div>
+                        `;
+                    }
+                    const scoreDisplay = document.getElementById("home-score-display");
+                    const examsDisplay = document.getElementById("home-exams-display");
+                    if (scoreDisplay) scoreDisplay.innerText = "0";
+                    if (examsDisplay) examsDisplay.innerText = "0";
+                    return;
+                }
 
                 let results = [];
                 snap.forEach(docSnap => {
@@ -10236,8 +10686,61 @@
                 window.lastResult = results[0];
                 
                 // Update stats counts
-                document.getElementById("home-score-display").innerText = window.lastResult.score || 1280;
+                document.getElementById("home-score-display").innerText = window.lastResult.score || 0;
                 document.getElementById("home-exams-display").innerText = results.length;
+
+                // Dynamically render the recent result card content
+                if (recentResultBox && window.lastResult) {
+                    const item = window.lastResult;
+                    const examTitle = item.examTitle || item.examId || "General Mock Test";
+                    const courseTitle = item.courseTitle || "General Subject";
+                    const score = item.score !== undefined ? item.score : 0;
+                    const correct = item.correct !== undefined ? item.correct : 0;
+                    const wrong = item.wrong !== undefined ? item.wrong : 0;
+                    const timeTaken = item.timeTaken || "0";
+                    const dateText = item.submittedAt?.toDate ? item.submittedAt.toDate().toLocaleDateString('bn-BD', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : (item.submittedAt ? new Date(item.submittedAt).toLocaleDateString() : "");
+
+                    recentResultBox.innerHTML = `
+                        <div style="border-radius: 16px; background: #FAF5FF; padding: 16px; border: 1px solid #E9D5FF; margin-top: 8px;" class="recent-result-item-card">
+                            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; flex-wrap: wrap; gap: 8px;">
+                                <div>
+                                    <div style="font-size: 11px; font-weight: 800; color: #7C3AED; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px; display: flex; align-items: center; gap: 4px;">
+                                        <span>📚</span> ${courseTitle}
+                                    </div>
+                                    <h4 style="font-size: 14.5px; font-weight: 800; color: #0F172A; margin: 0; line-height: 1.35;" class="dark:text-white">${examTitle}</h4>
+                                </div>
+                                <span style="font-size: 10.5px; font-weight: 700; color: #64748B; background: rgba(100, 116, 139, 0.08); padding: 4px 10px; border-radius: 30px; border: 1px solid rgba(100, 116, 139, 0.15); font-family: monospace;">
+                                    ⏱️ ${timeTaken} মিঃ
+                                </span>
+                            </div>
+                            
+                            <!-- Mini metric scorecard -->
+                            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 15px;">
+                                <div style="background: white; border-radius: 12px; padding: 10px; text-align: center; border: 1px solid #F1F5F9; box-shadow: 0 1px 3px rgba(0,0,0,0.02);" class="metric-block">
+                                    <div style="font-size: 10.5px; color: #64748B; font-weight: 700; margin-bottom: 4px;">প্রাপ্ত স্কোর</div>
+                                    <div style="font-size: 16px; font-weight: 900; color: #7C3AED;">${score}</div>
+                                </div>
+                                <div style="background: white; border-radius: 12px; padding: 10px; text-align: center; border: 1px solid #F1F5F9; box-shadow: 0 1px 3px rgba(0,0,0,0.02);" class="metric-block">
+                                    <div style="font-size: 10.5px; color: #64748B; font-weight: 700; margin-bottom: 4px;">সঠিক উত্তর</div>
+                                    <div style="font-size: 16px; font-weight: 900; color: #10B981;">${correct}</div>
+                                </div>
+                                <div style="background: white; border-radius: 12px; padding: 10px; text-align: center; border: 1px solid #F1F5F9; box-shadow: 0 1px 3px rgba(0,0,0,0.02);" class="metric-block">
+                                    <div style="font-size: 10.5px; color: #64748B; font-weight: 700; margin-bottom: 4px;">ভুল উত্তর</div>
+                                    <div style="font-size: 16px; font-weight: 900; color: #EF4444;">${wrong}</div>
+                                </div>
+                            </div>
+                            
+                            <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; padding-top: 10px; border-top: 1px dashed #E2E8F0;">
+                                <span style="font-size: 10.5px; color: #94A3B8; font-weight: 600; display: flex; align-items: center; gap: 4px;">
+                                    📅 ${dateText}
+                                </span>
+                                <button onclick="viewSpecificResult('${item.id}')" style="background: #7C3AED; color: white; border: none; padding: 8px 14px; border-radius: 10px; font-weight: 800; font-size: 11.5px; cursor: pointer; transition: all 0.2s; box-shadow: 0 2px 8px rgba(124, 58, 237, 0.25); display: flex; align-items: center; gap: 6px;" onmouseover="this.style.background='#6D28D9'" onmouseout="this.style.background='#7C3AED'">
+                                    <span>🔍</span> বিস্তারিত দেখুন &rarr;
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                }
 
                 // Calculate Streak
                 let dates = [];
@@ -10381,6 +10884,104 @@
                 }
             }
         }
+
+        // ----------------------------------------------------
+        // TOPIC 5: REFERRAL & EARN CLIENT LOGIC
+        // ----------------------------------------------------
+        window.copyReferralCode = function() {
+            const code = document.getElementById("myReferralCode").innerText;
+            navigator.clipboard.writeText(code).then(() => {
+                alert("📋 আপনার রেফারেল কোড কপি করা হয়েছে: " + code);
+            }).catch(() => {
+                const input = document.createElement("input");
+                input.value = code;
+                document.body.appendChild(input);
+                input.select();
+                document.execCommand("copy");
+                document.body.removeChild(input);
+                alert("📋 আপনার রেফারেল কোড কপি করা হয়েছে: " + code);
+            });
+        };
+
+        window.applyFriendReferral = async function() {
+            const uid = localStorage.getItem("uid");
+            if (!uid) {
+                alert("⚠️ দয়া করে আগে লগইন করুন!");
+                return;
+            }
+            const codeInp = document.getElementById("inputFriendReferralCode");
+            if (!codeInp) return;
+            const code = codeInp.value.trim().toUpperCase();
+            if (!code) {
+                alert("⚠️ দয়া করে সঠিক কোডটি প্রদান করুন!");
+                return;
+            }
+
+            const btn = document.getElementById("applyReferralBtn");
+            if (btn) {
+                btn.disabled = true;
+                btn.innerText = "প্রয়োগ হচ্ছে...";
+            }
+
+            try {
+                // Fetch current user document
+                const myRef = doc(db, "users", uid);
+                const mySnap = await getDoc(myRef);
+                if (!mySnap.exists()) {
+                    alert("⚠️ ব্যবহারকারী তথ্য খুঁজে পাওয়া যায়নি!");
+                    return;
+                }
+                const myData = mySnap.data();
+                if (myData.referredBy) {
+                    alert("⚠️ আপনি ইতিমধ্যে একটি রেফারেল কোড ব্যবহার করেছেন!");
+                    return;
+                }
+                if (myData.referralCode === code) {
+                    alert("⚠️ আপনি নিজের রেফারেল কোড ব্যবহার করতে পারবেন না!");
+                    return;
+                }
+
+                // Query for the friend who owns the referral code
+                const q = query(collection(db, "users"), where("referralCode", "==", code));
+                const querySnap = await getDocs(q);
+                if (querySnap.empty) {
+                    alert("⚠️ দুঃখিত, সঠিক বা সক্রিয় রেফারেল কোড প্রদান করুন!");
+                    return;
+                }
+
+                let friendDoc = null;
+                querySnap.forEach(docS => {
+                    friendDoc = docS;
+                });
+
+                const reward = window.adminSettings.referralReward !== undefined ? Number(window.adminSettings.referralReward) : 10;
+
+                // Atomic updates
+                await updateDoc(myRef, {
+                    referredBy: code,
+                    referralBonusLimit: increment(reward)
+                });
+
+                await updateDoc(doc(db, "users", friendDoc.id), {
+                    referralCount: increment(1),
+                    referralBonusLimit: increment(reward)
+                });
+
+                alert(`🎉 অভিনন্দন! রেফারেল কোড সফলভাবে যুক্ত হয়েছে। আপনি এবং আপনার বন্ধু দুজনেই +${reward}টি অতিরিক্ত দৈনিক প্রশ্ন লিমিট পেয়েছেন!`);
+                
+                // Reload profile statistics instantly
+                await window.loadProfileStats();
+
+            } catch (error) {
+                console.error("applyFriendReferral error:", error);
+                alert("⚠️ কোড প্রয়োগ করার সময় সমস্যা হয়েছে। দয়া করে আবার চেষ্টা করুন।");
+            } finally {
+                if (btn) {
+                    btn.disabled = false;
+                    btn.innerText = "প্রয়োগ করুন";
+                }
+            }
+        };
 
         // ----------------------------------------------------
         // SUPPORT & CONTACT MODAL CONTROLLERS
@@ -11088,6 +11689,200 @@
         window.qbankSelectedCategory = null;
         window.qbankSelectedSubcategory = null;
         window.qbankActiveSubject = "Directory"; // "Directory", "Subcategories", "Questions", "Bookmarks"
+        window.qbankMode = "practice";
+        window.qbankSpeedTimerEnabled = false;
+        window.qbankSpeedTimerSeconds = 30;
+        window.qbankActiveSpeedIndex = 0;
+        window.qbankPracticeAnswers = {};
+        window.qbankTimerInterval = null;
+
+        window.clearQbankTimer = function() {
+            if (window.qbankTimerInterval) {
+                clearInterval(window.qbankTimerInterval);
+                window.qbankTimerInterval = null;
+            }
+        };
+
+        window.startQbankCountdown = function(qId, seconds) {
+            window.clearQbankTimer();
+            
+            let timeLeft = seconds;
+            const timerValEl = document.getElementById('qbank_countdown_value');
+            const progressEl = document.getElementById('qbank_countdown_progress');
+            
+            if (timerValEl) {
+                timerValEl.innerHTML = `⏱️ <span style="font-size: 15px; font-weight: 800; color: #00BFA1;">${timeLeft}</span> সেকেন্ড বাকি`;
+            }
+            if (progressEl) {
+                progressEl.style.width = '100%';
+                progressEl.style.background = '#00BFA1';
+            }
+            
+            window.qbankTimerInterval = setInterval(() => {
+                timeLeft--;
+                
+                if (timerValEl) {
+                    timerValEl.innerHTML = `⏱️ <span style="font-size: 15px; font-weight: 800; color: ${timeLeft <= 5 ? '#EF4444' : '#00BFA1'};">${timeLeft}</span> সেকেন্ড বাকি`;
+                    if (timeLeft <= 5) {
+                        // Soft scaling effect to indicate countdown tension
+                        timerValEl.style.transform = 'scale(1.05)';
+                        setTimeout(() => { timerValEl.style.transform = 'scale(1)'; }, 150);
+                    }
+                }
+                if (progressEl) {
+                    progressEl.style.width = (timeLeft / seconds) * 100 + '%';
+                    if (timeLeft <= 5) {
+                        progressEl.style.background = '#EF4444';
+                    }
+                }
+                
+                if (timeLeft <= 0) {
+                    window.clearQbankTimer();
+                    // Time's up! Force reveal answer as incorrect (-1)
+                    window.revealQbankAnswer(qId, -1);
+                }
+            }, 1000);
+        };
+
+        window.toggleQbankSpeedTimer = function(enabled) {
+            window.qbankSpeedTimerEnabled = enabled;
+            window.qbankActiveSpeedIndex = 0;
+            window.qbankPracticeAnswers = {}; // Reset speed training session answers
+            window.clearQbankTimer();
+            window.filterQuestionBankQuestions();
+        };
+
+        window.updateQbankSpeedSeconds = function() {
+            const selectEl = document.getElementById("qbankSpeedSeconds");
+            if (selectEl) {
+                window.qbankSpeedTimerSeconds = parseInt(selectEl.value, 10) || 30;
+                if (window.qbankSpeedTimerEnabled) {
+                    window.qbankActiveSpeedIndex = 0;
+                    window.qbankPracticeAnswers = {};
+                    window.clearQbankTimer();
+                    window.filterQuestionBankQuestions();
+                }
+            }
+        };
+
+        window.toggleExamSpeedTimer = function(enabled) {
+            window.qbankSpeedTimerEnabled = enabled;
+            const qbankToggle = document.getElementById("qbankSpeedTimerToggle");
+            if (qbankToggle) qbankToggle.checked = enabled;
+        };
+
+        window.updateExamSpeedSeconds = function() {
+            const selectEl = document.getElementById("examSpeedSeconds");
+            if (selectEl) {
+                const val = parseInt(selectEl.value, 10) || 30;
+                window.qbankSpeedTimerSeconds = val;
+                const qbankSelect = document.getElementById("qbankSpeedSeconds");
+                if (qbankSelect) qbankSelect.value = val.toString();
+            }
+        };
+
+        window.mcqQuestionTimeLeft = 0;
+        window.mcqQuestionTimerInterval = null;
+
+        window.clearMcqQuestionTimer = function() {
+            if (window.mcqQuestionTimerInterval) {
+                clearInterval(window.mcqQuestionTimerInterval);
+                window.mcqQuestionTimerInterval = null;
+            }
+        };
+
+        window.startMcqQuestionTimer = function() {
+            window.clearMcqQuestionTimer();
+            
+            const panel = document.getElementById("mcqSpeedTimerPanel");
+            if (!panel) return;
+
+            if (!window.qbankSpeedTimerEnabled) {
+                panel.style.display = "none";
+                return;
+            }
+            
+            panel.style.display = "block";
+            
+            const index = window.currentQuestionIndex;
+            const timerValEl = document.getElementById('mcq_countdown_value');
+            const progressEl = document.getElementById('mcq_countdown_progress');
+
+            // Check if user has already answered this question
+            if (window.answers && window.answers[index]) {
+                const ans = window.answers[index];
+                if (timerValEl) {
+                    if (ans.answer === -1) {
+                        timerValEl.innerHTML = `<span style="color:#EF4444; font-weight:800;">⏱️ সময় শেষ! (Timeout)</span>`;
+                    } else {
+                        timerValEl.innerHTML = `<span style="color:#10B981; font-weight:800;">⏱️ উত্তর দেওয়া হয়েছে</span>`;
+                    }
+                }
+                if (progressEl) {
+                    progressEl.style.width = '100%';
+                    progressEl.style.background = ans.answer === -1 ? '#EF4444' : '#10B981';
+                }
+                return;
+            }
+
+            let seconds = window.qbankSpeedTimerSeconds || 30;
+            window.mcqQuestionTimeLeft = seconds;
+            
+            if (timerValEl) {
+                timerValEl.innerHTML = `⏱️ <span style="font-size: 15px; font-weight: 800; color: #00BFA1;">${seconds}</span> সেকেন্ড বাকি`;
+            }
+            if (progressEl) {
+                progressEl.style.width = '100%';
+                progressEl.style.background = '#00BFA1';
+            }
+            
+            window.mcqQuestionTimerInterval = setInterval(() => {
+                window.mcqQuestionTimeLeft--;
+                
+                if (timerValEl) {
+                    timerValEl.innerHTML = `⏱️ <span style="font-size: 15px; font-weight: 800; color: ${window.mcqQuestionTimeLeft <= 5 ? '#EF4444' : '#00BFA1'};">${window.mcqQuestionTimeLeft}</span> সেকেন্ড বাকি`;
+                    if (window.mcqQuestionTimeLeft <= 5) {
+                        timerValEl.style.transform = 'scale(1.05)';
+                        setTimeout(() => { timerValEl.style.transform = 'scale(1)'; }, 150);
+                    }
+                }
+                if (progressEl) {
+                    progressEl.style.width = (window.mcqQuestionTimeLeft / seconds) * 100 + '%';
+                    if (window.mcqQuestionTimeLeft <= 5) {
+                        progressEl.style.background = '#EF4444';
+                    }
+                }
+                
+                if (window.mcqQuestionTimeLeft <= 0) {
+                    window.clearMcqQuestionTimer();
+                    
+                    window.answers[window.currentQuestionIndex] = {
+                        questionId: "q" + (window.currentQuestionIndex + 1),
+                        answer: -1
+                    };
+                    renderPalette();
+                    
+                    if (timerValEl) {
+                        timerValEl.innerHTML = `<span style="color:#EF4444; font-weight:800;">⏱️ সময় শেষ! (Timeout)</span>`;
+                    }
+                    if (progressEl) {
+                        progressEl.style.width = '100%';
+                        progressEl.style.background = '#EF4444';
+                    }
+                    
+                    window.showMiniToast("⏱️ সময় শেষ! পরবর্তী প্রশ্নে নিয়ে যাওয়া হচ্ছে...");
+                    
+                    setTimeout(() => {
+                        if (window.currentQuestionIndex < window.questionsList.length - 1) {
+                            window.currentQuestionIndex++;
+                            window.loadQuestion();
+                        } else {
+                            finishExam();
+                        }
+                    }, 1200);
+                }
+            }, 1000);
+        };
 
         // Initialize the Question Bank
         window.initQuestionBank = async function() {
@@ -11486,6 +12281,9 @@
 
         // Back to category directory
         window.backToQbankDirectory = function() {
+            window.clearQbankTimer();
+            window.qbankActiveSpeedIndex = 0;
+            window.qbankPracticeAnswers = {};
             window.qbankActiveSubject = "Directory";
             const dirSection = document.getElementById("qbankDirectorySection");
             const subSection = document.getElementById("qbankSubcategoriesSection");
@@ -11498,6 +12296,9 @@
 
         // Back to subcategories view
         window.backToQbankSubcategories = function() {
+            window.clearQbankTimer();
+            window.qbankActiveSpeedIndex = 0;
+            window.qbankPracticeAnswers = {};
             if (window.qbankActiveSubject === "Bookmarks" || !window.qbankSelectedCategory) {
                 window.backToQbankDirectory();
                 return;
@@ -11539,6 +12340,9 @@
 
         // Enter specific Subcategory / Topic
         window.enterQbankSubcategory = function(subId) {
+            window.clearQbankTimer();
+            window.qbankActiveSpeedIndex = 0;
+            window.qbankPracticeAnswers = {};
             window.qbankSelectedSubcategory = subId;
             window.qbankActiveSubject = "Questions";
 
@@ -11576,6 +12380,9 @@
 
         // Enter Bookmarks lists directly from Tier 1 directory
         window.enterQbankBookmarks = function() {
+            window.clearQbankTimer();
+            window.qbankActiveSpeedIndex = 0;
+            window.qbankPracticeAnswers = {};
             window.qbankActiveSubject = "Bookmarks";
 
             // Set Breadcrumb
@@ -11867,8 +12674,201 @@
 
             // Apply free limits if user is free
             const isPremium = window.checkIsPremiumOrHasPurchasedCurrentCourse();
-            const limit = (window.adminSettings && window.adminSettings.freeQuestionLimit) || 5;
+            let limit = (window.adminSettings && window.adminSettings.freeQuestionLimit) || 5;
+            if (window.currentUserData && window.currentUserData.referralBonusLimit) {
+                limit += Number(window.currentUserData.referralBonusLimit);
+            }
             const visibleFiltered = isPremium ? filtered : filtered.slice(0, limit);
+
+            if (window.qbankSpeedTimerEnabled && window.qbankMode === "practice") {
+                const totalQuestions = visibleFiltered.length;
+                if (window.qbankActiveSpeedIndex >= totalQuestions) {
+                    window.qbankActiveSpeedIndex = totalQuestions - 1;
+                }
+                if (window.qbankActiveSpeedIndex < 0) {
+                    window.qbankActiveSpeedIndex = 0;
+                }
+                
+                const qIndex = window.qbankActiveSpeedIndex;
+                const q = visibleFiltered[qIndex];
+                const savedAns = window.qbankPracticeAnswers[q.id]; // undefined if not answered, -1 if timeout, or 1/2/3/4
+                
+                // Build Tracker dots HTML
+                let dotsHtml = `<div style="display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 16px; justify-content: center;">`;
+                for (let i = 0; i < totalQuestions; i++) {
+                    const qi = visibleFiltered[i];
+                    const qiAns = window.qbankPracticeAnswers[qi.id];
+                    let btnStyle = "background: #F1F5F9; border: 1.5px solid #CBD5E1; color: #475569;";
+                    let icon = "";
+                    if (i === qIndex) {
+                        btnStyle = "background: #FFF; border: 2.5px solid #00BFA1; color: #00BFA1; font-weight: 900; transform: scale(1.1);";
+                    } else if (qiAns !== undefined) {
+                        if (qiAns === -1) {
+                            btnStyle = "background: #FEF2F2; border: 1.5px solid #FCA5A5; color: #EF4444; font-weight: 700;";
+                            icon = "⏱️";
+                        } else if (qiAns === qi.correctAnswer) {
+                            btnStyle = "background: #F0FDF4; border: 1.5px solid #86EFAC; color: #10B981; font-weight: 700;";
+                            icon = "✅";
+                        } else {
+                            btnStyle = "background: #FEF2F2; border: 1.5px solid #FCA5A5; color: #EF4444; font-weight: 700;";
+                            icon = "❌";
+                        }
+                    }
+                    
+                    dotsHtml += `
+                        <button onclick="window.qbankActiveSpeedIndex = ${i}; window.clearQbankTimer(); window.filterQuestionBankQuestions();" style="width: 32px; height: 32px; border-radius: 50%; font-size: 11.5px; font-weight: 700; cursor: pointer; transition: all 0.2s; display: inline-flex; align-items: center; justify-content: center; ${btnStyle}" title="প্রশ্ন ${i+1}">
+                            ${icon ? icon : (i + 1)}
+                        </button>
+                    `;
+                }
+                dotsHtml += `</div>`;
+
+                // Build Timer bar HTML
+                const timerBarHtml = `
+                    <div style="background: #F8FAFC; border: 1.5px solid #E2E8F0; border-radius: 16px; padding: 12px; margin-bottom: 16px; box-sizing: border-box;" class="metric-block">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                            <span id="qbank_countdown_value" style="font-size: 13px; font-weight: 700; color: #475569; display: flex; align-items: center; gap: 4px; transition: transform 0.15s ease;" class="dark:text-slate-300">
+                                ⏱️ লোড হচ্ছে...
+                            </span>
+                            <span style="font-size: 11.5px; font-weight: 800; color: #00BFA1; background: #EBFDF9; padding: 2px 8px; border-radius: 30px;" class="dark:bg-teal-950/40 dark:text-teal-400">
+                                স্পিড ট্রেইনিং
+                            </span>
+                        </div>
+                        <div style="width: 100%; height: 6px; background: #E2E8F0; border-radius: 30px; overflow: hidden; border: 1px solid #F1F5F9;" class="dark:bg-slate-800 dark:border-slate-700">
+                            <div id="qbank_countdown_progress" style="width: 100%; height: 100%; background: #00BFA1; border-radius: 30px; transition: width 1s linear, background-color 0.3s;"></div>
+                        </div>
+                    </div>
+                `;
+
+                // Question Card Option styling
+                const getOptStyle = (optNum) => {
+                    if (savedAns !== undefined) {
+                        if (optNum === q.correctAnswer) {
+                            return "background: #F0FDF4; border: 1.5px solid #86EFAC; color: #166534;";
+                        }
+                        if (savedAns === optNum) {
+                            return "background: #FEF2F2; border: 1.5px solid #FCA5A5; color: #991B1B;";
+                        }
+                    }
+                    return "background: #F8FAFC; border: 1.5px solid #F1F5F9; color: #334155;";
+                };
+                
+                const getOptLabelStyle = (optNum) => {
+                    if (savedAns !== undefined) {
+                        if (optNum === q.correctAnswer) {
+                            return "background: #22C55E; color: #FFFFFF;";
+                        }
+                        if (savedAns === optNum) {
+                            return "background: #EF4444; color: #FFFFFF;";
+                        }
+                    }
+                    return "background: #E2E8F0; color: #475569;";
+                };
+
+                const isSaved = savedIds.includes(q.id);
+                const blockId = `qbank_ans_container_${q.id}`;
+                const hasAnswered = savedAns !== undefined;
+
+                let arenaCardHtml = `
+                    <div style="margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center;">
+                        <span style="font-size: 13.5px; font-weight: 800; color: #475569;" class="dark:text-slate-300">
+                            📝 প্রশ্ন ${qIndex + 1} / ${totalQuestions}
+                        </span>
+                        <div style="display: flex; gap: 8px;">
+                            <button onclick="window.qbankActiveSpeedIndex = ${Math.max(0, qIndex - 1)}; window.clearQbankTimer(); window.filterQuestionBankQuestions();" ${qIndex === 0 ? "disabled style='opacity:0.5; cursor:not-allowed;'" : "style='cursor:pointer;'"} style="background: #F1F5F9; border: 1.5px solid #E2E8F0; border-radius: 10px; color: #475569; padding: 6px 12px; font-size: 12px; font-weight: 700; display: inline-flex; align-items: center; gap: 4px; transition: all 0.2s;" class="metric-block dark:text-slate-300">
+                                &larr; পূর্ববর্তী
+                            </button>
+                            <button id="qbankSpeedNextBtn" onclick="window.qbankActiveSpeedIndex = ${Math.min(totalQuestions - 1, qIndex + 1)}; window.clearQbankTimer(); window.filterQuestionBankQuestions();" ${!hasAnswered ? "disabled style='opacity:0.5; cursor:not-allowed;'" : "style='cursor:pointer;'"} style="background: #00BFA1; border: none; border-radius: 10px; color: white; padding: 6px 14px; font-size: 12px; font-weight: 700; display: inline-flex; align-items: center; gap: 4px; transition: all 0.2s; box-shadow: 0 2px 6px rgba(0, 191, 161, 0.15);">
+                                পরবর্তী &rarr;
+                            </button>
+                        </div>
+                    </div>
+
+                    ${dotsHtml}
+                    ${timerBarHtml}
+
+                    <div class="card" style="position: relative; padding: 18px; margin-bottom: 0; overflow: hidden; border: 1.5px solid #E2E8F0; border-radius: 20px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                            <span style="background: rgba(0, 191, 166, 0.08); color: #00BFA1; font-size: 11px; font-weight: 800; padding: 3px 10px; border-radius: 6px; text-transform: uppercase; letter-spacing: 0.3px;">
+                                📚 ${q.subject || "সাধারণ বিষয়"}
+                            </span>
+                            <button onclick="window.toggleQbankBookmark('${q.id}')" style="background: transparent; border: none; font-size: 18px; cursor: pointer; transition: transform 0.15s; outline: none; padding: 4px;" onmouseover="this.style.transform='scale(1.15)'" onmouseout="this.style.transform='scale(1)'">
+                                ${isSaved ? "❤️" : "🤍"}
+                            </button>
+                        </div>
+
+                        <h4 style="font-size: 15px; font-weight: 800; color: #0F172A; line-height: 1.5; margin: 0 0 12px 0;" class="dark:text-white">
+                            ${qIndex + 1}. ${q.question}
+                        </h4>
+
+                        <div style="display: grid; grid-template-columns: 1fr; gap: 8px; margin-bottom: 14px;">
+                            <div id="opt_${q.id}_1" onclick="if(!${hasAnswered}){ window.revealQbankAnswer('${q.id}', 1); }" style="display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 10px; cursor: ${hasAnswered ? 'default' : 'pointer'}; font-size: 13.5px; font-weight: 600; transition: all 0.15s; ${getOptStyle(1)}" class="dark:bg-slate-800 dark:border-slate-700 dark:text-slate-200">
+                                <span style="display: inline-flex; align-items: center; justify-content: center; width: 22px; height: 22px; border-radius: 50%; font-size: 11px; font-weight: 800; text-transform: uppercase; ${getOptLabelStyle(1)}">A</span>
+                                <span>${q.option1}</span>
+                            </div>
+                            <div id="opt_${q.id}_2" onclick="if(!${hasAnswered}){ window.revealQbankAnswer('${q.id}', 2); }" style="display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 10px; cursor: ${hasAnswered ? 'default' : 'pointer'}; font-size: 13.5px; font-weight: 600; transition: all 0.15s; ${getOptStyle(2)}" class="dark:bg-slate-800 dark:border-slate-700 dark:text-slate-200">
+                                <span style="display: inline-flex; align-items: center; justify-content: center; width: 22px; height: 22px; border-radius: 50%; font-size: 11px; font-weight: 800; text-transform: uppercase; ${getOptLabelStyle(2)}">B</span>
+                                <span>${q.option2}</span>
+                            </div>
+                            <div id="opt_${q.id}_3" onclick="if(!${hasAnswered}){ window.revealQbankAnswer('${q.id}', 3); }" style="display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 10px; cursor: ${hasAnswered ? 'default' : 'pointer'}; font-size: 13.5px; font-weight: 600; transition: all 0.15s; ${getOptStyle(3)}" class="dark:bg-slate-800 dark:border-slate-700 dark:text-slate-200">
+                                <span style="display: inline-flex; align-items: center; justify-content: center; width: 22px; height: 22px; border-radius: 50%; font-size: 11px; font-weight: 800; text-transform: uppercase; ${getOptLabelStyle(3)}">C</span>
+                                <span>${q.option3}</span>
+                            </div>
+                            <div id="opt_${q.id}_4" onclick="if(!${hasAnswered}){ window.revealQbankAnswer('${q.id}', 4); }" style="display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 10px; cursor: ${hasAnswered ? 'default' : 'pointer'}; font-size: 13.5px; font-weight: 600; transition: all 0.15s; ${getOptStyle(4)}" class="dark:bg-slate-800 dark:border-slate-700 dark:text-slate-200">
+                                <span style="display: inline-flex; align-items: center; justify-content: center; width: 22px; height: 22px; border-radius: 50%; font-size: 11px; font-weight: 800; text-transform: uppercase; ${getOptLabelStyle(4)}">D</span>
+                                <span>${q.option4}</span>
+                            </div>
+                        </div>
+
+                        <div style="display: flex; gap: 8px; justify-content: space-between; align-items: center; border-top: 1px dashed #E2E8F0; padding-top: 12px; margin-top: 10px;" class="dark:border-slate-700">
+                            <button onclick="window.toggleQbankExplAccord('${q.id}')" style="background: #EBFDF9; color: #00BFA1; border: none; padding: 8px 16px; border-radius: 30px; font-size: 12.5px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 4px; transition: background 0.15s;" onmouseover="this.style.background='#D1F2EB'" onmouseout="this.style.background='#EBFDF9'" class="dark:bg-teal-950/40 dark:text-teal-400">
+                                👁️ উত্তর ও ব্যাখ্যা দেখুন
+                            </button>
+                            <button onclick="window.openQbankReportModal('${q.id}')" style="background: #FEF2F2; color: #EF4444; border: none; padding: 8px 16px; border-radius: 30px; font-size: 12.5px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 4px; transition: background 0.15s;" onmouseover="this.style.background='#FEE2E2'" onmouseout="this.style.background='#FEF2F2'" class="dark:bg-rose-950/30 dark:text-rose-400">
+                                ⚠️ ভুল রিপোর্ট করুন
+                            </button>
+                        </div>
+
+                        <div id="${blockId}" style="display: ${hasAnswered ? 'block' : 'none'}; margin-top: 12px; background: #FFFBEB; border: 1.5px solid #FCD34D; border-radius: 10px; padding: 12px; box-sizing: border-box;" class="dark:bg-slate-800 dark:border-slate-700">
+                            <p style="font-size: 13px; font-weight: 700; color: #166534; margin: 0 0 6px 0; display: flex; align-items: center; gap: 4px;" class="dark:text-green-400">
+                                <span>✅ সঠিক উত্তর:</span> 
+                                <span style="background: #D1F2EB; color: #047857; padding: 2px 10px; border-radius: 30px; font-size: 11.5px;" class="dark:bg-green-950 dark:text-green-300">অপশন ${q.correctAnswer === 1 ? 'A' : q.correctAnswer === 2 ? 'B' : q.correctAnswer === 3 ? 'C' : 'D'} (${q.correctAnswer === 1 ? q.option1 : q.correctAnswer === 2 ? q.option2 : q.correctAnswer === 3 ? q.option3 : q.correctAnswer === 4 ? q.option4 : ''})</span>
+                            </p>
+                            <div style="border-top: 1px dashed rgba(217, 119, 6, 0.2); margin: 6px 0; padding-top: 6px;" class="dark:border-slate-700"></div>
+                            <p style="font-size: 12.5px; font-weight: 600; color: #B45309; margin: 0; line-height: 1.55;" class="dark:text-amber-300">
+                                💡 <strong>বিস্তারিত বিশ্লেষণ:</strong><br>${q.explanation || "কোনো সঠিক ব্যাখ্যা সংযুক্ত করা হয়নি।"}
+                            </p>
+                        </div>
+                    </div>
+                `;
+
+                container.innerHTML = arenaCardHtml;
+
+                // Start timer if not already answered
+                if (!hasAnswered) {
+                    setTimeout(() => {
+                        window.startQbankCountdown(q.id, window.qbankSpeedTimerSeconds);
+                    }, 50);
+                } else {
+                    // Update timer text directly to show it was answered
+                    setTimeout(() => {
+                        const timerValEl = document.getElementById('qbank_countdown_value');
+                        const progressEl = document.getElementById('qbank_countdown_progress');
+                        if (timerValEl) {
+                            if (savedAns === -1) {
+                                timerValEl.innerHTML = `<span style="color:#EF4444; font-weight:800;">⏱️ সময় শেষ! (Timeout)</span>`;
+                            } else {
+                                timerValEl.innerHTML = `<span style="color:#10B981; font-weight:800;">⏱️ উত্তর দেওয়া হয়েছে</span>`;
+                            }
+                        }
+                        if (progressEl) {
+                            progressEl.style.width = '100%';
+                            progressEl.style.background = savedAns === -1 ? '#EF4444' : '#10B981';
+                        }
+                    }, 50);
+                }
+                return;
+            }
 
             let html = "";
             visibleFiltered.forEach((q, idx) => {
@@ -11993,6 +12993,69 @@
         window.revealQbankAnswer = function(qId, selectedOption) {
             const q = window.qbankAllQuestions.find(it => it.id === qId);
             if (!q) return;
+
+            // Play correct or incorrect sound effects
+            if (selectedOption === q.correctAnswer) {
+                if (typeof window.playCorrectSound === "function") {
+                    window.playCorrectSound();
+                }
+            } else {
+                if (typeof window.playIncorrectSound === "function") {
+                    window.playIncorrectSound();
+                }
+            }
+
+            // Handle speed training timer and answers
+            if (window.qbankSpeedTimerEnabled && window.qbankMode === "practice") {
+                window.clearQbankTimer();
+                if (!window.qbankPracticeAnswers) window.qbankPracticeAnswers = {};
+                window.qbankPracticeAnswers[qId] = selectedOption;
+                
+                // Update timer UI elements
+                const timerValEl = document.getElementById('qbank_countdown_value');
+                if (timerValEl) {
+                    if (selectedOption === -1) {
+                        timerValEl.innerHTML = `<span style="color:#EF4444; font-weight:800;">⏱️ সময় শেষ! (Timeout)</span>`;
+                    } else {
+                        timerValEl.innerHTML = `<span style="color:#10B981; font-weight:800;">⏱️ উত্তর দেওয়া হয়েছে</span>`;
+                    }
+                }
+                const progressEl = document.getElementById('qbank_countdown_progress');
+                if (progressEl) {
+                    progressEl.style.width = '100%';
+                    progressEl.style.background = selectedOption === -1 ? '#EF4444' : '#10B981';
+                }
+                
+                // Enable Next Question button
+                const nextBtn = document.getElementById('qbankSpeedNextBtn');
+                if (nextBtn) {
+                    nextBtn.removeAttribute('disabled');
+                    nextBtn.style.opacity = '1';
+                    nextBtn.style.cursor = 'pointer';
+                }
+                
+                // Redraw active index dots/buttons if needed by scheduling a refresh or doing it dynamically
+                // But wait! Redrawing the whole page here would interrupt the focus/options, so we just update the specific button dot:
+                const dotButtons = document.querySelectorAll(`button[title="প্রশ্ন ${window.qbankActiveSpeedIndex + 1}"]`);
+                dotButtons.forEach(btn => {
+                    if (selectedOption === -1) {
+                        btn.style.background = "#FEF2F2";
+                        btn.style.borderColor = "#FCA5A5";
+                        btn.style.color = "#EF4444";
+                        btn.innerText = "⏱️";
+                    } else if (selectedOption === q.correctAnswer) {
+                        btn.style.background = "#F0FDF4";
+                        btn.style.borderColor = "#86EFAC";
+                        btn.style.color = "#10B981";
+                        btn.innerText = "✅";
+                    } else {
+                        btn.style.background = "#FEF2F2";
+                        btn.style.borderColor = "#FCA5A5";
+                        btn.style.color = "#EF4444";
+                        btn.innerText = "❌";
+                    }
+                });
+            }
 
             const normCorrect = q.correctAnswer;
             
