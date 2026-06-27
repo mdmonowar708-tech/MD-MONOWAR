@@ -30,13 +30,6 @@ export const SAMPLE_EXAMS: LiveExam[] = [
   }
 ];
 
-export const SAMPLE_COURSES = [
-  { id: "course_math", title: "Job Math Master Course" },
-  { id: "course_english", title: "English Grammar Premium" },
-  { id: "course_ict", title: "ICT Full Course" },
-  { id: "course_bcs", title: "BCS Preparation Masterclass" }
-];
-
 export const SAMPLE_QUESTIONS: Record<string, Question> = {
   q1: {
     id: "q1",

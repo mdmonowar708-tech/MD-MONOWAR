@@ -3615,6 +3615,10 @@
                     <!-- Payment Proof Fields -->
                     <div style="display: flex; flex-direction: column; gap: 12px;">
                         <div>
+                            <label style="display: block; font-size: 12px; font-weight: 700; color: #334155; margin-bottom: 5px;">কুপন কোড (Coupon Code - Optional)</label>
+                            <input id="storeCouponCode" type="text" placeholder="যদি থাকে" style="width: 100%; height: 42px; padding: 0 12px; border-radius: 10px; border: 1.5px solid #E2E8F0; font-size: 14px; font-weight: 600; box-sizing: border-box; outline: none; transition: border 0.2s; background: white;" onfocus="this.style.borderColor='#00BFA1';" oninput="updateStorePriceWithCoupon()">
+                        </div>
+                        <div>
                             <label style="display: block; font-size: 12px; font-weight: 700; color: #334155; margin-bottom: 5px;">যে নম্বর থেকে টাকা পাঠিয়েছেন (Sender Number)</label>
                             <input id="storeSenderNumber" type="tel" placeholder="01XXXXXXXXX" style="width: 100%; height: 42px; padding: 0 12px; border-radius: 10px; border: 1.5px solid #E2E8F0; font-size: 14px; font-weight: 600; box-sizing: border-box; outline: none; transition: border 0.2s; background: white;" onfocus="this.style.borderColor='#00BFA1';">
                         </div>
@@ -5842,8 +5846,7 @@
                 const snap = await getDocs(collection(db, "live_exams"));
                 if (snap.empty) {
                     console.log("No live exams collection found or empty in DB. Showing mock fallbacks.");
-                    examBox.innerHTML = generatePremiumExamCardHTML('exam_bcs_05', 'BCS Preliminary Mock Test #05', 60, 50, 'free', '৪৭তম বিসিএস প্রস্তুতি - ৭০ দিনে সম্পূর্ণ সিলেবাস।') +
-                                        generatePremiumExamCardHTML('exam_math_01', 'Primary & High School Maths Quiz #01', 30, 25, 'premium', '৪৭তম বিসিএস প্রস্তুতি - ৮৫ দিনে সম্পূর্ণ সিলেবাস।');
+                    examBox.innerHTML = "";
                     return;
                 }
 
@@ -6120,11 +6123,11 @@
             if (window.loadedCoursesMap && window.loadedCoursesMap[courseId]) {
                 courseTitle = window.loadedCoursesMap[courseId];
             } else if (courseId === 'course_bcs') {
-                courseTitle = "৪৭তম বিসিএস প্রস্তুতি - ৭০ দিনে সম্পূর্ণ সিলেবাস।";
+                courseTitle = "BCS Preparation Course";
             } else if (courseId === 'course_math') {
-                courseTitle = "৪৭তম বিসিএস প্রস্তুতি - ৮৫ দিনে সম্পূর্ণ সিলেবাস।";
+                courseTitle = "Math Course";
             } else if (courseId === 'course_ict') {
-                courseTitle = "৪৯তম বিশেষ জেনারেল পার্ট।";
+                courseTitle = "ICT Course";
             }
             
             // Set header values
@@ -6175,12 +6178,7 @@
                 });
             }
 
-            const coursesMap = Object.assign({
-                'course_math': '৪৭তম বিসিএস প্রস্তুতি - ৮৫ দিনে সম্পূর্ণ সিলেবাস।',
-                'course_bcs': '৪৭তম বিসিএস প্রস্তুতি - ৭০ দিনে সম্পূর্ণ সিলেবাস।',
-                'course_ict': '৪৯তম বিশেষ জেনারেল পার্ট।',
-                'course_english': 'ইংরেজি ব্যাকরণ প্রিমিয়াম (English Grammar Special)'
-            }, window.loadedCoursesMap || {});
+            const coursesMap = Object.assign({}, window.loadedCoursesMap || {});
             
             renderLiveExamsTab(tab, coursesMap);
         };
@@ -6351,12 +6349,7 @@
                 // Deep dynamic title resolution
                 let courseTitle = exam.courseTitle || exam.course_title || exam.courseName || exam.course_name || exam.course || exam.subject;
                 if (!courseTitle) {
-                    const resolvedCourseMap = Object.assign({
-                        'course_math': '৪৭তম বিসিএস প্রস্তুতি - ৮৫ দিনে সম্পূর্ণ সিলেবাস।',
-                        'course_bcs': '৪৭তম বিসিএস প্রস্তুতি - ৭০ দিনে সম্পূর্ণ সিলেবাস।',
-                        'course_ict': '৪৯তম বিশেষ জেনারেল পার্ট।',
-                        'course_english': 'ইংরেজি ব্যাকরণ প্রিমিয়াম (English Grammar Special)'
-                    }, window.loadedCoursesMap || {}, coursesMap || {});
+                    const resolvedCourseMap = Object.assign({}, window.loadedCoursesMap || {}, coursesMap || {});
                     
                     courseTitle = resolvedCourseMap[cId] || cId || 'সাধারণ প্রস্তুতি কোর্স';
                 }
@@ -6380,12 +6373,7 @@
             window.allUserResultsList = [];
 
             const coursesList = [];
-            const coursesMap = {
-                'course_bcs': '৪৭তম বিসিএস প্রস্তুতি - ৭০ দিনে সম্পূর্ণ সিলেবাস।',
-                'course_math': '৪৭তম বিসিএস প্রস্তুতি - ৮৫ দিনে সম্পূর্ণ সিলেবাস।',
-                'course_ict': '৪৯তম বিশেষ জেনারেল পার্ট।',
-                'course_english': 'ইংরেজি ব্যাকরণ প্রিমিয়াম (English Grammar Special)'
-            };
+            const coursesMap = {};
 
             let resultsSnap = null;
             let coursesSnap = null;
@@ -6433,6 +6421,11 @@
                     coursesSnap.forEach(cDoc => {
                         const cData = cDoc.data();
                         const realTitle = cData.title || cData.name || cData.courseName || cData.courseTitle || cData.course_name || cData.course_title;
+                        
+                        console.log("Processing course:", cDoc.id, realTitle);
+                        
+                        if (cDoc.id === '4poW2UhG9rm24ZcnZWku' || (realTitle && realTitle.includes('4poW2UhG9rm24ZcnZWku')) || (cData.name && cData.name.includes('4poW2UhG9rm24ZcnZWku'))) return;
+                        
                         if (realTitle) {
                             coursesMap[cDoc.id] = realTitle;
                         }
@@ -6568,7 +6561,7 @@
                 }
             }
 
-            window.allExamsCoursesList = coursesList;
+            window.allExamsCoursesList = coursesList.filter(c => c.id !== '4poW2UhG9rm24ZcnZWku' && c.title !== '4poW2UhG9rm24ZcnZWku' && c.name !== '4poW2UhG9rm24ZcnZWku');
             window.completedExamIdsSet = completedExamIds;
             window.hasFetchedCoursesAndExams = true;
 
@@ -6648,6 +6641,7 @@
                 let coursesHTML = "";
                 coursesList.forEach(course => {
                     if (!course || !course.id) return;
+                    if (course.id === '4poW2UhG9rm24ZcnZWku' || course.title === '4poW2UhG9rm24ZcnZWku') return;
                     const cId = course.id;
                     const isCourseFree = course.free === true || course.isFree === true || course.access === 'free' || (course.price !== undefined && Number(course.price) === 0) || (cId === 'course_ict');
                     
@@ -8350,6 +8344,14 @@
             const globalLoader = document.getElementById("globalSubmitLoader");
             if (globalLoader) globalLoader.style.display = "none";
 
+            if (user) {
+                // If we have a push token saved, associate it with the user
+                const token = localStorage.getItem("fcm_token") || window.pushNotificationToken;
+                if (token) {
+                    await saveTokenToUserDoc(token);
+                }
+            }
+
             // If user is authenticated but email is not verified, force them out
             if (user && !user.emailVerified) {
                 // Allow users registered before June 23, 2026 to bypass
@@ -8605,7 +8607,7 @@
                                     window.dynamicPurchasedTitlesMap = window.dynamicPurchasedTitlesMap || {};
                                     window.dynamicPurchasedTitlesMap[pData.itemId] = pData.itemName;
                                 }
-                                if (pData.itemType === "premium" || pData.itemId.includes("premium")) {
+                                if (pData.itemType === "premium") {
                                     isApprovedPremium = true;
                                 } else {
                                     if (!approvedPaymentPurchased.includes(pData.itemId)) {
@@ -8856,7 +8858,7 @@
                                     window.dynamicPurchasedTitlesMap = window.dynamicPurchasedTitlesMap || {};
                                     window.dynamicPurchasedTitlesMap[pData.itemId] = pData.itemName;
                                 }
-                                if (pData.itemType === "premium" || pData.itemId.includes("premium")) {
+                                if (pData.itemType === "premium") {
                                     isApprovedPremium = true;
                                 } else {
                                     if (!approvedPaymentPurchased.includes(pData.itemId)) {
@@ -8884,7 +8886,7 @@
                                         window.dynamicPurchasedTitlesMap = window.dynamicPurchasedTitlesMap || {};
                                         window.dynamicPurchasedTitlesMap[pData.itemId] = pData.itemName;
                                     }
-                                    if (pData.itemType === "premium" || pData.itemId.includes("premium")) {
+                                    if (pData.itemType === "premium") {
                                         isApprovedPremium = true;
                                     } else {
                                         if (!approvedPaymentPurchased.includes(pData.itemId)) {
@@ -9570,6 +9572,9 @@
                     coursesSnap.forEach(cDoc => {
                         const cData = cDoc.data();
                         const realTitle = cData.title || cData.name || cData.courseName || cData.courseTitle || cData.course_name || cData.course_title;
+                        
+                        if (cDoc.id === '4poW2UhG9rm24ZcnZWku' || (realTitle && realTitle.includes('4poW2UhG9rm24ZcnZWku')) || (cData.name && cData.name.includes('4poW2UhG9rm24ZcnZWku'))) return;
+                        
                         if (realTitle) {
                             let purchasePrice = Number(cData.promoPrice !== undefined ? cData.promoPrice : (cData.price !== undefined ? cData.price : 150));
                             let originalPrice = cData.promoPrice !== undefined && cData.price !== undefined ? Number(cData.price) : (cData.originalPrice || cData.original_price || 300);
@@ -9629,41 +9634,7 @@
 
                 // If courses are empty, seed robust defaults for courses
                 if (coursesList.length === 0) {
-                    const defaultCourses = [
-                        {
-                            id: "course_math",
-                            name: "৪৭তম বিসিএস গণিত প্রস্তুতি কোর্স (৮৫ দিন)",
-                            price: 150,
-                            originalPrice: 300,
-                            description: "📐 টপিকভিত্তিক ৩৮টি ও ৫০টি প্রিমিয়াম গণিত পরীক্ষা",
-                            tag: "",
-                            type: "course",
-                            category: "course",
-                            order: 3
-                        },
-                        {
-                            id: "course_bcs",
-                            name: "৪৭তম বিসিএস প্রস্তুতি - ৭০ দিনের ফুল কোর্স",
-                            price: 199,
-                            originalPrice: 300,
-                            description: "📚 ৩০টি টপিক সংবলিত হাই-ডেন্সিটি প্রিমিয়াম মক এক্সাম",
-                            tag: "",
-                            type: "course",
-                            category: "course",
-                            order: 4
-                        },
-                        {
-                            id: "course_ict",
-                            name: "৪৯তম বিশেষ কম্পিউটার ও আইসিটি কোর্স",
-                            price: 120,
-                            originalPrice: 240,
-                            description: "💻 তথ্য ও যোগাযোগ প্রযুক্তি বিষয়ক সকল বিশেষ প্রশ্ন ব্যাংক",
-                            tag: "",
-                            type: "course",
-                            category: "course",
-                            order: 5
-                        }
-                    ];
+                    const defaultCourses = [];
                     coursesList = [...defaultCourses];
                 }
 
@@ -9728,8 +9699,9 @@
             if (!container) return;
 
             const role = userData ? (userData.role || (userData.premium ? "premium" : "free")) : "free";
-            
-            // Normalize purchased list safely (handles array, string, object map)
+            const isPremiumUser = role === "premium" || role === "admin" || role === "moderator";
+
+            // Normalize purchased list safely
             let purchased = [];
             if (userData) {
                 const rawPurchased = userData.purchasedCourses || userData.purchased_courses;
@@ -9742,116 +9714,46 @@
                 }
             }
 
-            const coursesFullNames = {
-                'course_bcs': '৪৭তম বিসিএস ফুল প্রিপারেশন কোর্স (৭০ দিন)',
-                'course_math': 'বিসিএস প্রিলি গণিত স্পেশাল কোর্স (৮৫ দিন)',
-                'course_ict': '৪৯তম বিশেষ কম্পিউটার ও আইসিটি জেনারেল পার্ট',
-                'course_english': 'ইংরেজি ব্যাকরণ প্রিমিয়াম (English Grammar Special)'
-            };
-
             let html = "";
-            if (role === "premium" || role === "admin" || role === "moderator") {
-                // Premium layout: Show all four available library courses with high-contrast indicator
-                Object.keys(coursesFullNames).forEach(cId => {
-                    const name = coursesFullNames[cId];
-                    html += `<div class="course" onclick="window.showFilteredExamsView('${cId}', '${name.replace(/'/g, "\\'")}')" style="cursor: pointer; border-left: 4px solid #F59E0B; background: #FFFBEB; color: #92400E; font-weight: 700; padding: 10px 14px; border-radius: 8px; margin-bottom: 4px; transition: all 0.15s ease;" onmouseover="this.style.opacity='0.9'; this.style.transform='translateY(-1px)';" onmouseout="this.style.opacity='1'; this.style.transform='none';">⭐ ${name} (Premium)</div>`;
-                });
+            const allCourses = window.allExamsCoursesList || [];
+            
+            const filteredCourses = allCourses.filter(course => {
+                if (isPremiumUser) return true;
                 
-                // Show any additional courses dynamically loaded from the DB
-                if (window.loadedCoursesMap) {
-                    Object.keys(window.loadedCoursesMap).forEach(cId => {
-                        if (!coursesFullNames[cId]) {
-                            const dbTitle = window.loadedCoursesMap[cId];
-                            html += `<div class="course" onclick="window.showFilteredExamsView('${cId}', '${dbTitle.replace(/'/g, "\\'")}')" style="cursor: pointer; border-left: 4px solid #F59E0B; background: #FFFBEB; color: #92400E; font-weight: 700; padding: 10px 14px; border-radius: 8px; margin-bottom: 4px; transition: all 0.15s ease;" onmouseover="this.style.opacity='0.9'; this.style.transform='translateY(-1px)';" onmouseout="this.style.opacity='1'; this.style.transform='none';">⭐ ${dbTitle} (Premium)</div>`;
-                        }
-                    });
-                }
-                if (window.dynamicPurchasedTitlesMap) {
-                    Object.keys(window.dynamicPurchasedTitlesMap).forEach(cId => {
-                        if (!coursesFullNames[cId] && (!window.loadedCoursesMap || !window.loadedCoursesMap[cId])) {
-                            const title = window.dynamicPurchasedTitlesMap[cId];
-                            html += `<div class="course" onclick="window.showFilteredExamsView('${cId}', '${title.replace(/'/g, "\\'")}')" style="cursor: pointer; border-left: 4px solid #F59E0B; background: #FFFBEB; color: #92400E; font-weight: 700; padding: 10px 14px; border-radius: 8px; margin-bottom: 4px; transition: all 0.15s ease;" onmouseover="this.style.opacity='0.9'; this.style.transform='translateY(-1px)';" onmouseout="this.style.opacity='1'; this.style.transform='none';">⭐ ${title} (Premium)</div>`;
-                        }
-                    });
-                }
-            } else if (purchased.length > 0) {
-                // Free user layout: ONLY show purchased individual courses
-                purchased.forEach((cId, idx) => {
-                    const resolvedName = coursesFullNames[cId] || (window.dynamicPurchasedTitlesMap && window.dynamicPurchasedTitlesMap[cId]) || (window.loadedCoursesMap && window.loadedCoursesMap[cId]);
-                    if (resolvedName) {
-                        html += `<div class="course" onclick="window.showFilteredExamsView('${cId}', '${resolvedName.replace(/'/g, "\\'")}')" style="cursor: pointer; border-left: 4px solid #10B981; background: #ECFDF5; color: #065F46; font-weight: 700; padding: 10px 14px; border-radius: 8px; margin-bottom: 4px; transition: all 0.15s ease;" onmouseover="this.style.opacity='0.9'; this.style.transform='translateY(-1px)';" onmouseout="this.style.opacity='1'; this.style.transform='none';">✅ ${resolvedName}</div>`;
-                    } else {
-                        // Generate a unique div ID to display loading status, and asynchronously lookup name in Firestore database
-                        const uniqueId = "purchased_course_item_" + String(idx) + "_" + cId.replace(/[^a-zA-Z0-9]/g, '_');
-                        let fallbackName = cId.replace(/^(course|plan)_/, '').replace(/[_-]/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
-                        html += `<div id="${uniqueId}" class="course" onclick="window.showFilteredExamsView('${cId}', this.innerText.replace('✅ ', ''))" style="cursor: pointer; border-left: 4px solid #10B981; background: #ECFDF5; color: #065F46; font-weight: 700; padding: 10px 14px; border-radius: 8px; margin-bottom: 4px; transition: all 0.15s ease;" onmouseover="this.style.opacity='0.9'; this.style.transform='translateY(-1px)';" onmouseout="this.style.opacity='1'; this.style.transform='none';">✅ ${fallbackName}</div>`;
-                        
-                        // Async live look up to load names if database has them
-                        (async () => {
-                            try {
-                                if (window.dynamicPurchasedTitlesMap && window.dynamicPurchasedTitlesMap[cId]) {
-                                    const el = document.getElementById(uniqueId);
-                                    if (el) el.innerHTML = `✅ ${window.dynamicPurchasedTitlesMap[cId]}`;
-                                    return;
-                                }
-                                
-                                // Lookup in 'courses' collection
-                                const cSnap = await getDoc(doc(db, "courses", cId));
-                                if (cSnap.exists()) {
-                                    const cData = cSnap.data();
-                                    const t = cData.title || cData.name || cData.courseName || cData.courseTitle || cData.course_name || cData.course_title;
-                                    if (t) {
-                                        window.dynamicPurchasedTitlesMap = window.dynamicPurchasedTitlesMap || {};
-                                        window.dynamicPurchasedTitlesMap[cId] = t;
-                                        const el = document.getElementById(uniqueId);
-                                        if (el) el.innerHTML = `✅ ${t}`;
-                                        return;
-                                    }
-                                }
-                                
-                                // Lookup in 'premium_plans' collection
-                                const pSnap = await getDoc(doc(db, "premium_plans", cId));
-                                if (pSnap.exists()) {
-                                    const pData = pSnap.data();
-                                    const t = pData.name || pData.title;
-                                    if (t) {
-                                        window.dynamicPurchasedTitlesMap = window.dynamicPurchasedTitlesMap || {};
-                                        window.dynamicPurchasedTitlesMap[cId] = t;
-                                        const el = document.getElementById(uniqueId);
-                                        if (el) el.innerHTML = `✅ ${t}`;
-                                        return;
-                                    }
-                                }
+                const isPurchased = purchased.includes(course.id);
+                const isFree = course.free === true || course.isFree === true || course.access === 'free' || (course.price !== undefined && Number(course.price) === 0) || (course.id === 'course_ict');
+                
+                // Explicitly check for premium status if not free and not purchased
+                const isPremium = course.access === 'premium' || (course.price !== undefined && Number(course.price) > 0 && !isFree);
 
-                                // Lookup in 'plans' collection
-                                const plSnap = await getDoc(doc(db, "plans", cId));
-                                if (plSnap.exists()) {
-                                    const plData = plSnap.data();
-                                    const t = plData.name || plData.title;
-                                    if (t) {
-                                        window.dynamicPurchasedTitlesMap = window.dynamicPurchasedTitlesMap || {};
-                                        window.dynamicPurchasedTitlesMap[cId] = t;
-                                        const el = document.getElementById(uniqueId);
-                                        if (el) el.innerHTML = `✅ ${t}`;
-                                        return;
-                                    }
-                                }
-                            } catch (err) {
-                                console.warn("Failed async lookup for " + cId, err);
-                            }
-                        })();
-                    }
-                });
-            } else {
-                html += `
-                <div style="text-align: center; padding: 16px; border: 1.5px dashed #CBD5E1; border-radius: 12px; background: #F8FAFC;">
-                    <p style="font-size: 13px; color: #64748B; font-weight: 600; margin: 0 0 10px 0;">আপনার সক্রিয় কোনো পৃথক কোর্স বা প্রিমিয়াম সাবস্ক্রিপশন নেই।</p>
-                    <button onclick="openPremiumStoreModal()" style="background: linear-gradient(135deg, #00BFA1, #008B7D); color: white; border: none; font-size: 12px; font-weight: 700; padding: 8px 14px; border-radius: 8px; cursor: pointer; display: inline-flex; align-items: center; gap: 4px; box-shadow: 0 2px 6px rgba(0, 191, 151, 0.15); transition: opacity 0.2s;" onmouseover="this.style.opacity='0.9'" onmouseout="this.style.opacity='1'">
-                        👑 স্টোর থেকে কিনুন
-                    </button>
-                </div>
-                `;
-            }
+                if (isPremium && !isPurchased) return false;
+
+                return isPurchased || isFree;
+            });
+
+            filteredCourses.forEach(course => {
+                const cId = course.id;
+                const title = course.title || "Unnamed Course";
+                const isFree = course.free === true || course.isFree === true || course.access === 'free' || (course.price !== undefined && Number(course.price) === 0) || (cId === 'course_ict');
+                const isPurchased = purchased.includes(cId);
+
+                let badge = "";
+                let style = "";
+                
+                if (isPremiumUser) {
+                    badge = "⭐";
+                    style = "border-left: 4px solid #F59E0B; background: #FFFBEB; color: #92400E;";
+                } else if (isPurchased) {
+                    badge = "✅";
+                    style = "border-left: 4px solid #10B981; background: #ECFDF5; color: #065F46;";
+                } else {
+                    badge = "🆓";
+                    style = "border-left: 4px solid #3B82F6; background: #EFF6FF; color: #1E40AF;";
+                }
+
+                html += `<div class="course" onclick="window.showFilteredExamsView('${cId}', '${title.replace(/'/g, "\\'")}')" style="cursor: pointer; ${style} font-weight: 700; padding: 10px 14px; border-radius: 8px; margin-bottom: 4px; transition: all 0.15s ease;" onmouseover="this.style.opacity='0.9'; this.style.transform='translateY(-1px)';" onmouseout="this.style.opacity='1'; this.style.transform='none';">${badge} ${title}</div>`;
+            });
+
             container.innerHTML = html;
             
             // Trigger routine card update
@@ -10658,9 +10560,59 @@
             }, 2000);
         };
 
+        window.updateStorePriceWithCoupon = async function() {
+            const couponCode = document.getElementById("storeCouponCode").value.trim().toUpperCase();
+            const priceEl = document.getElementById("storeSelectedPriceBengali");
+            let finalPrice = Number(window.selectedStoreItemPrice);
+
+            if (couponCode) {
+                try {
+                    const q = query(collection(db, "coupons"), where("code", "==", couponCode));
+                    const querySnapshot = await getDocs(q);
+                    
+                    if (!querySnapshot.empty) {
+                        const couponDoc = querySnapshot.docs[0];
+                        const cData = couponDoc.data();
+                        
+                        if (cData.isActive !== false) {
+                            finalPrice = Math.max(0, finalPrice - Number(cData.discount || 0));
+                        }
+                    }
+                } catch (e) {
+                    console.warn("Coupon check error:", e);
+                }
+            }
+            
+            // Use the existing global helper to convert number to Bengali digits
+            priceEl.innerText = toBengaliNumberStr(finalPrice);
+        };
+
         window.submitStorePayment = async function() {
             const senderNo = document.getElementById("storeSenderNumber").value.trim();
             const trxId = document.getElementById("storeTrxId").value.trim();
+            const couponCode = document.getElementById("storeCouponCode").value.trim();
+            let finalPrice = Number(window.selectedStoreItemPrice);
+            let appliedCoupon = null;
+
+            if (couponCode) {
+                try {
+                    const couponSnap = await getDoc(doc(db, "coupons", couponCode.toUpperCase()));
+                    if (couponSnap.exists()) {
+                        const cData = couponSnap.data();
+                        if (cData.isActive !== false) {
+                            finalPrice = Math.max(0, finalPrice - Number(cData.discount || 0));
+                            appliedCoupon = couponCode.toUpperCase();
+                            alert("✅ কুপন কোড সফলভাবে যুক্ত হয়েছে! ডিসকাউন্টসহ নতুন মূল্য: ৳" + finalPrice);
+                        } else {
+                            alert("⚠️ কুপনটি বর্তমানে সচল নেই।");
+                        }
+                    } else {
+                        alert("⚠️ ভুল কুপন কোড।");
+                    }
+                } catch (e) {
+                    console.warn("Coupon check error:", e);
+                }
+            }
 
             if (!senderNo || senderNo.length < 10) {
                 alert("অনুগ্রহ করে সচল ১০-১১ ডিজিটের পেমেন্ট মোবাইল নম্বর প্রদান করুন।");
@@ -10696,7 +10648,9 @@
                     itemId: window.selectedStoreItemId,
                     itemName: window.selectedStoreItemName,
                     itemType: window.selectedStoreItemType,
-                    price: window.selectedStoreItemPrice,
+                    price: finalPrice,
+                    originalPrice: window.selectedStoreItemPrice,
+                    couponCode: appliedCoupon,
                     paymentChannel: window.selectedStorePaymentChannel,
                     method: window.selectedStorePaymentChannel,
                     senderNumber: senderNo,
@@ -14603,6 +14557,11 @@
             loadExam(examId);
             window.showMiniToast("🎯 ২০টি প্রশ্নের ডেইলি চ্যালেঞ্জ শুরু হয়েছে!");
         };
+
+        // Initialize on load
+        document.addEventListener('DOMContentLoaded', () => {
+            window.fetchCoursesAndExamsData().catch(e => console.error("Initial fetch failed:", e));
+        });
     </script>
 </body>
 

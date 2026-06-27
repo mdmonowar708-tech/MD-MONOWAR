@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from "react";
-import { SAMPLE_EXAMS, SAMPLE_QUESTIONS, SAMPLE_GLOBAL_USERS, SAMPLE_COURSES } from "./simulationData";
+import { SAMPLE_EXAMS, SAMPLE_QUESTIONS, SAMPLE_GLOBAL_USERS } from "./simulationData";
 import { LiveExam, Question, ExamResult, UserProfile } from "./types";
 import Sidebar from "./components/Sidebar";
 import BottomNav from "./components/BottomNav";
@@ -171,9 +171,7 @@ export default function App() {
     : SAMPLE_EXAMS;
 
   const mergedCourses = useMemo(() => {
-    const baseCourses = firestoreCourses.length > 0
-      ? firestoreCourses
-      : SAMPLE_COURSES;
+    const baseCourses = [...firestoreCourses];
 
     if (firestoreRoutines.length > 0) {
       const updatedCourses = baseCourses.map(course => ({
@@ -253,7 +251,7 @@ export default function App() {
       return updatedCourses;
     }
     return baseCourses;
-  }, [firestoreCourses, firestoreRoutines]);
+  }, [firestoreCourses, firestoreRoutines, user]);
 
   // Dynamic Real-time listener for the currently selected exam's questions. Runs only when selectedExamId changes.
   // This solves performance (dashboard and courses load instantly) and enables real-time question additions/updates instantly without refresh!
