@@ -16,6 +16,25 @@ async function startServer() {
 
   app.use(express.json());
 
+  // API route to save user FCM token
+  app.post("/api/save-token", async (req, res) => {
+    const { uid, token } = req.body;
+
+    if (!uid || !token) {
+      return res.status(400).json({ error: "Missing required fields" });
+    }
+
+    try {
+        await getFirestore().collection("users").doc(uid).set({
+            fcmToken: token
+        }, { merge: true });
+        res.json({ success: true });
+    } catch (error) {
+        console.error("Error saving token:", error);
+        res.status(500).json({ error: "Failed to save token" });
+    }
+  });
+
   // API route to send notification
   app.post("/api/send-notification", async (req, res) => {
     const { targetUid, title, body } = req.body;

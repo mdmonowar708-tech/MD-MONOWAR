@@ -12,7 +12,8 @@ import LeaderboardPage from "./components/LeaderboardPage";
 import ProfilePage from "./components/ProfilePage";
 import AuthPage from "./components/AuthPage";
 import PremiumModal from "./components/PremiumModal";
-import { testConnection, db } from "./firebase";
+import { testConnection, db, messaging } from "./firebase";
+import { getToken } from "firebase/messaging";
 import { collection, doc, onSnapshot } from "firebase/firestore";
 import AdminSettingsPage from "./components/AdminSettingsPage";
 import RoutinePage from "./components/RoutinePage";
@@ -77,6 +78,32 @@ export default function App() {
     }, (error) => {
       console.warn("Firestore settings lookup warnings (offline support):", error);
     });
+
+    // FCM Token registration
+    const registerFcmToken = async () => {
+      if (!user) return;
+      try {
+        const permission = await Notification.requestPermission();
+        if (permission === 'granted') {
+          // NOTE: You MUST generate a VAPID key in Firebase Console and replace this placeholder!
+          const token = await getToken(messaging, { 
+            vapidKey: 'BMVEiceHr_GxpmFuYQqOF4Z65h4mEQZy4O9r83HHloH5ajuzx4NB7RzZ4LhARmGtT4RbrMAxnPrcWmNh9jJOhmA' 
+          });
+          
+          if (token) {
+            await fetch('/api/save-token', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ uid: user.uid, token })
+            });
+            console.log("FCM Token saved successfully");
+          }
+        }
+      } catch (error) {
+        console.error("Error registering FCM token:", error);
+      }
+    };
+    registerFcmToken();
 
     // 2. Exams listener
     const unsubscribeExams = onSnapshot(collection(db, "exams"), (snapshot) => {
