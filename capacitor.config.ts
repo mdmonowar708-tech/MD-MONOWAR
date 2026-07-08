@@ -1,7 +1,7 @@
 import type { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-  appId: 'com.mcq.preparation',
+  appId: 'com.mcqhero.app',
   appName: 'MCQ Hero',
   webDir: 'dist'
 };

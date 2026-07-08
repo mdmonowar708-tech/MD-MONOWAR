@@ -7,6 +7,8 @@
     <title>MCQ HERO</title>
 
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@400;700&display=swap');
+
         :root {
             --primary: #00BFA6;
             --secondary: #009688;
@@ -15,6 +17,51 @@
             --danger: #EF4444;
             --dark: #111827;
             --light: #F5F7FA;
+        }
+
+        @media print {
+            body * { visibility: hidden; }
+            #printArea, #printArea * { visibility: visible; }
+            #printArea { position: absolute; left: 0; top: 0; width: 100%; }
+            .a4-print-layout { margin: 0; padding: 0; }
+        }
+
+        .a4-print-layout {
+            width: 210mm;
+            margin: 12mm auto;
+            background: white;
+            font-family: 'Noto Sans Bengali', sans-serif;
+            padding: 12mm;
+            box-sizing: border-box;
+            color: #111827;
+        }
+        .print-header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .questions-wrapper {
+            column-count: 2;
+            column-gap: 12mm;
+        }
+        .question-card {
+            break-inside: avoid;
+            page-break-inside: avoid;
+            margin-bottom: 15px;
+            padding: 10px;
+            border: 1px solid #E2E8F0;
+            border-radius: 5px;
+        }
+        .topic-heading {
+            background-color: #F1F5F9;
+            padding: 10px;
+            margin: 15px 0;
+            font-weight: bold;
+            break-inside: avoid;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
 
         .exam-card {
@@ -435,13 +482,14 @@
             height: 100%;
             background: white;
             z-index: 999;
-            transition: .3s;
-            box-shadow: 0 0 20px rgba(0, 0, 0, .15);
+            transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
             padding: 20px;
         }
 
         .sidebar.active {
             left: 0;
+            box-shadow: 0 0 20px rgba(0,0,0,0.2);
         }
 
         .welcome-card {
@@ -1637,6 +1685,8 @@
         }
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 </head>
 
 <body>
@@ -1830,6 +1880,8 @@
         <a href="#" onclick="showPage('exam-history-page', document.getElementById('nav-results')); closeSidebar();">🏆 Results</a>
         <a href="#" onclick="showPage('profile-page', this); closeSidebar();">👤 Profile</a>
         <a href="#" id="sidebarAdminPortalLink" onclick="window.openAdminSettingsModal(); closeSidebar();" style="display: none; color: #7C3AED; background: rgba(124, 58, 237, 0.08); font-weight: 750; border-radius: 8px;">🛡️ অ্যাডমিন প্যানেল</a>
+        <a href="#" id="sidebarPushNotificationLink" onclick="window.openPushNotificationModal(); closeSidebar();" style="display: none; color: #E11D48; background: rgba(225, 29, 72, 0.08); font-weight: 750; border-radius: 8px;">🔔 পুশ নোটিফিকেশন</a>
+        <a href="#" id="sidebarNotificationHistoryLink" onclick="showNotificationHistoryPage(); closeSidebar();" style="display: none; color: #64748B; font-weight: 700; padding-top: 10px; margin-top: 6px;">📜 নোটিফিকেশন ইতিহাস</a>
         <a href="#" onclick="window.openContactSupportModal(); closeSidebar();" style="border-top: 1px solid rgba(226, 232, 240, 0.4); padding-top: 10px; margin-top: 6px; color: #0EA5E9; font-weight: 700;">💬 Contact Support</a>
         <a href="#" onclick="window.openPrivacyPolicyModal(); closeSidebar();" style="color: #64748B;">🛡️ Privacy Policy</a>
     </div>
@@ -2118,6 +2170,8 @@
                 <span>Leaderboard</span>
             </div>
 
+
+
             <!-- Premium Card -->
             <div onclick="openPremiumStoreModal()" style="cursor: pointer; background: #FFFDF5; border: 1.5px dashed #FCD34D;" onmouseover="this.style.background='#FEF3C7'" onmouseout="this.style.background='#FFFDF5'">
                 <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#D97706" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="margin: 0 auto; display: block;">
@@ -2304,6 +2358,11 @@
 
             <!-- Tier 1: Subjects Directory (Visible by default) -->
             <div id="qbankDirectorySection">
+                <!-- Loader inside Qbank directory -->
+                <div id="qbankDirLoader" style="display: none; padding: 40px; text-align: center; color: #64748B; font-weight: 600; font-size: 14px;">
+                    <div style="border: 4px solid #f3f3f3; border-top: 4px solid #00BFA1; border-radius: 50%; width: 30px; height: 30px; animation: spin 1s linear infinite; margin: 0 auto 10px;"></div>
+                    বিষয়সমূহ লোড হচ্ছে...
+                </div>
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; padding: 0 2px;">
                     <span style="font-size: 13.5px; font-weight: 800; color: #475569; text-transform: uppercase; letter-spacing: 0.3px;">📚 বিষয়ভিত্তিক ক্যাটাগরি সমূহ:</span>
                     <span id="qbankTotalSummaryBadge" style="background: #F1F5F9; color: #475569; font-size: 11.5px; font-weight: 700; padding: 4px 10px; border-radius: 30px;">মোট ১০ টি বিষয়</span>
@@ -2337,6 +2396,10 @@
 
             <!-- Tier 2: Specific Subject Questions Listing View (Hidden by default) -->
             <div id="qbankQuestionsSection" style="display: none;">
+                <!-- Loader inside Qbank -->
+                <div id="qbankLoader" style="display: none; padding: 40px; text-align: center; color: #64748B; font-weight: 600; font-size: 14px;">
+                    ⏳ প্রশ্ন লোড হচ্ছে...
+                </div>
                 <!-- Back action bar -->
                 <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 16px;">
                     <button onclick="window.backToQbankSubcategories()" style="background: #F1F5F9; border: 1.5px solid #E2E8F0; border-radius: 12px; color: #475569; padding: 10px 16px; font-size: 13px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 6px; transition: all 0.2s;" onmouseover="this.style.background='#E2E8F0'" onmouseout="this.style.background='#F1F5F9'">
@@ -2421,7 +2484,21 @@
                 <div id="qbankQuestionsContainer" style="display: flex; flex-direction: column; gap: 14px;">
                     <!-- Individual question cards will load here -->
                 </div>
+
+
             </div>
+        </div>
+    </div>
+
+    
+
+    <!-- Note Details Modal -->
+    <div id="noteDetailsModal" style="display:none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center;">
+        <div style="background: white; padding: 20px; border-radius: 12px; width: 90%; max-width: 500px; max-height: 80vh; overflow-y: auto;">
+            <h2 id="noteTitle" style="margin-top: 0;"></h2>
+            <div id="noteContent" style="margin-top: 10px;"></div>
+            <button onclick="document.getElementById('noteDetailsModal').style.display='none'" style="margin-top: 20px; width: 100%; padding: 10px; background: #E2E8F0; color: #475569; border: none; border-radius: 8px; cursor: pointer;">বন্ধ করুন</button>
+            <button onclick="window.downloadNoteAsPDF()" style="margin-top: 10px; width: 100%; padding: 10px; background: #00BFA1; color: white; border: none; border-radius: 8px; cursor: pointer;">PDF ডাউনলোড করুন</button>
         </div>
     </div>
 
@@ -2557,161 +2634,88 @@
     </div>
 
     <!-- PDF Download Page (Premium PDF Download Centre) -->
-    <div id="pdf-page" style="display:none; background: #F8FAFC; min-height: 100vh;">
-        <div class="hero-header" style="background: white; padding: 0; border-bottom: 1.5px solid #F1F5F9; margin-bottom: 16px;">
-            <div class="topbar" style="display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: white; margin-bottom: 0;">
-                <button onclick="showPage('home-page')" style="background: #EBFDF9; border: none; border-radius: 12px; width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: #00BFA1; font-size: 18px; font-weight: bold; transition: all 0.2s;" onmouseover="this.style.background='#D1F2EB'" onmouseout="this.style.background='#EBFDF9'">
-                    ←
-                </button>
-                <div style="font-size: 19px; font-weight: 800; color: #0F172A; text-align: center; display: flex; align-items: center; gap: 8px;">
-                     <span>📄 প্রিমিয়াম PDF ডাউনলোড সেন্টার</span>
-                </div>
-                <div style="width: 44px;"></div> <!-- placeholder to balanced center -->
-            </div>
-        </div>
-
-        <div style="padding: 0 16px 80px 16px; max-width: 800px; margin: 0 auto; box-sizing: border-box;">
-            <!-- Modern Promo Pitch -->
-            <div style="background: linear-gradient(135deg, #FFFBEB, #FEF3C7); border: 1.5px solid #FDE68A; border-radius: 16px; padding: 18px; margin-bottom: 20px; box-shadow: 0 4px 10px rgba(245, 158, 11, 0.05); display: flex; gap: 14px; align-items: flex-start;">
-                <div style="font-size: 30px; line-height: 1;">📄</div>
+    <div id="pdf-page" style="display:none; background: #F8FAFC; min-height: 100vh; padding: 24px;">
+        <div style="max-width: 800px; margin: 0 auto;">
+            <!-- Header -->
+            <div style="display: flex; align-items: center; gap: 16px; margin-bottom: 24px;">
+                <div style="background: #14B8A6; color: white; width: 56px; height: 56px; border-radius: 16px; display: flex; align-items: center; justify-content: center; font-size: 28px; box-shadow: 0 4px 6px -1px rgba(20, 184, 166, 0.2);">📄</div>
                 <div>
-                    <h3 style="font-size: 14.5px; font-weight: 800; color: #92400E; margin: 0 0 4px 0;">আকর্ষণীয় অফলাইন এ৪ প্রিন্ট লেআউটে PDF বুকলেট</h3>
-                    <p style="font-size: 12px; color: #B45309; margin: 0; line-height: 1.5; font-weight: 500;">আপনার সুবিধামত অফলাইনে ও লাইট নিভে পড়ার জন্য যেকোনো বিষয়ের পুরো প্রশ্নব্যাংক অথবা বুকমার্ককৃত রিভিশন প্রশ্নসমূহ একটি ক্লিকেই পরিচ্ছন্ন ডেকোরেটেড বুকলেট আকারে PDF ফাইল নামিয়ে নিতে পারেন।</p>
+                    <h2 style="font-size: 24px; font-weight: 800; color: #0F172A; margin: 0;">PDF বুকলেট</h2>
+                    <p style="font-size: 14px; color: #64748B; margin: 0;">আপনার প্রয়োজনীয় প্রশ্নের পিডিএফ তৈরি করুন</p>
                 </div>
             </div>
 
-            <!-- Premium Upsell/Membership Banner -->
-            <div id="pdfPremiumPromoBanner" style="display: none; background: linear-gradient(135deg, #FFFDF5, #FFF9E6); border: 2.5px dashed #F59E0B; border-radius: 16px; padding: 18px; margin-bottom: 20px; box-shadow: 0 4px 12px rgba(245, 158, 11, 0.08);">
-                <div style="display: flex; gap: 14px; align-items: center; justify-content: space-between; flex-wrap: wrap;">
-                    <div style="display: flex; gap: 12px; align-items: center; max-width: 500px;">
-                        <span style="font-size: 32px; flex-shrink:0;">👑</span>
-                        <div>
-                            <h4 style="font-size: 14px; font-weight: 800; color: #92400E; margin: 0 0 3px 0;">আপনি বর্তমানে ফ্রি লিমিটেশন সংস্করণে আছেন!</h4>
-                            <p style="font-size: 11.5px; color: #B45309; margin: 0; line-height: 1.4; font-weight: 600;">ফ্রি মেম্বার হিসেবে আপনি প্রতিটি ক্যাটাগরিতে ১ম ১০টি প্রশ্ন সম্পূর্ণ প্রিন্টযোগ্য ফরম্যাটে ট্রায়াল পিডিএফ তৈরি করতে পারবেন। আনলিমিটেড বুকলেট ডাউনলোড ও পূর্ণাঙ্গ ব্যাখ্যা রেন্ডারিং পেতে প্রিমিয়াম মেম্বারশিপে আপগ্রেড করুন।</p>
-                        </div>
+            <!-- Metadata Card -->
+            <div style="background: white; border-radius: 20px; padding: 20px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); border: 1px solid #E2E8F0; margin-bottom: 24px; display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                <div>
+                    <label style="font-size: 12px; font-weight: 700; color: #94A3B8; text-transform: uppercase;">বিষয়</label>
+                    <select id="category-selector" onchange="window.loadSubCategories(this.value)" style="width: 100%; margin-top: 8px; padding: 12px; border-radius: 12px; border: 1.5px solid #E2E8F0; font-size: 14px; background: #F8FAFC; cursor: pointer; outline: none; transition: all 0.2s;" onfocus="this.style.borderColor='#14B8A6'">
+                        <option value="">বিষয় নির্বাচন করুন</option>
+                    </select>
+                </div>
+                <div>
+                    <label style="font-size: 12px; font-weight: 700; color: #94A3B8; text-transform: uppercase;">টপিক</label>
+                    <select id="subcategory-selector" onchange="window.loadQuestions()" style="width: 100%; margin-top: 8px; padding: 12px; border-radius: 12px; border: 1.5px solid #E2E8F0; font-size: 14px; background: #F8FAFC; cursor: pointer; outline: none; transition: all 0.2s;" onfocus="this.style.borderColor='#14B8A6'">
+                        <option value="">সাব-ক্যাটাগরি নির্বাচন করুন</option>
+                    </select>
+                </div>
+                <div style="grid-column: span 2; display: flex; gap: 12px; border-top: 1px solid #F1F5F9; pt-16px; margin-top: 8px; padding-top: 16px;">
+                    <div style="flex: 1; text-align: center; background: #F1F5F9; padding: 12px; border-radius: 12px;">
+                        <div style="font-size: 12px; color: #64748B;">মোট প্রশ্ন</div>
+                        <div id="total-questions-count" style="font-size: 18px; font-weight: 800; color: #14B8A6;">0</div>
                     </div>
-                    <button onclick="window.upgradeCurrentUserToPremium()" style="background: linear-gradient(135deg, #00BFA1, #009688); color: white; border: none; border-radius: 12px; font-weight: 800; font-size: 12.5px; padding: 12px 18px; cursor: pointer; box-shadow: 0 4px 10px rgba(0, 191, 161, 0.25); display: flex; align-items: center; gap: 4px; transition: transform 0.2s;" onmouseover="this.style.transform='translateY(-1px)'" onmouseout="this.style.transform='translateY(0)'">
-                        👑 প্রিমিয়ামে আপগ্রেড করুন
-                    </button>
+                    <div style="flex: 1; text-align: center; background: #F1F5F9; padding: 12px; border-radius: 12px;">
+                        <div style="font-size: 12px; color: #64748B;">আনুমানিক পৃষ্ঠা</div>
+                        <div style="font-size: 18px; font-weight: 800; color: #2563EB;">0</div>
+                    </div>
                 </div>
             </div>
 
-            <!-- Premium Success Active Banner -->
-            <div id="pdfPremiumActiveBanner" style="display: none; background: linear-gradient(135deg, #ECFDF5, #D1FAE5); border: 1.5px solid #10B981; border-radius: 16px; padding: 14px 18px; margin-bottom: 20px; box-shadow: 0 4px 10px rgba(16, 185, 129, 0.05); display: flex; align-items: center; gap: 12px;">
-                <span style="font-size: 24px;">🎉</span>
-                <div>
-                    <h4 style="font-size: 13.5px; font-weight: 800; color: #065F46; margin: 0 0 2px 0;">মেম্বারশিপ স্ট্যাটাস: প্রিমিয়াম 👑 লাইফটাইম একটিভ</h4>
-                    <p style="font-size: 11px; color: #047857; margin: 0; font-weight: 600;">অভিনন্দন! আপনার একাউন্টে সম্পূর্ণ বুকলেট ও ব্যাখ্যাসহ আনলিমিটেড পিডিএফ ডাউনলোড করার সুবর্ণ সুযোগ সক্রিয় আছে।</p>
-                </div>
+            <!-- Action Buttons -->
+            <div style="display: flex; gap: 12px; margin-bottom: 24px;">
+                <button onclick="window.togglePDFPreview()" style="flex: 1; padding: 14px; background: #2563EB; color: white; border: none; border-radius: 12px; font-weight: 700; cursor: pointer; transition: all 0.2s; box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.2);" onmouseover="this.style.background='#1D4ED8'" onmouseout="this.style.background='#2563EB'">👁️ প্রিভিউ PDF</button>
+                <button onclick="window.downloadBookletAsPDF(this, document.getElementById('column-selector').value === '2')" style="flex: 1; padding: 14px; background: #14B8A6; color: white; border: none; border-radius: 12px; font-weight: 700; cursor: pointer; transition: all 0.2s; box-shadow: 0 4px 6px -1px rgba(20, 184, 166, 0.2);" onmouseover="this.style.background='#0D9488'" onmouseout="this.style.background='#14B8A6'">📥 ডাউনলোড PDF</button>
             </div>
 
-            <!-- Main interactive selection card -->
-            <div style="background: white; border: 1.5px solid #E2E8F0; border-radius: 20px; padding: 22px; box-shadow: 0 4px 12px rgba(0,0,0,0.015); margin-bottom: 20px; box-sizing: border-box;">
-                
-                <!-- Format selector segments -->
-                <div style="display: flex; background: #F1F5F9; padding: 4px; border-radius: 14px; margin-bottom: 22px;">
-                    <button id="pdfTabSubject" onclick="window.setPDFSourceType('subject')" style="flex: 1; border: none; background: white; color: #0F172A; font-weight: 800; padding: 12px 10px; border-radius: 10px; font-size: 13px; cursor: pointer; transition: all 0.2s; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
-                        📁 বিষয় ভিত্তিক PDF
-                    </button>
-                    <button id="pdfTabBookmarks" onclick="window.setPDFSourceType('bookmarks')" style="flex: 1; border: none; background: transparent; color: #475569; font-weight: 700; padding: 12px 10px; border-radius: 10px; font-size: 13px; cursor: pointer; transition: all 0.2s;">
-                        ❤️ প্রিয় বুকমার্ক PDF
-                    </button>
-                    <button id="pdfTabAll" onclick="window.setPDFSourceType('all')" style="flex: 1; border: none; background: transparent; color: #475569; font-weight: 700; padding: 12px 10px; border-radius: 10px; font-size: 13px; cursor: pointer; transition: all 0.2s;">
-                        📚 অল প্রশ্নব্যাংক
-                    </button>
-                </div>
-
-                <!-- Subject specific configuration inputs -->
-                <div id="pdfSubjectSelectors" style="display: block;">
-                    <div style="margin-bottom: 16px;">
-                        <label style="display: block; font-size: 12.5px; font-weight: 800; color: #475569; margin-bottom: 8px;">১. বিষয় সিলেক্ট করুন (Select Subject Category):</label>
-                        <select id="pdfSelectCategory" onchange="window.onPDFCategoryChange()" style="width: 100%; height: 46px; border-radius: 12px; border: 1.5px solid #CBD5E1; padding: 0 12px; font-size: 14px; font-weight: 700; color: #1E293B; outline: none; background: white; cursor: pointer; transition: border-color 0.15s; box-sizing: border-box;">
-                            <!-- populated by script -->
+            <!-- Advanced Settings (Collapsible) -->
+            <details style="background: white; border-radius: 20px; padding: 20px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); border: 1px solid #E2E8F0; margin-bottom: 24px;">
+                <summary style="font-size: 16px; font-weight: 700; color: #0F172A; cursor: pointer; display: flex; justify-content: space-between; align-items: center;">
+                    ⚙️ Advanced PDF Settings
+                    <span style="font-size: 12px; color: #64748B;">ট্যাপ করে সেটিংস খুলুন</span>
+                </summary>
+                <div style="margin-top: 20px; display: grid; grid-template-columns: 1fr 1fr; gap: 16px; pt-16px; border-top: 1px solid #F1F5F9;">
+                    <div>
+                        <label style="font-size: 12px; font-weight: 700; color: #94A3B8;">কলাম সংখ্যা</label>
+                        <select id="column-selector" onchange="window.updatePdfStyles()" style="width: 100%; margin-top: 8px; padding: 10px; border-radius: 10px; border: 1px solid #E2E8F0;">
+                            <option value="1">১ কলাম</option>
+                            <option value="2" selected>২ কলাম</option>
                         </select>
                     </div>
-
-                    <div style="margin-bottom: 22px;">
-                        <label style="display: block; font-size: 12.5px; font-weight: 800; color: #475569; margin-bottom: 8px;">২. সাব-ক্যাটাগরি বা টপিক সিলেক্ট করুন:</label>
-                        <select id="pdfSelectSubcategory" onchange="window.updatePDFPreviewCount()" style="width: 100%; height: 46px; border-radius: 12px; border: 1.5px solid #CBD5E1; padding: 0 12px; font-size: 14px; font-weight: 700; color: #1E293B; outline: none; background: white; cursor: pointer; transition: border-color 0.15s; box-sizing: border-box;">
-                            <!-- populated dynamically -->
-                        </select>
+                    <div>
+                        <label style="font-size: 12px; font-weight: 700; color: #94A3B8;">ফন্ট সাইজ (px)</label>
+                        <input type="number" id="font-size-input" value="14" oninput="window.updatePdfStyles()" style="width: 100%; margin-top: 8px; padding: 10px; border-radius: 10px; border: 1px solid #E2E8F0;">
                     </div>
-                </div>
-
-                <!-- Bookmark message if bookmarks chosen -->
-                <div id="pdfBookmarksMessage" style="display: none; background: #FFF5F5; border: 1.5px solid #FEE2E2; border-radius: 14px; padding: 16px; margin-bottom: 22px; text-align: center;">
-                    <div style="font-size: 26px; margin-bottom: 6px;">❤️</div>
-                    <h4 style="font-size: 13.5px; font-weight: 800; color: #9B1C1C; margin: 0 0 3px 0;">বুকমার্ক করা প্রশ্নসমূহ (Revision Copy)</h4>
-                    <p style="font-size: 12px; color: #C53030; margin: 0; line-height: 1.5; font-weight: 500;">আপনার বুকমার্ক তালিকায় সেভ করা সব প্রশ্নগুলো একটি সিঙ্গেল ফাইলে বুকলেট আকারে রিভিশন দেওয়ার উপযুক্ত ফরম্যাটে ডাউনলোড হবে।</p>
-                </div>
-
-                <!-- All question message -->
-                <div id="pdfAllQuestionsMessage" style="display: none; background: #EBFDF9; border: 1.5px solid #CCFBF1; border-radius: 14px; padding: 16px; margin-bottom: 22px; text-align: center;">
-                    <div style="font-size: 26px; margin-bottom: 6px;">📖</div>
-                    <h4 style="font-size: 13.5px; font-weight: 800; color: #0369A1; margin: 0 0 3px 0;">সম্পূর্ণ প্রশ্ন সংগ্রহ সংগ্রহশালা</h4>
-                    <p style="font-size: 12px; color: #0369A1; margin: 0; line-height: 1.5; font-weight: 500;">সার্ভারের সম্পূর্ণ প্রশ্নের ডাটাবেজ থেকে সকল প্রশ্নের একটি সমৃদ্ধ অফলাইন স্টাডি বুকলেট তৈরি হবে। বেশি প্রশ্ন থাকলে ডাউনলোড হতে ৪-৫ সেকেন্ড লাগতে পারে।</p>
-                </div>
-
-                <!-- Custom Styling and Options Configs -->
-                <div style="border-top: 1.5px solid #F1F5F9; padding-top: 20px; margin-bottom: 24px;">
-                    <label style="display: block; font-size: 13px; font-weight: 800; color: #475569; margin-bottom: 12px;">৩. পিডিএফ ফরম্যাট ও তথ্য কনফিগারেশন:</label>
-                    
-                    <div style="display: flex; flex-direction: column; gap: 12px;">
-                        <!-- Highlight Option config -->
-                        <div style="display: flex; gap: 10px; align-items: flex-start; cursor: pointer;" onclick="document.getElementById('pdfOptShowAnswers').click()">
-                            <input type="checkbox" id="pdfOptShowAnswers" checked onchange="window.onPDFOptionToggle()" style="margin-top: 3px; cursor: pointer; width: 16px; height: 16px; accent-color: #00BFA1;">
-                            <div>
-                                <span style="font-size: 13px; font-weight: 700; color: #334155;">প্রশ্নের সাথেই উত্তরপত্র হাইলাইট করুন (গাইড বুকলেট ফরম্যাট)</span>
-                                <p style="font-size: 11px; color: #64748B; margin: 2px 0 0 0; line-height: 1.4;">সক্রিয় থাকলে প্রতিটি প্রশ্নের নিচে সঠিক উত্তরটি সুনির্দিষ্ট রঙের মাধ্যমে সাথে সাথেই হাইলাইট করা থাকবে। আর বন্ধ থাকলে, শেষের পৃষ্ঠায় এন্সার কি (Answer Key) যোগ হবে।</p>
-                            </div>
-                        </div>
-
-                        <!-- Include Explanation config -->
-                        <div id="pdfExplainConfigRow" style="display: flex; gap: 10px; align-items: flex-start; cursor: pointer;" onclick="document.getElementById('pdfOptShowExplanations').click()">
-                            <input type="checkbox" id="pdfOptShowExplanations" checked style="margin-top: 3px; cursor: pointer; width: 16px; height: 16px; accent-color: #00BFA1;">
-                            <div>
-                                <span style="font-size: 13px; font-weight: 700; color: #334155;">প্রশ্নের সঠিক উত্তরের ব্যাখ্যা যুক্ত করুন (Include Explanations)</span>
-                                <p style="font-size: 11px; color: #64748B; margin: 2px 0 0 0; line-height: 1.4;">প্রতিটি প্রশ্নের নিচে থাকা সঠিক উত্তরের বিশ্লেষণ বা ব্যাখ্যা পিডিএফ এ৪ ডকুমেন্টে প্রিন্টযোগ্য আকারে সংযুক্ত করা হবে।</p>
-                            </div>
-                        </div>
-
-                        <!-- A4 Printable margins layout -->
-                        <div style="display: flex; gap: 10px; align-items: flex-start; cursor: pointer;" onclick="document.getElementById('pdfOptDoubleColumn').click()">
-                            <input type="checkbox" id="pdfOptDoubleColumn" style="margin-top: 3px; cursor: pointer; width: 16px; height: 16px; accent-color: #00BFA1;">
-                            <div>
-                                <span style="font-size: 13px; font-weight: 700; color: #334155;">দ্বি-কলাম লেআউট ব্যবহার করুন (Double Column layout)</span>
-                                <p style="font-size: 11px; color: #64748B; margin: 2px 0 0 0; line-height: 1.4;">অনুরূপ সরকারি চাকরির প্রশ্নপত্রের মত ২ কলামে প্রশ্নগুলো সাজানো হবে যাতে কম পাতায় বেশি প্রশ্ন প্রিন্ট করা যায় (কাগজ সাশ্রয়কারী লেআউট)।</p>
-                            </div>
+                    <div style="grid-column: span 2;">
+                        <label style="font-size: 12px; font-weight: 700; color: #94A3B8;">ওয়াটারমার্ক টেক্সট</label>
+                        <div style="display: flex; gap: 8px; margin-top: 8px;">
+                            <input type="checkbox" id="watermark-toggle" onchange="window.updateWatermarkSettings()">
+                            <input type="text" id="watermark-text" placeholder="ওয়াটারমার্ক টেক্সট" oninput="window.updateWatermarkSettings()" style="flex: 1; padding: 10px; border-radius: 10px; border: 1px solid #E2E8F0;">
                         </div>
                     </div>
                 </div>
+            </details>
 
-                <!-- Dynamic Count Preview and Download Trigger -->
-                <div style="background: #F8FAFC; border: 1.5px solid #E2E8F0; border-radius: 14px; padding: 14px; display: flex; justify-content: space-between; align-items: center; box-sizing: border-box; margin-bottom: 24px;">
-                    <div style="text-align: left;">
-                        <span style="font-size: 11.5px; font-weight: 700; color: #64748B; text-transform: uppercase;">সংকলন প্রাকদর্শন</span>
-                        <div id="pdfSummaryBadge" style="font-size: 14px; font-weight: 800; color: #0F172A; margin-top: 2px;">লোড হচ্ছে...</div>
-                    </div>
-                    <div style="background: #EBFDF9; color: #00BFA1; font-weight: 800; font-size: 11px; padding: 4px 10px; border-radius: 30px;">
-                        ⚡ এ৪ প্রিন্ট উপযোগী
-                    </div>
+            <!-- PDF Container -->
+            <div class="pdf-booklet-container" style="display: flex; flex-direction: column; gap: 20px; align-items: center; padding: 20px; background: #E2E8F0; border-radius: 20px; position: relative;">
+                <div class="pdf-download-badge" style="display:none; position: absolute; top: 10px; right: 10px; background: #3B82F6; color: white; padding: 5px 10px; border-radius: 4px; font-size: 12px; z-index: 10;">
+                    প্রসেসিং: <span class="pdf-progress">0</span>%
                 </div>
-
-                <!-- PDF generating and download CTA button -->
-                <button id="pdfDownloadBtn" onclick="window.triggerPDFGeneration()" style="width: 100%; height: 52px; background: linear-gradient(135deg, #00BFA1, #009688); border: none; color: white; border-radius: 14px; font-weight: 800; font-size: 14.5px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; box-shadow: 0 4px 12px rgba(0, 191, 161, 0.2); transition: all 0.2s;" onmouseover="this.style.transform='translateY(-1px)'" onmouseout="this.style.transform='translateY(0)'">
-                    📥 PDF বুকলেট ডাউনলোড করুন
-                </button>
+                <div id="questions-container" style="width: 100%; display: flex; flex-direction: column; gap: 20px; align-items: center;">
+                    <!-- Dynamic content will be populated here -->
+                </div>
+                <div id="printArea" style="position: fixed; left: -10000px; top: 0; visibility: visible; display: block;"></div>
             </div>
-
-            <!-- PDF Help Guideline Tips -->
-            <div style="background: white; border: 1.5px solid #E2E8F0; border-radius: 16px; padding: 16px; box-shadow: 0 2px 6px rgba(0,0,0,0.01); box-sizing: border-box;">
-                <h4 style="font-size: 13px; font-weight: 800; color: #1E293B; margin: 0 0 10px 0; display: flex; align-items: center; gap: 6px;">💡 ব্যবহারকারী নির্দেশিকা ও সহযোগিতা:</h4>
-                <ul style="margin: 0; padding-left: 20px; font-size: 11.5px; color: #475569; line-height: 1.6; font-weight: 500;">
-                    <li style="margin-bottom: 6px;">পিডিএফ ফাইলে কোনো যুক্তবর্ণ বা হরফে সমস্যা দেখা দিলে বা জটিলতা থাকলে, অনুগ্রহ করে ব্রাউজার রিফ্রেশ দিয়ে পুনরায় ট্রাই করুন। বাংলা অক্ষরের শতভাগ নির্ভুল ফ্রেম নিশ্চিত করতে আমরা উন্নত ক্যানভাস রেন্ডারিং মেথড ব্যবহার করি।</li>
-                    <li style="margin-bottom: 6px;"><strong>প্রশ্নপত্র ফরম্যাট:</strong> আপনি যদি নিজে বা বন্ধুদের পরীক্ষা নিতে চান, তবে "প্রশ্নের সাথেই উত্তরপত্র হাইলাইট করুন" অপশনটি টিক অফ করে দিবেন। এতে প্রশ্নপত্রের শেষে সুন্দর উত্তরপত্র (Answer Key) যোগ হবে।</li>
-                    <li style="margin-bottom: 6px;">আপনার বুকমার্ক করা কাস্টম রিভিশন পিডিএফ আপনি যেকোনো সময় কোনো লিমিট ছাড়াই আপনার ডিভাইসে সেভ করতে পারবেন।</li>
-                </ul>
-            </div>
+            <iframe id="pdf-preview-frame" style="display:none; width: 100%; height: 80vh; border: none; margin-top: 20px; background: white; border-radius: 20px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);"></iframe>
         </div>
     </div>
 
@@ -2997,19 +3001,7 @@
     <div id="admin-settings-modal" style="display:none; position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(15, 23, 42, 0.45); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); z-index:115000; align-items:center; justify-content:center; padding:16px; box-sizing: border-box;">
         <div class="summary-card" style="width:100%; max-width:550px; text-align:left; box-sizing: border-box; animation: popupIn 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275); position:relative; padding: 24px; max-height: 90vh; overflow-y: auto;">
             <button onclick="window.closeAdminSettingsModal()" style="position: absolute; top: 16px; right: 16px; border: none; background: #F1F5F9; color: #64748B; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; cursor: pointer; font-size: 14px; transition: background 0.2s; z-index: 10;">✕</button>
-            <h2 style="font-size: 19px; font-weight: 850; color: #1E293B; margin: 0 0 6px 0; display: flex; align-items: center; gap: 8px;">
-                <span>⚙️ অ্যাডমিন ম্যানেজার ও প্রোমো সেটিংস</span>
-            </h2>
-            <p style="font-size: 12.5px; color: #64748B; font-weight: 600; margin-bottom: 20px;">এই প্যানেল হতে অ্যাপের ফ্রী লিমিট ও প্রচারণামূলক বিজ্ঞাপন (Promoted Cards) নিয়ন্ত্রণ করুন।</p>
-            
-            <!-- Limit Section -->
-            <div style="border-bottom: 1px solid #E2E8F0; padding-bottom: 16px; margin-bottom: 16px;">
-                <h3 style="font-size: 14px; font-weight: 800; color: #0F172A; margin: 0 0 10px 0; display: flex; align-items: center; gap: 6px;">📚 প্রশ্ন ব্যাংক লিমিট</h3>
-                <div style="display: flex; flex-direction: column; gap: 4px;">
-                    <label style="font-size: 12px; font-weight: 750; color: #475569;">ফ্রী ইউজারদের জন্য দৈনিক সর্বোচ্চ ফ্রী প্রশ্ন দেখতে পারার লিমিট (Daily Question Limit):</label>
-                    <input type="number" id="adminSettingsFreeLimit" min="0" placeholder="যেমন: 5" style="width: 100%; height: 44px; border-radius: 12px; border: 1.5px solid #CBD5E1; padding: 0 12px; font-size: 13.5px; font-weight: 600; outline: none; box-sizing: border-box;" onfocus="this.style.borderColor='#00BFA1'" onblur="this.style.borderColor='#CBD5E1'">
-                </div>
-            </div>
+            <p style="padding: 20px; font-weight: 700; color: #64748B;">অ্যাডমিন প্যানেল আপডেট করা হচ্ছে...</p>
 
             <!-- Ad/Promo Section -->
             <div>
@@ -3397,6 +3389,7 @@
                 <div class="result-buttons">
                     <button class="solution-btn" id="viewSolutionBtn">📖 View Solutions</button>
                     <button class="btn" id="leaderboardBtn" style="margin-top: 0;">🏆 Leaderboard</button>
+                    <button class="btn" id="shareResultBtn" style="margin-top: 0; background: #3B82F6; grid-column: span 2;" onclick="window.shareResult()">📤 Share Result</button>
                 </div>
                 <div style="margin-top: 15px;">
                     <button onclick="goToHome()" style="width: 100%; height: 50px; background: #00BFA1; color: white; border: none; border-radius: 14px; font-weight: 700; font-size: 14.5px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; box-shadow: 0 4px 12px rgba(0, 191, 161, 0.2); transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.02)'" onmouseout="this.style.transform='scale(1)'">
@@ -3908,69 +3901,34 @@
         </div>
     </div>
 
-    <!-- Notice Board Modal -->
-    <div id="noticeBoardModal" style="display:none; position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(15, 23, 42, 0.65); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); z-index:100004; align-items:center; justify-content:center; padding:16px; box-sizing: border-box;">
-        <div style="background:#ffffff; border-radius:28px; width:100%; max-width:550px; box-shadow:0 30px 60px -15px rgba(0, 0, 0, 0.3); animation: popupIn 0.3s cubic-bezier(0.16, 1, 0.3, 1); position:relative; box-sizing: border-box; display: flex; flex-direction: column; max-height: 85vh; border: 1px solid rgba(255, 255, 255, 0.8);">
-            
-            <!-- Modal Header -->
-            <div style="padding: 24px 24px 16px 24px; border-bottom: 1.5px solid #F1F5F9; position: relative; flex-shrink: 0;">
-                <button onclick="closeNoticeBoardModal()" style="position: absolute; top: 18px; right: 18px; border: none; background: #F1F5F9; color: #64748B; width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; cursor: pointer; font-size: 14px; transition: all 0.2s; outline: none;" onmouseover="this.style.background='#E2E8F0'; this.style.color='#0F172A';" onmouseout="this.style.background='#F1F5F9'; this.style.color='#64748B';">✕</button>
-                <div style="display: flex; align-items: center; gap: 12px;">
-                    <span style="font-size: 28px;">📢</span>
-                    <div>
-                        <h2 style="font-size: 20px; font-weight: 850; color: #1E293B; margin: 0; letter-spacing: -0.5px; line-height: 1.3;">MCQ HERO নোটিশ বোর্ড</h2>
-                        <p style="font-size: 13px; color: #64748B; font-weight: 600; margin: 2px 0 0 0;">গুরুত্বপূর্ণ ঘোষণা ও পরীক্ষার নোটিশসমূহ</p>
-                    </div>
-                </div>
+    <!-- Notices Page -->
+    <div id="notices-page" style="display:none; background: #FAFAFA; min-height: 100vh;">
+        <div class="hero-header" style="background: white; padding: 0; border-bottom: 1.5px solid #F1F5F9; margin-bottom: 16px;">
+            <div class="topbar" style="display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: white; margin-bottom: 0;">
+                <button onclick="showPage('home-page')" style="background: #EBFDF9; border: none; border-radius: 12px; width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: #00BFA1; font-size: 18px; font-weight: bold; transition: all 0.2s;" onmouseover="this.style.background='#D1F2EB'" onmouseout="this.style.background='#EBFDF9'">←</button>
+                <div style="font-size: 19px; font-weight: 800; color: #0F172A; text-align: center; display: flex; align-items: center; gap: 8px;"><span>📢 নোটিশ বোর্ড</span></div>
+                <div style="width: 44px;"></div>
             </div>
+        </div>
 
-            <!-- Loader inside notice board -->
+        <div style="padding: 0 16px 80px 16px; max-width: 800px; margin: 0 auto; box-sizing: border-box;">
+            <!-- Loader -->
             <div id="noticeBoardLoader" style="padding: 40px; text-align: center; display: none;">
                 <div style="width: 24px; height: 24px; border: 3px solid #6D28D9; border-top-color: transparent; border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 12px auto;"></div>
                 <p style="font-size: 13px; color: #64748B; font-weight: 600; margin: 0;">নোটিশ লোড হচ্ছে...</p>
             </div>
 
-            <!-- Modal Scrollable Content: Notice List -->
-            <div id="noticeBoardList" style="padding: 20px 24px; overflow-y: auto; flex: 1; display: flex; flex-direction: column; gap: 14px; background: #FAFAFA;">
+            <!-- Notice List -->
+            <div id="noticeBoardList" style="display: flex; flex-direction: column; gap: 14px;">
                 <!-- Notices will load here dynamically -->
             </div>
+            
 
-            <!-- Admin Notice Creation Panel Toggle (Visible only if current user role is admin / moderator) -->
-            <div id="adminNoticePanel" style="display: none; padding: 20px 24px; border-top: 1.5px solid #F1F5F9; background: #FAF5FF; flex-shrink: 0; box-sizing: border-box;">
-                <h3 style="font-size: 14px; font-weight: 800; color: #6D28D9; margin: 0 0 12px 0; display: flex; align-items: center; gap: 6px;">
-                    <span>🛡️</span> নতুন নোটিশ প্রকাশ করুন (Admin Panel)
-                </h3>
-                <div style="display: flex; flex-direction: column; gap: 10px;">
-                    <div style="display: grid; grid-template-columns: 1fr 130px; gap: 10px;">
-                        <input id="newNoticeTitle" type="text" placeholder="নোটিশের শিরোনাম (Title)" style="width:100%; padding: 10px 14px; border-radius: 10px; border: 1.5px solid #E2E8F0; font-size: 13px; font-weight: 600; outline: none; background: white; box-sizing: border-box;" />
-                        <select id="newNoticeCategory" style="padding: 10px; border-radius: 10px; border: 1.5px solid #E2E8F0; font-size: 13px; font-weight: 600; outline: none; background: white; cursor: pointer; box-sizing: border-box;">
-                            <option value="important">📢 গুরুত্বপূর্ণ</option>
-                            <option value="update">💡 আপডেট</option>
-                            <option value="offer">🎁 অফার</option>
-                            <option value="exam">📝 পরীক্ষা</option>
-                        </select>
-                    </div>
-                    <textarea id="newNoticeMessage" rows="2" placeholder="নোটিশের বিস্তারিত বিবরণ (Details...)" style="width:100%; padding: 10px 14px; border-radius: 10px; border: 1.5px solid #E2E8F0; font-size: 13px; font-weight: 600; outline: none; background: white; resize: none; box-sizing: border-box;"></textarea>
-                    
-                    <div style="display: flex; justify-content: flex-end; gap: 10px; align-items: center;">
-                        <div style="display: flex; align-items: center; gap: 6px; margin-right: auto;">
-                            <input id="newNoticePin" type="checkbox" style="width:16px; height:16px; cursor: pointer;" />
-                            <label for="newNoticePin" style="font-size: 12px; font-weight: 700; color: #475569; cursor: pointer; user-select: none;">পিন করে রাখুন (Pin Notice)</label>
-                        </div>
-                        <button id="publishNoticeBtn" style="background: linear-gradient(135deg, #7C3AED, #6D28D9); color: white; border: none; font-size: 13px; font-weight: 700; padding: 10px 18px; border-radius: 10px; cursor: pointer; display: inline-flex; align-items: center; gap: 4px; transition: opacity 0.2s; outline: none;">
-                            🚀 প্রকাশ করুন
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Modal Footer / Optional Close -->
-            <div style="padding: 16px 24px; border-top: 1.5px solid #F1F5F9; display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; background: #F8FAFC; border-radius: 0 0 28px 28px;">
-                <span id="noticeCountBadge" style="font-size: 12px; font-weight: 700; color: #64748B;">মোট ০টি নোটিশ</span>
-                <button onclick="closeNoticeBoardModal()" style="background: #E2E8F0; color: #1E293B; border: none; font-size: 13px; font-weight: 700; padding: 10px 20px; border-radius: 12px; cursor: pointer; transition: all 0.2s; outline: none;" onmouseover="this.style.background='#CBD5E1';" onmouseout="this.style.background='#E2E8F0';">বন্ধ করুন</button>
-            </div>
 
         </div>
+    </div>
+
+
     </div>
 
     <!-- Self-Verification Modal for Firebase Email Delivery Failure Fail-safe -->
@@ -4230,6 +4188,7 @@
                 targetPage.style.display = "block";
             }
 
+
             if (pageId === "question-bank-page" && typeof window.backToQbankDirectory === "function") {
                 window.backToQbankDirectory();
             }
@@ -4439,6 +4398,20 @@
 
     <!-- MODULE SCRIPTS FOR FIREBASE AND SCIENTIFIC APP IMPLEMENTATION -->
     <script type="module">
+        // Global patch for circular JSON structures
+        const originalJSONStringify = JSON.stringify;
+        JSON.stringify = function(value, replacer, space) {
+            try {
+                return originalJSONStringify(value, replacer, space);
+            } catch (e) {
+                if (e instanceof TypeError && e.message.includes("circular")) {
+                    console.warn("Circular structure detected, returning empty object for serialization.");
+                    return "{}";
+                }
+                throw e;
+            }
+        };
+
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
         import {
             getFirestore, doc, getDoc, setDoc, updateDoc, increment, collection, getDocs, query, where, addDoc, orderBy, limit, deleteDoc, serverTimestamp, onSnapshot
@@ -4446,6 +4419,9 @@
         import {
             getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut, updateProfile, updatePassword, sendPasswordResetEmail, sendEmailVerification
         } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+        import {
+            getMessaging, getToken, onMessage
+        } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-messaging.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyAOBUkkt6zGBgOfcHDG-MpnJQuH98ke1mQ",
@@ -4461,6 +4437,13 @@
         const auth = getAuth(app);
 
         window.auth = auth;
+        window.db = db;
+        window.collection = collection;
+        window.query = query;
+        window.where = where;
+        window.orderBy = orderBy;
+        window.getDocs = getDocs;
+        window.addDoc = addDoc;
         window.firebaseSignOut = signOut;
 
         // --- Capacitor Push Notifications Integration ---
@@ -4469,7 +4452,51 @@
 
         async function setupPushNotifications() {
             if (!window.Capacitor) {
-                console.log("Push notifications skipped: Not running in a Capacitor mobile environment.");
+                console.log("Not in Capacitor. Setting up Firebase Web Push Cloud Messaging...");
+                if (typeof window.Notification !== 'undefined' && 'serviceWorker' in navigator) {
+                    try {
+                        const registration = await navigator.serviceWorker.register('firebase-messaging-sw.js', { scope: '/' });
+                        console.log('FCM Service Worker registered successfully with scope:', registration.scope);
+                        
+                        const messaging = getMessaging(app);
+                        
+                        // Request user permission for notifications
+                        const permission = await Notification.requestPermission();
+                        if (permission === 'granted') {
+                            const token = await getToken(messaging, { 
+                                vapidKey: 'BMVEiceHr_GxpmFuYQqOF4Z65h4mEQZy4O9r83HHloH5ajuzx4NB7RzZ4LhARmGtT4RbrMAxnPrcWmNh9jJOhmA',
+                                serviceWorkerRegistration: registration 
+                            });
+                            
+                            if (token) {
+                                console.log('Web FCM Token generated successfully:', token);
+                                window.pushNotificationToken = token;
+                                localStorage.setItem("fcm_token", token);
+                                await saveTokenToUserDoc(token);
+                            } else {
+                                console.log('No registration token available.');
+                            }
+                        } else {
+                            console.warn('Notification permission not granted.');
+                        }
+
+                        // Listen for foreground messages
+                        onMessage(messaging, (payload) => {
+                            console.log('Message received in foreground: ', payload);
+                            const title = payload.notification?.title || "নতুন নোটিফিকেশন";
+                            const body = payload.notification?.body || "";
+                            if (typeof window.showMiniToast === "function") {
+                                window.showMiniToast(`🔔 ${title}: ${body}`);
+                            } else {
+                                alert(`${title}\n${body}`);
+                            }
+                        });
+                    } catch (err) {
+                        console.error('Error establishing Firebase Web Push:', err);
+                    }
+                } else {
+                    console.warn('Service workers or Notifications are not supported in this browser.');
+                }
                 return;
             }
 
@@ -7349,20 +7376,19 @@
                         const firstElement = examData.questions[0];
                         if (typeof firstElement === 'string') {
                             // Array of string IDs pointing dynamically to database
-                            const fetched = [];
-                            for (const qId of examData.questions) {
-                                let qSnap = await getDoc(doc(db, "questions", qId));
-                                if (qSnap.exists()) {
-                                    fetched.push({ id: qSnap.id, ...qSnap.data() });
-                                } else {
-                                    qSnap = await getDoc(doc(db, "exam_questions", qId));
-                                    if (qSnap.exists()) {
-                                        fetched.push({ id: qSnap.id, ...qSnap.data() });
+                            const fetched = await Promise.all(
+                                examData.questions.map(async (qId) => {
+                                    let qSnap = await getDoc(doc(db, "questions", qId));
+                                    if (!qSnap.exists()) {
+                                        qSnap = await getDoc(doc(db, "exam_questions", qId));
                                     }
-                                }
-                            }
-                            if (fetched.length > 0) {
-                                questions = fetched;
+                                    return qSnap.exists() ? { id: qSnap.id, ...qSnap.data() } : null;
+                                })
+                            );
+                            
+                            const validQuestions = fetched.filter(q => q !== null);
+                            if (validQuestions.length > 0) {
+                                questions = validQuestions;
                                 loadedSource = "live_exams document 'questions' array of string IDs";
                             }
                         } else if (typeof firstElement === 'object' && firstElement !== null) {
@@ -7373,20 +7399,19 @@
                     
                     // Pattern 1.5: Array of question doc IDs inside 'questionIds' field of live_exams document
                     if (questions.length === 0 && examData.questionIds && Array.isArray(examData.questionIds) && examData.questionIds.length > 0) {
-                        const fetched = [];
-                        for (const qId of examData.questionIds) {
-                            let qSnap = await getDoc(doc(db, "questions", qId));
-                            if (qSnap.exists()) {
-                                fetched.push({ id: qSnap.id, ...qSnap.data() });
-                            } else {
-                                qSnap = await getDoc(doc(db, "exam_questions", qId));
-                                if (qSnap.exists()) {
-                                    fetched.push({ id: qSnap.id, ...qSnap.data() });
+                        const fetched = await Promise.all(
+                            examData.questionIds.map(async (qId) => {
+                                let qSnap = await getDoc(doc(db, "questions", qId));
+                                if (!qSnap.exists()) {
+                                    qSnap = await getDoc(doc(db, "exam_questions", qId));
                                 }
-                            }
-                        }
-                        if (fetched.length > 0) {
-                            questions = fetched;
+                                return qSnap.exists() ? { id: qSnap.id, ...qSnap.data() } : null;
+                            })
+                        );
+                        
+                        const validQuestions = fetched.filter(q => q !== null);
+                        if (validQuestions.length > 0) {
+                            questions = validQuestions;
                             loadedSource = "live_exams document 'questionIds' referenced from top collections";
                         }
                     }
@@ -7758,13 +7783,16 @@
             }
 
             try {
-                const examSnap = await getDoc(doc(db, "live_exams", examId));
+                // Fetch in parallel
+                const [examSnap, dbQuestions] = await Promise.all([
+                    getDoc(doc(db, "live_exams", examId)),
+                    window.fetchExamQuestions(examId)
+                ]);
+
                 if (examSnap.exists()) {
                     const examData = examSnap.data();
                     window.currentExam = examData;
                     
-                    // Pre-fetch real database questions
-                    const dbQuestions = await window.fetchExamQuestions(examId);
                     if (dbQuestions && dbQuestions.length > 0) {
                         window.fetchedQuestionsMap = window.fetchedQuestionsMap || {};
                         window.fetchedQuestionsMap[examId] = dbQuestions;
@@ -8491,6 +8519,26 @@
                             adminLink.style.display = "block";
                         } else {
                             adminLink.style.display = "none";
+                        }
+                    }
+
+                    // Toggle Sidebar Push Notification Link
+                    const pushNotifLink = document.getElementById("sidebarPushNotificationLink");
+                    if (pushNotifLink && pushNotifLink.style) {
+                        if (finalRole === "admin") {
+                            pushNotifLink.style.display = "block";
+                        } else {
+                            pushNotifLink.style.display = "none";
+                        }
+                    }
+
+                    // Toggle Sidebar Notification History Link
+                    const notifHistoryLink = document.getElementById("sidebarNotificationHistoryLink");
+                    if (notifHistoryLink && notifHistoryLink.style) {
+                        if (finalRole === "admin") {
+                            notifHistoryLink.style.display = "block";
+                        } else {
+                            notifHistoryLink.style.display = "none";
                         }
                     }
 
@@ -9813,9 +9861,9 @@
             }
 
             if (activeCourses.length === 0) {
-                selectorContainer.innerHTML = `<div style="text-align: center; padding: 12px; color: #64748B; font-size: 11.5px; font-weight: 500; width: 100%;">
-                    🔒 পরীক্ষা রুটিন ও পিডিএফ লেকচার শিট দেখতে যেকোনো একটি কোর্সে এনরোল করুন!
-                </div>`;
+                selectorContainer.innerHTML = '<div style="text-align: center; padding: 12px; color: #64748B; font-size: 11.5px; font-weight: 500; width: 100%;">' +
+                    '🔒 পরীক্ষা রুটিন ও পিডিএফ লেকচার শিট দেখতে যেকোনো একটি কোর্সে এনরোল করুন!' +
+                '</div>';
                 if (contentPanel) contentPanel.style.display = "none";
                 return;
             }
@@ -9825,7 +9873,8 @@
             }
 
             let buttonsHtml = "";
-            activeCourses.forEach(course => {
+            for (let i = 0; i < activeCourses.length; i++) {
+                const course = activeCourses[i];
                 const isSelected = course.id === window.selectedRoutineCourseId;
                 const displayTitle = course.title || course.name || course.courseName || course.courseTitle || course.course_name || course.course_title || "ফ্রি কোর্স";
                 const cleanTitle = displayTitle.split(" - ")[0].split(" (")[0];
@@ -9838,7 +9887,8 @@
                         📘 ${cleanTitle}
                     </button>
                 `;
-            });
+            }
+
             selectorContainer.innerHTML = buttonsHtml;
 
             const activeCourse = activeCourses.find(c => c.id === window.selectedRoutineCourseId);
@@ -10886,7 +10936,7 @@
         async function loadNotice() {
             try {
                 // Seed fallback ones if collection is brand new
-                await seedDefaultNoticesIfEmpty();
+                // await seedDefaultNoticesIfEmpty();
 
                 // Fetch the latest notice (could be pinned, or just absolute latest by date)
                 const q = query(collection(db, "notices"), orderBy("createdAt", "desc"), limit(40));
@@ -11421,7 +11471,7 @@
         };
 
         window.closeNoticeBoardModal = function() {
-            document.getElementById("noticeBoardModal").style.display = "none";
+            showPage('home-page');
         };
 
         // Self-Verification Implementation Logic
@@ -11524,17 +11574,16 @@
                 topBadge.style.display = "none";
             }
 
-            const modal = document.getElementById("noticeBoardModal");
+            showPage('notices-page');
             const loader = document.getElementById("noticeBoardLoader");
             const listContainer = document.getElementById("noticeBoardList");
-            const countBadge = document.getElementById("noticeCountBadge");
-            const adminPanel = document.getElementById("adminNoticePanel");
 
-            modal.style.display = "flex";
+
+
             loader.style.display = "block";
             listContainer.innerHTML = "";
-            countBadge.innerText = "মোট ০টি নোটিশ";
-            adminPanel.style.display = "none";
+
+
 
             try {
                 // Fetch user role to enable admin publishing access dynamically
@@ -11554,9 +11603,6 @@
                     }
                 }
 
-                if (isStaff) {
-                    adminPanel.style.display = "block";
-                }
 
                 // Make sure defaults are there
                 await seedDefaultNoticesIfEmpty();
@@ -11591,7 +11637,7 @@
                     return tB - tA;
                 });
 
-                countBadge.innerText = `মোট ${list.length}টি নোটিশ`;
+
 
                 let html = "";
                 list.forEach((item, idx) => {
@@ -11675,53 +11721,6 @@
             } catch (err) {
                 console.error("deleteNotice error:", err);
                 alert(`❌ নোটিশ মুছতে ব্যর্থ হয়েছে: ${err.message}`);
-            }
-        };
-
-        // Click handler to publish a new notice
-        document.getElementById("publishNoticeBtn").onclick = async function() {
-            const titleInput = document.getElementById("newNoticeTitle");
-            const categorySelect = document.getElementById("newNoticeCategory");
-            const messageInput = document.getElementById("newNoticeMessage");
-            const pinCheckbox = document.getElementById("newNoticePin");
-
-            const title = titleInput.value.trim();
-            const message = messageInput.value.trim();
-            const category = categorySelect.value;
-            const pinned = pinCheckbox.checked;
-
-            if (!title || !message) {
-                alert("⚠️ দয়া করে নোটিশের শিরোনাম এবং মূল বিবরণ উভয় অংশ পূরণ করুন!");
-                return;
-            }
-
-            const btn = document.getElementById("publishNoticeBtn");
-            const originalText = btn.innerText;
-            btn.innerText = "⏳ প্রকাশ করা হচ্ছে...";
-            btn.disabled = true;
-
-            try {
-                await addDoc(collection(db, "notices"), {
-                    title: title,
-                    message: message,
-                    category: category,
-                    pinned: pinned,
-                    createdAt: serverTimestamp()
-                });
-
-                titleInput.value = "";
-                messageInput.value = "";
-                pinCheckbox.checked = false;
-
-                alert("🚀 সফলভাবে নোটিশটি প্রকাশ করা হয়েছে!");
-                window.openNoticeBoardModal();
-                loadNotice();
-            } catch (err) {
-                console.error("publishNewNotice error:", err);
-                alert(`❌ নোটিশ প্রকাশ করতে ব্যর্থ হয়েছে: ${err.message}`);
-            } finally {
-                btn.innerText = originalText;
-                btn.disabled = false;
             }
         };
 
@@ -11934,6 +11933,12 @@
 
         // Initialize the Question Bank
         window.initQuestionBank = async function() {
+            // Show loader
+            const qDirLoader = document.getElementById("qbankDirLoader");
+            if (qDirLoader) qDirLoader.style.display = "block";
+            const qSubjectsGrid = document.getElementById("qbankSubjectsGrid");
+            if (qSubjectsGrid) qSubjectsGrid.style.display = "none";
+
             // Highly polished default premium questions for direct, reliable offline/online hybrid operation
             const defaults = [
                 {
@@ -12410,6 +12415,10 @@
             if (dirSection) dirSection.style.display = "none";
             if (subSection) subSection.style.display = "none";
             if (qSection) qSection.style.display = "block";
+            
+            // Show loader
+            const qLoader = document.getElementById("qbankLoader");
+            if (qLoader) qLoader.style.display = "block";
 
             // Hide bookmark reset button unless we're in Bookmarks view
             const clearBtn = document.getElementById("qbankBookmarksResetBtn");
@@ -12549,7 +12558,14 @@
                 </div>
             `;
 
-            grid.innerHTML = html;
+            setTimeout(() => {
+                grid.innerHTML = html;
+                grid.style.display = "grid";
+    
+                // Hide loader
+                const qDirLoader = document.getElementById("qbankDirLoader");
+                if (qDirLoader) qDirLoader.style.display = "none";
+            }, 0);
         };
 
         // Render full subcategory cards for selected Category
@@ -12716,6 +12732,9 @@
                            <p style="font-size: 12.5px; margin: 0; line-height: 1.4;">অনুগ্রহ করে সঠিক কি-ওয়ার্ড টাইপ করে খোঁজার চেষ্টা করুন।</p>
                         </div>
                     `;
+                    // Hide loader
+                    const qLoader = document.getElementById("qbankLoader");
+                    if (qLoader) qLoader.style.display = "none";
                 }
                 return;
             }
@@ -13035,6 +13054,9 @@
             }
 
             container.innerHTML = html;
+            // Hide loader
+            const qLoader = document.getElementById("qbankLoader");
+            if (qLoader) qLoader.style.display = "none";
         };
 
         // Interactive verification showing option grading
@@ -13356,6 +13378,82 @@
             }
         };
 
+        window.openPushNotificationModal = function() {
+            const role = window.currentUserRole || localStorage.getItem("role") || "free";
+            if (role !== "admin") {
+                alert("🚫 দুঃখিত, এই ফিচার শুধু অ্যাডমিন অ্যাক্সেসের জন্য সীমিত।");
+                return;
+            }
+            document.getElementById("push-notification-modal").style.display = "flex";
+        };
+        window.closePushNotificationModal = function() {
+            document.getElementById("push-notification-modal").style.display = "none";
+        };
+        window.showNotificationHistoryPage = async function() {
+            const role = window.currentUserRole || localStorage.getItem("role") || "free";
+            if (role !== "admin") {
+                alert("🚫 দুঃখিত, এই ফিচার শুধু অ্যাডমিন অ্যাক্সেসের জন্য সীমিত।");
+                return;
+            }
+            showPage('notification-history-page', null);
+            const container = document.getElementById("notificationHistoryContainer");
+            container.innerHTML = "লোড হচ্ছে...";
+            try {
+                const response = await fetch('/api/notification-history');
+                const history = await response.json();
+                
+                if (!response.ok) {
+                    throw new Error(history.error || "হিস্ট্রি লোড করতে সমস্যা হয়েছে।");
+                }
+
+                if (history.length === 0) {
+                    container.innerHTML = "কোনো নোটিফিকেশন ইতিহাস নেই।";
+                    return;
+                }
+                container.innerHTML = history.map(item => `
+                    <div style="padding: 15px; border-bottom: 1px solid #E2E8F0; margin-bottom: 10px; background: white; border-radius: 8px;">
+                        <strong style="font-size: 16px;">${item.title}</strong><br>
+                        <p style="margin: 5px 0; color: #475569;">${item.body}</p>
+                        <small style="color: #94A3B8;">${new Date(item.timestamp).toLocaleString()}</small><br>
+                        <span style="font-size: 12px; color: #059669; font-weight: bold;">সাকসেস: ${item.successCount}</span> | 
+                        <span style="font-size: 12px; color: #DC2626; font-weight: bold;">ফেইল: ${item.failureCount}</span>
+                    </div>
+                `).join('');
+            } catch (e) {
+                container.innerHTML = "ত্রুটি: " + e.message;
+            }
+        };
+        window.sendPushNotification = async function() {
+            const title = document.getElementById("pushNotifTitle").value;
+            const message = document.getElementById("pushNotifMessage").value;
+            if(!title || !message) { alert("শিরোনাম ও বার্তা দিন"); return; }
+            
+            try {
+                const response = await fetch('/api/send-all-notification', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ title, body: message }),
+                });
+
+                const result = await response.json();
+                
+                if (response.ok) {
+                    alert("🎉 সাকসেস! নোটিফিকেশনটি সফলভাবে পাঠানো হয়েছে। (" + result.successCount + " সফল)");
+                } else {
+                    alert("❌ নোটিফিকেশন পাঠাতে সমস্যা হয়েছে: " + (result.error || "Unknown error"));
+                }
+            } catch (error) {
+                console.error("Error:", error);
+                alert("❌ নোটিফিকেশন পাঠাতে সমস্যা হয়েছে।");
+            }
+            
+            document.getElementById("pushNotifTitle").value = "";
+            document.getElementById("pushNotifMessage").value = "";
+            window.closePushNotificationModal();
+        };
+
         window.openAdminSettingsModal = function() {
             const role = window.currentUserRole || localStorage.getItem("role") || "free";
             if (role !== "admin" && role !== "moderator") {
@@ -13419,6 +13517,48 @@
             const modal = document.getElementById("admin-settings-modal");
             if (modal) {
                 modal.style.display = "none";
+            }
+        };
+
+        window.sendAllPushNotification = async function() {
+            const title = document.getElementById("pushNotifTitle").value.trim();
+            const body = document.getElementById("pushNotifBody").value.trim();
+            const btn = document.getElementById("sendPushBtn");
+
+            if (!title || !body) {
+                alert("শিরোনাম এবং বিস্তারিত অবশ্যই লিখতে হবে।");
+                return;
+            }
+
+            const originalText = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = "⏳ পাঠানো হচ্ছে...";
+
+            try {
+                const response = await fetch("/api/send-all-notification", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ title, body })
+                });
+
+                if (response.ok) {
+                    alert("✅ নোটিফিকেশন সফলভাবে পাঠানো হয়েছে!");
+                    document.getElementById("pushNotifTitle").value = "";
+                    document.getElementById("pushNotifBody").value = "";
+                } else {
+                    const error = await response.json();
+                    throw new Error(error.error || "Failed to send");
+                }
+            } catch (error) {
+                console.error("Error:", error);
+                if (error.message.includes("RESOURCE_EXHAUSTED") || error.message.includes("Quota exceeded")) {
+                    alert("❌ নোটিফিকেশন পাঠাতে সমস্যা হয়েছে: ফায়ারবেস নোটিফিকেশন কোটা পূর্ণ হয়ে গেছে। দয়া করে কিছুক্ষণ পরে আবার চেষ্টা করুন অথবা আপনার ফায়ারবেস প্ল্যান চেক করুন।");
+                } else {
+                    alert("❌ নোটিফিকেশন পাঠাতে সমস্যা হয়েছে: " + error.message);
+                }
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = originalText;
             }
         };
 
@@ -13784,6 +13924,189 @@
             }
         };
 
+        window.selectCategoryTab = function(categoryId) {
+            const select = document.getElementById("studyNotesCategory");
+            select.value = categoryId;
+            
+            // Update tab styles
+            const tabs = document.getElementById("studyNotesCategoryTabs").children;
+            for (let tab of tabs) {
+                if (tab.getAttribute('data-id') === categoryId) {
+                    tab.style.background = '#00BFA1';
+                    tab.style.color = 'white';
+                    tab.style.borderColor = '#00BFA1';
+                } else {
+                    tab.style.background = 'white';
+                    tab.style.color = '#475569';
+                    tab.style.borderColor = '#E2E8F0';
+                }
+            }
+            
+            window.loadSubcategoriesForNotes();
+        };
+
+        window.initStudyNotesPage = function() {
+            const tabContainer = document.getElementById("studyNotesCategoryTabs");
+            const select = document.getElementById("studyNotesCategory");
+            const loading = document.getElementById("studyNotesLoading");
+            const container = document.getElementById("studyNotesContainer");
+            if (!tabContainer || !select) return;
+            
+            if (!window.qbankCategories || window.qbankCategories.length === 0) {
+                loading.style.display = 'block';
+                container.style.display = 'none';
+                setTimeout(window.initStudyNotesPage, 500);
+                return;
+            }
+            
+            loading.style.display = 'none';
+            container.style.display = 'flex';
+            
+            let html = '<option value="">সকল বিষয়</option>';
+            let tabsHtml = `<button onclick="window.selectCategoryTab('')" data-id="" style="padding: 8px 16px; border-radius: 20px; border: 1px solid #00BFA1; background: #00BFA1; color: white; cursor: pointer; white-space: nowrap; font-size: 13px; font-weight: 600;">সকল বিষয়</button>`;
+            
+            window.qbankCategories.forEach(cat => {
+                html += `<option value="${cat.id || cat.docId}">${cat.name}</option>`;
+                tabsHtml += `<button onclick="window.selectCategoryTab('${cat.id || cat.docId}')" data-id="${cat.id || cat.docId}" style="padding: 8px 16px; border-radius: 20px; border: 1px solid #E2E8F0; background: white; cursor: pointer; white-space: nowrap; font-size: 13px; font-weight: 600; color: #475569;">${cat.name}</button>`;
+            });
+            select.innerHTML = html;
+            tabContainer.innerHTML = tabsHtml;
+            window.loadSubcategoriesForNotes();
+        };
+
+        window.loadSubcategoriesForNotes = function() {
+            const categoryId = document.getElementById("studyNotesCategory").value;
+            const subcategorySelect = document.getElementById("studyNotesSubcategory");
+            
+            if (!window.qbankSubcategories) {
+                 // Try again after a short delay
+                setTimeout(window.loadSubcategoriesForNotes, 500);
+                return;
+            }
+            
+            let subcats = window.qbankSubcategories || [];
+            if (categoryId) {
+                subcats = subcats.filter(s => s.categoryId === categoryId);
+            }
+            
+            let html = '<option value="">সকল টপিক</option>';
+            subcats.forEach(sub => {
+                html += `<option value="${sub.id}">${sub.name}</option>`;
+            });
+            subcategorySelect.innerHTML = html;
+            window.loadNotes();
+        };
+        
+        window.currentNotes = [];
+        window.showNoteDetails = function(index) {
+            const note = window.currentNotes[index];
+            if (!note) return;
+            document.getElementById('noteTitle').innerText = note.title || 'Untitled';
+            document.getElementById('noteContent').innerText = note.content || '';
+            document.getElementById('noteDetailsModal').style.display = 'flex';
+        };
+
+        window.downloadNoteAsPDF = function() {
+            const title = document.getElementById('noteTitle').innerText;
+            const content = document.getElementById('noteContent').innerText;
+            console.log("Downloading PDF:", title, content);
+
+            const element = document.createElement('div');
+            element.style.padding = '40px';
+            element.style.color = '#333';
+            element.style.backgroundColor = 'white';
+            element.style.fontFamily = 'Arial, sans-serif';
+            element.style.lineHeight = '1.6';
+            element.style.position = 'relative';
+            // PDF generation
+            const generatePdf = async () => {
+                if (window.PdfEngine) {
+                    await window.PdfEngine.generate(title, content);
+                } else {
+                    console.error("PdfEngine not loaded yet");
+                }
+            };
+            generatePdf();
+        };
+        
+        window.loadNotes = async function() {
+            console.log("Loading notes...");
+            const container = document.getElementById("studyNotesContainer");
+            const loading = document.getElementById("studyNotesLoading");
+            const categoryId = document.getElementById("studyNotesCategory").value;
+            const subcategoryId = document.getElementById("studyNotesSubcategory").value;
+            
+            if (!container || !loading) return;
+            
+            loading.style.display = 'block';
+            container.style.display = 'none';
+            container.innerHTML = '';
+            window.currentNotes = [];
+            
+            try {
+                let q = collection(db, "study_notes");
+                let queries = [];
+                if (categoryId) queries.push(where("categoryId", "==", categoryId));
+                if (subcategoryId) queries.push(where("subcategoryId", "==", subcategoryId));
+                
+                let qSnap;
+                if (queries.length > 0) {
+                    qSnap = await getDocs(query(q, ...queries));
+                } else {
+                    qSnap = await getDocs(q);
+                }
+                
+                let html = "";
+                let index = 0;
+                qSnap.forEach((doc) => {
+                    const data = doc.data();
+                    window.currentNotes.push(data);
+                    
+                    const title = data.title || 'Untitled';
+                    const content = data.content || '';
+                    const preview = content.length > 100 ? content.substring(0, 100) + '...' : content;
+                    
+                    html += `<div style="background: white; padding: 20px; border-radius: 12px; border: 1px solid #E2E8F0;">
+                        <h2 style="margin-top: 0; font-size: 18px;">${title}</h2>
+                        <p style="color: #475569;">${preview}</p>
+                        <button onclick="window.showNoteDetails(${index})" style="background: #EBFDF9; color: #00BFA1; border: none; padding: 8px 16px; border-radius: 8px; cursor: pointer; font-weight: bold;">বিস্তারিত দেখুন</button>
+                    </div>`;
+                    index++;
+                });
+                
+                container.innerHTML = html || '<div style="text-align: center; padding: 40px; color: #64748B;">কোনো নোট পাওয়া যায়নি।</div>';
+            } catch (error) {
+                console.error("Error loading notes:", error);
+                container.innerHTML = '<div style="text-align: center; padding: 40px; color: #EF4444;">নোট লোড করতে সমস্যা হয়েছে।</div>';
+            } finally {
+                loading.style.display = 'none';
+                container.style.display = 'flex';
+            }
+        };
+
+        window.toggleQbankView = function(viewType) {
+            const qContainer = document.getElementById("qbankQuestionsContainer");
+            const nContainer = document.getElementById("qbankNotesContainer");
+            const qTab = document.getElementById("qbankTabQuestions");
+            const nTab = document.getElementById("qbankTabNotes");
+            
+            if (viewType === 'questions') {
+                qContainer.style.display = 'flex';
+                nContainer.style.display = 'none';
+                qTab.style.background = '#00BFA1';
+                qTab.style.color = 'white';
+                nTab.style.background = 'transparent';
+                nTab.style.color = '#64748B';
+            } else {
+                qContainer.style.display = 'none';
+                nContainer.style.display = 'flex';
+                qTab.style.background = 'transparent';
+                qTab.style.color = '#64748B';
+                nTab.style.background = '#00BFA1';
+                nTab.style.color = 'white';
+            }
+        };
+
         window.resetQbankSearch = function() {
             const input = document.getElementById("qbankSearchInput");
             if (input) {
@@ -13847,103 +14170,12 @@
 
             window.updatePDFPreviewCount();
         };
-
-        // --- Job Circulars Page (জব সার্কুলার) JS Controller ---
-        window.allJobCircularsCompiled = [];
-
-        // Global states for image zoom and dragging
-        window.jobCircularZoomScale = 1;
-        window.isDraggingJobCircularImg = false;
-        window.jobCircularImgStartX = 0;
-        window.jobCircularImgStartY = 0;
-        window.jobCircularImgScrollLeft = 0;
-        window.jobCircularImgScrollTop = 0;
-
-        window.initJobCircularsPage = async function() {
-            console.log("Initializing Job Circulars Page...");
+        window.renderJobCirculars = function(jobCirculars) {
             const container = document.getElementById("jobCircularsContainer");
             if (!container) return;
-            
-            // Show responsive loading spinner state
-            container.innerHTML = `
-                <div style="text-align: center; padding: 50px 20px;">
-                    <div style="border: 3.5px solid #F1F5F9; border-top: 3.5px solid #1565FF; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin: 0 auto 14px auto;"></div>
-                    <p style="font-size: 13px; color: #475569; font-weight: 800; margin: 0;">সার্কুলারসমূহ লোড হচ্ছে...</p>
-                </div>
-            `;
-            
-            try {
-                const jobCol = collection(db, "job_circulars");
-                let snap;
-                try {
-                    const q = query(jobCol, orderBy("createdAt", "desc"));
-                    snap = await getDocs(q);
-                } catch (orderByErr) {
-                    console.warn("Firebase query with orderBy failed (or index not created yet), falling back to client-side sort:", orderByErr);
-                    snap = await getDocs(jobCol);
-                }
-                
-                let circulars = [];
-                snap.forEach(docSnap => {
-                    const data = docSnap.data();
-                    circulars.push({
-                        id: docSnap.id,
-                        title: data.title || "",
-                        vacancies: data.vacancies || "",
-                        deadline: data.deadline || "",
-                        pdfUrl: data.pdfUrl || "",
-                        imgUrl: data.imgUrl || "",
-                        createdAt: data.createdAt ? (typeof data.createdAt.toDate === "function" ? data.createdAt.toDate() : new Date(data.createdAt)) : null
-                    });
-                });
-
-                // Client-side fallback sorting just in case orderBy was bypassed or failed
-                circulars.sort((a, b) => {
-                    const timeA = a.createdAt ? a.createdAt.getTime() : 0;
-                    const timeB = b.createdAt ? b.createdAt.getTime() : 0;
-                    return timeB - timeA; // Descending
-                });
-                
-                window.allJobCircularsCompiled = circulars;
-                window.renderJobCirculars(circulars);
-                
-            } catch (err) {
-                console.error("Failed to fetch job circulars:", err);
-                container.innerHTML = `
-                    <div style="background: #FEF2F2; border: 1.5px solid #FECACA; border-radius: 16px; padding: 16px; display: flex; gap: 10px; align-items: flex-start; text-align: left; margin: 20px 0;">
-                        <span style="font-size: 20px;">⚠️</span>
-                        <div>
-                            <h5 style="font-size: 14px; font-weight: 800; color: #991B1B; margin: 0 0 4px 0;">ডাটা লোড হতে ত্রুটি হয়েছে</h5>
-                            <p style="font-size: 12px; color: #7F1D1D; font-weight: 600; margin: 0; line-height: 1.45;">নেটওয়ার্ক অথবা সার্ভার সমস্যার কারণে সার্কুলারসমূহ এই মুহূর্তে লোড করা সম্ভব হয়নি। অনুগ্রহ করে ইন্টারনেট কানেকশন চেক করুন।</p>
-                        </div>
-                    </div>
-                    <div id="jobCircularsEmptyState" style="display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 40px 24px; text-align: center; background: white; border-radius: 20px; border: 1.5px solid #F1F5F9;">
-                        <span style="font-size: 40px; margin-bottom: 12px;">🚫</span>
-                        <h4 style="font-size: 15px; font-weight: 850; color: #0F172A; margin: 0 0 6px 0;">সার্কুলার ডাটা খালি</h4>
-                        <p style="font-size: 12px; color: #64748B; font-weight: 600; max-width: 320px; margin: 0;">অ্যাডমিন প্যানেল থেকে সার্কুলার যুক্ত করার পর এখানে স্বয়ংক্রিয়ভাবে প্রদর্শিত হবে।</p>
-                    </div>
-                `;
-            }
-        };
-
-        window.renderJobCirculars = function(circulars) {
-            const container = document.getElementById("jobCircularsContainer");
-            if (!container) return;
-            
-            if (circulars.length === 0) {
-                container.innerHTML = `
-                    <div id="jobCircularsEmptyState" style="display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 50px 24px; text-align: center; background: white; border-radius: 20px; border: 1.5px solid #F1F5F9; box-shadow: 0 4px 12px rgba(0,0,0,0.015);">
-                        <span style="font-size: 48px; margin-bottom: 12px;">💼</span>
-                        <h4 style="font-size: 16px; font-weight: 850; color: #0F172A; margin: 0 0 6px 0;">কোনো জব সার্কুলার পাওয়া যায়নি!</h4>
-                        <p style="font-size: 12.5px; color: #64748B; font-weight: 600; max-width: 320px; margin: 0; line-height: 1.5;">আমাদের রেকর্ডে বর্তমানে কোনো সক্রিয় চাকরির বিজ্ঞপ্তি নেই। নিয়মিত চেক করুন!</p>
-                    </div>
-                `;
-                return;
-            }
             
             let htmlContent = "";
-            circulars.forEach((circ, index) => {
-                // Action Buttons Logic
+            jobCirculars.forEach((circ, index) => {
                 let pdfBtn = "";
                 if (circ.pdfUrl && circ.pdfUrl.trim() !== "") {
                     pdfBtn = `
@@ -14090,7 +14322,20 @@
             window.pdfSourceType = "subject";
             window.setPDFSourceType("subject");
 
-            // Populate category list
+            // Setup auto-refresh for categories every 5 minutes
+            if (window.pdfRefreshInterval) clearInterval(window.pdfRefreshInterval);
+            window.pdfRefreshInterval = setInterval(async () => {
+                await window.loadCategoriesIntoSelector();
+                const catSelector = document.getElementById('category-selector');
+                if (catSelector && catSelector.value) {
+                    window.loadSubCategories(catSelector.value);
+                }
+            }, 5 * 60 * 1000);
+
+            // Populate category list (initial load)
+            window.loadCategoriesIntoSelector();
+
+            // Populate category list (Legacy initPDFPage logic, might be redundant but keeping to avoid breaking things)
             const selectCategory = document.getElementById("pdfSelectCategory");
             if (selectCategory && window.qbankCategories) {
                 selectCategory.innerHTML = window.qbankCategories.map(cat => 
@@ -14121,8 +14366,8 @@
             // We search for subcategories in window.qbankSubcategories map
             // or filter from subdirectories.
             let subcats = [];
-            if (window.qbankSubcategories && window.qbankSubcategories[selectedCatId]) {
-                subcats = window.qbankSubcategories[selectedCatId];
+            if (window.qbankSubcategories && Array.isArray(window.qbankSubcategories)) {
+                subcats = window.qbankSubcategories.filter(sub => sub.categoryId === selectedCatId);
             }
 
             let htmlOptions = `<option value="all">-- সম্পূর্ণ ক্যাটাগরির সকল প্রশ্ন --</option>`;
@@ -14184,100 +14429,119 @@
 
             if (window.pdfSourceType === "all") {
                 let text = `মোট <span style="color: #00BFA1; font-size:16px;">${helperBengaliNumber(allQuestions.length)}টি</span> ডাটাবেজ প্রশ্ন`;
-                if (!isPremiumUser) {
-                    text += ` <span style="font-size:10.5px; color:#D97706; display:block; margin-top:4px; font-weight:bold;">⚠️ ফ্রি লিমিট: ১ম ১০টি প্রশ্ন ডাউনলোড হবে</span>`;
-                }
-                summaryBadge.innerHTML = text;
-                return;
-            }
-
-            // Otherwise, it's subject-based
-            const selectCategory = document.getElementById("pdfSelectCategory");
-            const selectSubcategory = document.getElementById("pdfSelectSubcategory");
-            
-            if (!selectCategory || !selectSubcategory) {
-                summaryBadge.innerText = "০ টি প্রশ্ন";
-                return;
-            }
-
-            const catId = selectCategory.value;
-            const subId = selectSubcategory.value;
-
-            const filtered = allQuestions.filter(q => {
-                if (q.categoryId !== catId) return false;
-                if (subId !== "all" && q.subcategoryId !== subId) return false;
-                return true;
-            });
-
-            let text = `মোট <span style="color: #00BFA1; font-size:16px;">${helperBengaliNumber(filtered.length)}টি</span> ফিল্টারকৃত প্রশ্ন`;
-            if (!isPremiumUser && filtered.length > 10) {
-                text += ` <span style="font-size:10.5px; color:#D97706; display:block; margin-top:4px; font-weight:bold;">⚠️ ফ্রি লিমিট: ১ম ১০টি প্রশ্ন ডাউনলোড হবে</span>`;
-            }
-            summaryBadge.innerHTML = text;
-        };
-
-        window.triggerPDFGeneration = function() {
-            const btn = document.getElementById("pdfDownloadBtn");
-            const originalText = btn.innerHTML;
-
-            const helperBengaliNumber = function(num) {
-                const bnNums = ['০', '১', '২', '৩', '৪', '৫', '৬', '৭', '৮', '৯'];
-                return num.toString().replace(/\d/g, d => bnNums[d]);
-            };
-
-            // Gather options & configure variables
-            const showAnswers = document.getElementById("pdfOptShowAnswers").checked;
-            const showExplanations = document.getElementById("pdfOptShowExplanations").checked;
-            const doubleColumn = document.getElementById("pdfOptDoubleColumn").checked;
-
-            const allQuestions = window.qbankAllQuestions || [];
-            let questionsToPrint = [];
-            let titleText = "";
-            let categoryName = "সাধারণ বিষয়";
-            let subcategoryName = "পূর্ণাঙ্গ সংকলন";
-
-            if (window.pdfSourceType === "bookmarks") {
-                const bookmarks = window.getQbankBookmarksList();
-                questionsToPrint = allQuestions.filter(q => bookmarks.includes(q.id));
-                titleText = "বুকমার্ক করা প্রিয় প্রশ্ন সংকলন (Revision Copy)";
-                categoryName = "বুকমার্ককৃত প্রশ্নতালিকা";
-                subcategoryName = "আমার রিভিশন ফাইল";
-            } else if (window.pdfSourceType === "all") {
-                questionsToPrint = [...allQuestions];
-                titleText = "সম্পূর্ণ MCQ HERO প্রশ্নব্যাংক সংগ্রহশালা";
-                categoryName = "সকল প্রশ্ন";
-                subcategoryName = "পূর্ণাঙ্গ ডাটাবেজ";
+                   async function runPdfDownloadWithElements(container, button, twoColumn, badge, progressEl) {
+            // Apply layout via class
+            if (twoColumn) {
+                container.classList.add('two-column-layout');
             } else {
-                const selectCategory = document.getElementById("pdfSelectCategory");
-                const selectSubcategory = document.getElementById("pdfSelectSubcategory");
-                
-                if (selectCategory && selectSubcategory) {
-                    const catId = selectCategory.value;
-                    const subId = selectSubcategory.value;
-                    
-                    categoryName = selectCategory.options[selectCategory.selectedIndex]?.text || "সাধারণ বিষয়";
-                    subcategoryName = subId === "all" ? "সম্পূর্ণ ক্যাটাগরি" : (selectSubcategory.options[selectSubcategory.selectedIndex]?.text || "ক্যাটাগরি");
-
-                    questionsToPrint = allQuestions.filter(q => {
-                        if (q.categoryId !== catId) return false;
-                        if (subId !== "all" && q.subcategoryId !== subId) return false;
-                        return true;
-                    });
-                    titleText = `${categoryName} - (${subcategoryName}) প্রশ্ন সংকলন`;
-                }
+                container.classList.remove('two-column-layout');
             }
+            
+            // Add cover page
+            const categoryName = document.getElementById('category-selector').value;
+            const subcategoryName = document.getElementById('subcategory-selector').options[document.getElementById('subcategory-selector').selectedIndex].text;
+            
+            const coverPage = document.createElement('div');
+            coverPage.className = 'pdf-page-content';
+            coverPage.style.cssText = 'height: 297mm; display: flex; flex-direction: column; justify-content: center; align-items: center; border: 1px solid #ddd; padding: 40px;';
+            coverPage.innerHTML = `
+                <h1 style="font-size: 36px; font-weight: bold; margin-bottom: 20px;">${categoryName}</h1>
+                <h2 style="font-size: 28px; color: #475569; margin-bottom: 50px;">${subcategoryName}</h2>
+                <p style="font-size: 18px; color: #94a3b8;">সংগ্রহে: ${new Date().toLocaleDateString('bn-BD')}</p>
+            `;
+            container.prepend(coverPage);
 
-            if (questionsToPrint.length === 0) {
-                alert("⚠️ দুঃখিত, আপনার নির্বাচিত ক্যাটাগরিতে প্রিন্ট করার মতো কোনো প্রশ্ন পাওয়া যায়নি!");
+            const pages = container.querySelectorAll('.pdf-page-content');
+            const totalPages = pages.length;
+            const docTitle = "আমার বুকলেট";
+            
+            badge.style.display = 'block';
+            progressEl.innerText = '0';
+
+            pages.forEach((page, index) => {
+                const titleEl = page.querySelector('.doc-title-element');
+                const pageNumEl = page.querySelector('.page-number-element');
+                
+                if (titleEl) titleEl.innerText = `${docTitle}`;
+                if (pageNumEl) pageNumEl.innerText = `পৃষ্ঠা ${index + 1} of ${totalPages}`;
+                
+                const percent = 5 + Math.floor(((index + 1) / totalPages) * 50);
+                progressEl.innerText = percent.toString();
+            });
+            
+            // Temporarily set for PDF generation
+            const originalStyle = container.style.cssText;
+            const originalClassList = Array.from(container.classList);
+            
+            // Ensure container is visible and has a reasonable width for PDF
+            container.style.width = '210mm';
+            container.style.background = 'white';
+            container.style.display = 'block'; // Force block for PDF
+            container.style.position = 'static'; // Force static for PDF
+
+            const element = container;
+            const opt = {
+                margin:       10,
+                filename:     'booklet.pdf',
+                image:        { type: 'jpeg', quality: 0.98 },
+                html2canvas:  { scale: 2, useCORS: true },
+                jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            };
+            
+            progressEl.innerText = '60';
+
+            // Ensure html2pdf is available
+            if (typeof html2pdf !== 'function') {
+                console.error("html2pdf not found");
+                alert("PDF লাইব্রেরি লোড হয়নি।");
+                return;
+            }
+            if (typeof html2canvas === 'undefined') {
+                console.error("html2canvas not found");
+                alert("html2canvas লাইব্রেরি লোড হয়নি।");
+                return;
+            }
+            if (typeof jsPDF === 'undefined') {
+                console.error("jsPDF not found");
+                alert("jsPDF লাইব্রেরি লোড হয়নি।");
+                return;
+            }
+            
+            // Short delay to allow browser to render styles
+            await new Promise(resolve => setTimeout(resolve, 500));
+            
+            html2pdf().set(opt).from(element).save().then(() => {
+                coverPage.remove();
+                progressEl.innerText = '100';
+                // Restore original style
+                container.style.cssText = originalStyle;
+                container.className = originalClassList.join(' ');
+                
+                // Save to Firestore
+                window.saveDownloadToFirestore(subcategoryName, categoryName);
+
+                setTimeout(() => {
+                    if (badge) badge.style.display = 'none';
+                }, 500);
+            }).catch(err => {
+                console.error("html2pdf error:", err);
+                alert("পিডিএফ তৈরি করতে সমস্যা হয়েছে: " + err.message);
+                coverPage.remove();
+                if (badge) badge.style.display = 'none';
+                container.style.cssText = originalStyle;
+                container.className = originalClassList.join(' ');
+            });
+        }
+alert("⚠️ দুঃখিত, আপনার নির্বাচিত ক্যাটাগরিতে প্রিন্ট করার মতো কোনো প্রশ্ন পাওয়া যায়নি!");
                 return;
             }
 
             // --- Apply Premium vs Free access control ---
-            const isPremiumUser = (window.currentUserRole === "premium" || window.currentUserRole === "admin" || window.currentUserRole === "moderator");
+            const isPremiumUserForDownload = (window.currentUserRole === "premium" || window.currentUserRole === "admin" || window.currentUserRole === "moderator");
             let isLimitApplied = false;
             let originalCount = questionsToPrint.length;
 
-            if (!isPremiumUser && questionsToPrint.length > 10) {
+            if (!isPremiumUserForDownload && questionsToPrint.length > 10) {
                 questionsToPrint = questionsToPrint.slice(0, 10);
                 isLimitApplied = true;
             }
@@ -14323,7 +14587,7 @@
                     const answerKeys = []; // To store questions correct answer key if showAnswers is false
 
                     // If double column layout requested, apply elegant column styling
-                    const columnStyle = doubleColumn ? `style="column-count: 2; column-gap: 25px; column-rule: 1.5px dashed #E2E8F0;"` : "";
+                    const columnStyle = ""; // Force single column for stability
 
                     questionsContentHtml += `<div ${columnStyle}>`;
 
@@ -14347,7 +14611,7 @@
                             q.option4 || q.options?.[3] || "অপশন ঘ"
                         ];
 
-                        optionsHtml += `<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin: 8px 0;">`;
+                        optionsHtml += `<div style="display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0;">`;
                         opts.forEach((o, oIdx) => {
                             const isCorrectOption = showAnswers && (oIdx === correctIndex);
                             const optStyle = isCorrectOption 
@@ -14355,7 +14619,7 @@
                                 : `border: 1px solid #E2E8F0; background: #FFF; color: #334155;`;
                             
                             optionsHtml += `
-                                <div style="padding: 6px 10px; border-radius: 6px; font-size: 11.5px; display: flex; align-items: center; gap: 6px; box-sizing: border-box; ${optStyle}">
+                                <div style="flex: 1 1 45%; padding: 6px 10px; border-radius: 6px; font-size: 11.5px; display: flex; align-items: center; gap: 6px; box-sizing: border-box; ${optStyle}">
                                     <span style="background: currentColor; color: #fff; border-radius: 50%; width: 16px; height: 16px; font-size: 10px; display: flex; align-items: center; justify-content: center; font-weight: 800; flex-shrink: 0;">${optionLabels[oIdx]}</span>
                                     <span>${o} ${isCorrectOption ? "✔️" : ""}</span>
                                 </div>
@@ -14374,10 +14638,10 @@
                         }
 
                         questionsContentHtml += `
-                            <div style="break-inside: avoid; page-break-inside: avoid; margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1px solid #F1F5F9;">
-                                <div style="font-weight: 800; font-size: 13px; color: #0F172A; line-height: 1.4;">
-                                    <span style="color: #00BFA1;">${serialBn}.</span> ${q.question} 
-                                    ${q.tag ? `<span style="font-size: 10px; color: #64748B; background: #F1F5F9; padding: 2px 6px; border-radius: 4px; margin-left: 6px; font-weight: normal;">${q.tag}</span>` : ""}
+                            <div style="break-inside: avoid; page-break-inside: avoid; display: block; margin-bottom: 20px; padding-bottom: 16px; border-bottom: 1px solid #E2E8F0; width: 100%; box-sizing: border-box;">
+                                <div style="font-weight: 700; font-size: 14px; color: #1E293B; line-height: 1.5; margin-bottom: 10px;">
+                                    <span style="color: #009688; margin-right: 6px;">${serialBn}.</span> ${q.question} 
+                                    ${q.tag ? `<span style="font-size: 11px; color: #475569; background: #F1F5F9; padding: 2px 8px; border-radius: 4px; margin-left: 8px; font-weight: 500;">${q.tag}</span>` : ""}
                                 </div>
                                 ${optionsHtml}
                                 ${explanationBlock}
@@ -14439,11 +14703,15 @@
                         filename:    `MCQ_Hero_${isLimitApplied ? "Free_Trial_" : ""}${categoryName.replace(/\s+/g, '_')}_${subcategoryName.replace(/\s+/g, '_')}.pdf`,
                         image:       { type: 'jpeg', quality: 0.98 },
                         html2canvas: { scale: 2, useCORS: true, letterRendering: true },
-                        jsPDF:       { unit: 'mm', format: 'a4', orientation: 'portrait' }
+                        jsPDF:       { unit: 'mm', format: 'a4', orientation: 'portrait' },
+                        pagebreak:   { mode: 'avoid', selector: '.question-container' }
                     };
 
                     // Execute generation promise chain
-                    html2pdf().from(printArea).set(opt).save().then(() => {
+                    const loader = document.getElementById('pdf-loader');
+                    if (loader) loader.style.display = 'flex';
+                    window.PdfEngine.generateFromElement(printArea, opt).then(() => {
+                        if (loader) loader.style.display = 'none';
                         if (isLimitApplied) {
                             window.showMiniToast("ফ্রি ট্রায়াল পিডিএফ সফলভাবে ডাউনলোড হয়েছে! 💖 সম্পূর্ণ ফাইলের জন্য মেম্বারশিপ নিন।");
                         } else {
@@ -14455,6 +14723,7 @@
                         btn.innerHTML = originalText;
                         btn.disabled = false;
                     }).catch(error => {
+                        if (loader) loader.style.display = 'none';
                         console.error("PDF generation failed:", error);
                         alert("⚠️ PDF তৈরিতে সামান্য সমস্যা হয়েছে! অনুগ্রহ করে আবার চেষ্টা করুন।");
                         printArea.remove();
@@ -14491,6 +14760,24 @@
                 toast.style.bottom = "85px";
                 setTimeout(() => toast.remove(), 250);
             }, 2000);
+        };
+
+        window.shareResult = async function() {
+            const score = document.getElementById("r-score") ? document.getElementById("r-score").innerText : "0";
+            const rank = document.getElementById("r-rank") ? document.getElementById("r-rank").innerText : "#0";
+            if (navigator.share) {
+                try {
+                    await navigator.share({
+                        title: 'Exam Result',
+                        text: `আমি BCS প্রিলিমিনারি মডেলে ${score} স্কোর করেছি এবং আমার র‍্যাঙ্ক ${rank}!`,
+                        url: window.location.href,
+                    });
+                } catch (err) {
+                    console.error('Error sharing:', err);
+                }
+            } else {
+                alert('আপনার ব্রাউজারে শেয়ারিং ফিচারটি সমর্থিত নয়।');
+            }
         };
 
         window.startDailyChallenge = async function() {
@@ -14558,11 +14845,668 @@
             window.showMiniToast("🎯 ২০টি প্রশ্নের ডেইলি চ্যালেঞ্জ শুরু হয়েছে!");
         };
 
+        window.loadCategoriesIntoSelector = async function() {
+            const selector = document.getElementById('category-selector');
+            if (!selector) return;
+
+            try {
+                const querySnapshot = await window.getDocs(window.collection(window.db, "categories"));
+                // Clear existing options except the first one
+                selector.innerHTML = '<option value="">বিষয় নির্বাচন করুন</option>';
+                querySnapshot.forEach((doc) => {
+                    const data = doc.data();
+                    if (data.name) {
+                        const option = document.createElement("option");
+                        option.value = data.name;
+                        option.text = data.name;
+                        selector.appendChild(option);
+                    }
+                });
+            } catch (e) {
+                console.error("Error loading categories:", e);
+            }
+        };
+
+        window.loadSubCategories = async function(categoryName) {
+            console.log("Loading subcategories for category:", categoryName);
+            const selector = document.getElementById('subcategory-selector');
+            if (!selector) return;
+
+            // Clear existing options
+            selector.innerHTML = '<option value="">সাব-ক্যাটাগরি নির্বাচন করুন</option>';
+            if (!categoryName) return;
+
+            try {
+                // 1. Get Category ID first
+                const catRef = window.collection(window.db, "categories");
+                const catQuery = window.query(catRef, window.where("name", "==", categoryName));
+                const catSnapshot = await window.getDocs(catQuery);
+                
+                if (catSnapshot.empty) {
+                    console.log("Category not found:", categoryName);
+                    return;
+                }
+                
+                const categoryId = catSnapshot.docs[0].id;
+                console.log("Found category ID:", categoryId);
+
+                // 2. Query Subcategories using parentId
+                const subRef = window.collection(window.db, "subcategories");
+                const qQuery = window.query(subRef, window.where("parentId", "==", categoryId));
+                const querySnapshot = await window.getDocs(qQuery);
+                
+                console.log("Found subcategories:", querySnapshot.size);
+                
+                querySnapshot.forEach((doc) => {
+                    const data = doc.data();
+                    console.log("Subcategory doc:", data);
+                    if (data.name) {
+                        const option = document.createElement("option");
+                        option.value = data.name;
+                        option.text = data.name;
+                        option.dataset.subid = doc.id;
+                        selector.appendChild(option);
+                    }
+                });
+            } catch (e) {
+                console.error("Error loading subcategories:", e);
+            }
+        };
+
+        window.renderQuestionCard = function(data) {
+            const optionsMap = { 1: 'A', 2: 'B', 3: 'C', 4: 'D' };
+            const correctLetter = optionsMap[data.correctAnswer] || '';
+            const correctText = data[`option${data.correctAnswer}`] || '';
+            
+            let explanationHtml = '';
+            if (data.explanation && data.explanation.trim() !== '') {
+                explanationHtml = `
+                    <div style="margin-top:16px; background:#F0FDF4; padding:12px; border-radius:8px; border:1px solid #DCFCE7;">
+                        <div style="font-weight:700; color:#059669; font-size:12px; margin-bottom:4px;">💡 ব্যাখ্যা:</div>
+                        <div style="color:#475569; font-size:13px; line-height:1.5;">${data.explanation}</div>
+                    </div>
+                `;
+            }
+            
+            return `
+                <div class="question-card" style="background: white; border-radius: 12px; padding: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); margin-bottom: 20px; border: 1px solid #E2E8F0; width: 100%; box-sizing: border-box;">
+                    <div style="font-weight:700; font-size:16px; margin-bottom:16px; color: #1E293B;">${data.question || 'প্রশ্ন'}</div>
+                    <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap:10px; font-weight:500; color:#334155; font-size:14px; margin-bottom: 16px;">
+                        <div>A. ${data.option1 || ''}</div>
+                        <div>B. ${data.option2 || ''}</div>
+                        <div>C. ${data.option3 || ''}</div>
+                        <div>D. ${data.option4 || ''}</div>
+                    </div>
+                    <div style="border-top: 1px solid #F1F5F9; padding-top: 16px; color: #059669; font-weight:700; font-size:14px;">
+                        ✔ সঠিক উত্তর: ${correctLetter}. ${correctText}
+                    </div>
+                    ${explanationHtml}
+                </div>
+            `;
+        };
+
+        window.loadQuestions = async function() {
+            const container = document.querySelector('.pdf-booklet-container');
+            const questionsContainer = document.getElementById('questions-container');
+            if (!questionsContainer) return;
+            
+            const categoryName = document.getElementById('category-selector').value;
+            const subcategorySelect = document.getElementById('subcategory-selector');
+            const subcategoryName = subcategorySelect.value;
+            const subcategoryOption = subcategorySelect.options[subcategorySelect.selectedIndex];
+            
+            // Debugging
+            console.log("subcategoryOption:", subcategoryOption);
+            if (subcategoryOption) {
+                console.log("dataset:", subcategoryOption.dataset);
+                console.log("data-subid attribute:", subcategoryOption.getAttribute('data-subid'));
+            }
+
+            // Assuming the option value was changed to subId
+            const subId = subcategoryOption ? (subcategoryOption.dataset.subid || subcategoryOption.getAttribute('data-subid')) : null;
+            
+            console.log("Loading content for:", categoryName, subcategoryName, "subId:", subId);
+            
+            // Add Loading Spinner with CSS animation
+            questionsContainer.innerHTML = `
+                <div id="loader" style="text-align:center; padding:40px;">
+                    <div style="border: 4px solid #f3f3f3; border-top: 4px solid #009688; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin: 0 auto;"></div>
+                    <p style="margin-top: 15px; font-weight: bold; color: #1E293B;">লোড হচ্ছে...</p>
+                </div>
+            `;
+
+            if (!subId) {
+                questionsContainer.innerHTML = '';
+                return;
+            }
+
+            try {
+                const qRef = window.collection(window.db, "questions");
+                // Query by subId
+                console.log("Querying questions with subId:", subId);
+                const qQuery = window.query(qRef, window.where("subId", "==", subId));
+                console.log("Executing query for subId:", subId);
+                const querySnapshot = await window.getDocs(qQuery);
+                
+                console.log("Query returned docs count:", querySnapshot.size);
+                
+                // Clear spinner
+                questionsContainer.innerHTML = '';
+
+                // Render questions to container
+                if (querySnapshot.empty) {
+                    questionsContainer.innerHTML = '<div style="text-align:center; padding: 20px; color: #64748B;">এই টপিকের জন্য কোনো প্রশ্ন পাওয়া যায়নি।</div>';
+                } else {
+                    let html = '';
+                    querySnapshot.forEach((doc) => {
+                        const data = doc.data();
+                        html += window.renderQuestionCard(data);
+                    });
+                    questionsContainer.innerHTML = html;
+                    document.getElementById('total-questions-count').innerText = querySnapshot.size;
+                }
+
+                // Prepare print area
+                window.preparePrintArea(querySnapshot);
+                window.applyWatermarks();
+            } catch (e) {
+                console.error("Error loading questions:", e);
+                questionsContainer.innerHTML = `<div style="color:red; text-align:center; padding: 20px;">প্রশ্ন লোড করতে সমস্যা হয়েছে।</div>`;
+            }
+        };
+
+        // Global preparePrintArea
+        window.preparePrintArea = async function(querySnapshot) {
+            const printArea = document.getElementById('printArea');
+            
+            const subject = document.getElementById('category-selector').value;
+            const topic = document.getElementById('subcategory-selector').options[document.getElementById('subcategory-selector').selectedIndex].text;
+            
+            // Print CSS
+            const printCSS = `
+                <style>
+                    @page { size: A4 portrait; margin: 15mm; }
+                    .a4-print-layout { font-family: "Arial", sans-serif; width: 100%; }
+                    .print-header { border-bottom: 2px solid #000; margin-bottom: 20px; padding-bottom: 10px; }
+                    .questions-wrapper { }
+                    .question-card { break-inside: avoid; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 1px solid #eee; }
+                    .print-footer { text-align: center; font-size: 10px; margin-top: 20px; padding-top: 10px; border-top: 1px solid #ccc; }
+                </style>
+            `;
+
+            printArea.innerHTML = printCSS + `
+                <div class="a4-print-layout">
+                    <div class="print-header">
+                        <h1 style="font-size: 24px; font-weight: 700; margin: 0;">MCQ HERO</h1>
+                        <h2 style="font-size: 20px; margin: 5px 0;">Subject: ${subject}</h2>
+                        <p style="font-size: 16px; margin: 0;">Topic: ${topic}</p>
+                    </div>
+                    <div class="questions-wrapper" id="questions-wrapper">
+                        <!-- Questions will be added here -->
+                    </div>
+                    <div class="print-footer">
+                        MCQ HERO - Page <span class="page-number"></span>
+                    </div>
+                </div>
+            `;
+            
+            const questionsWrapper = document.getElementById('questions-wrapper');
+            
+            querySnapshot.forEach((doc) => {
+                const data = doc.data();
+                const div = document.createElement("div");
+                div.className = "question-card";
+                
+                const optionsArray = [data.option1, data.option2, data.option3, data.option4].filter(Boolean);
+                const optionsHtml = optionsArray.map((opt, i) => `<div style="margin: 2px 0;">${String.fromCharCode(65+i)}. ${opt}</div>`).join('');
+
+                div.innerHTML = `
+                    <div style="font-weight:bold; font-size: 15px; margin-bottom:5px;">${data.question || 'প্রশ্ন'}</div>
+                    <div style="font-size: 14px; margin-bottom: 10px;">
+                        ${optionsHtml}
+                    </div>
+                    ${data.correctAnswer ? `<div style="font-weight:bold; color:green; font-size: 14px; background: #DCFCE7; padding: 4px; border-radius: 4px; margin-bottom: 5px; display: inline-block;">সঠিক উত্তর: ${data.correctAnswer}</div>` : ''}
+                    ${data.explanation ? `<div style="font-size: 13px; color: #444; font-style: italic; margin-top: 5px;">ব্যাখ্যা: ${data.explanation}</div>` : ''}
+                `;
+                questionsWrapper.appendChild(div);
+            });
+            
+            return questionsWrapper.children.length > 0;
+        }
+
         // Initialize on load
         document.addEventListener('DOMContentLoaded', () => {
             window.fetchCoursesAndExamsData().catch(e => console.error("Initial fetch failed:", e));
+            window.loadCategoriesIntoSelector().catch(e => console.error("Category load failed:", e));
+
+            // Register Service Worker
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.register('/sw.js')
+                    .then(reg => console.log('Service Worker registered', reg))
+                    .catch(err => console.error('Service Worker registration failed', err));
+            }
+            
+            // Initialize My Downloads Section
+            initMyDownloadsSection();
+            
+            // Initialize PDF preferences
+            const savedFontSize = localStorage.getItem('pdfFontSize');
+            const savedColumns = localStorage.getItem('pdfColumns');
+            const savedWatermarkToggle = localStorage.getItem('watermarkToggle');
+            const savedWatermarkText = localStorage.getItem('watermarkText');
+            
+            const fontSizeInput = document.getElementById('font-size-input');
+            const columnSelector = document.getElementById('column-selector');
+            const watermarkToggle = document.getElementById('watermark-toggle');
+            const watermarkTextInput = document.getElementById('watermark-text');
+            const container = document.querySelector('.pdf-booklet-container');
+
+            if (fontSizeInput) fontSizeInput.value = savedFontSize || '14';
+            if (columnSelector) columnSelector.value = savedColumns || '2';
+            
+            if (container) {
+                container.style.fontSize = `${savedFontSize || '14'}px`;
+                if ((savedColumns || '2') === '2') container.classList.add('two-column-layout');
+                else container.classList.remove('two-column-layout');
+            }
+            if (watermarkToggle) {
+                watermarkToggle.checked = savedWatermarkToggle === 'true';
+            }
+            if (watermarkTextInput) {
+                watermarkTextInput.value = savedWatermarkText || '';
+            }
+            window.applyWatermarks();
         });
+
+        window.updateWatermarkSettings = function() {
+            const watermarkToggle = document.getElementById('watermark-toggle');
+            const watermarkTextInput = document.getElementById('watermark-text');
+            localStorage.setItem('watermarkToggle', watermarkToggle.checked);
+            localStorage.setItem('watermarkText', watermarkTextInput.value);
+            window.applyWatermarks();
+        };
+
+        window.applyWatermarks = function() {
+            const watermarkToggle = document.getElementById('watermark-toggle');
+            const watermarkTextInput = document.getElementById('watermark-text');
+            const pages = document.querySelectorAll('.pdf-page-content');
+            
+            pages.forEach(page => {
+                let watermark = page.querySelector('.pdf-watermark');
+                if (watermarkToggle && watermarkToggle.checked && watermarkTextInput && watermarkTextInput.value) {
+                    if (!watermark) {
+                        watermark = document.createElement('div');
+                        watermark.className = 'pdf-watermark';
+                        watermark.style.position = 'absolute';
+                        watermark.style.top = '50%';
+                        watermark.style.left = '50%';
+                        watermark.style.transform = 'translate(-50%, -50%) rotate(-45deg)';
+                        watermark.style.color = 'rgba(0, 0, 0, 0.1)';
+                        watermark.style.fontSize = '40px';
+                        watermark.style.fontWeight = 'bold';
+                        watermark.style.pointerEvents = 'none';
+                        watermark.style.zIndex = '1';
+                        page.style.position = 'relative';
+                        page.appendChild(watermark);
+                    }
+                    watermark.innerText = watermarkTextInput.value;
+                } else if (watermark) {
+                    watermark.remove();
+                }
+            });
+        };
+    </script>
+    <div id="pdf-loader" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(255,255,255,0.8); z-index:999999; flex-direction:column; justify-content:center; align-items:center;">
+        <div style="border: 4px solid #f3f3f3; border-top: 4px solid #009688; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite;"></div>
+        <p style="margin-top: 15px; font-weight: bold; color: #1E293B;">পিডিএফ তৈরি হচ্ছে, দয়া করে অপেক্ষা করুন...</p>
+    </div>
+    <style>@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .two-column-layout .question-explanation-wrapper { grid-template-columns: 1fr 1fr !important; }
+    </style>
+    <!-- Push Notification Modal -->
+    <div id="push-notification-modal" style="display:none; position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(15, 23, 42, 0.45); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); z-index:115000; align-items:center; justify-content:center; padding:16px; box-sizing: border-box;">
+        <div class="summary-card" style="width:100%; max-width:550px; text-align:left; box-sizing: border-box; animation: popupIn 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275); position:relative; padding: 24px; max-height: 90vh; overflow-y: auto;">
+            <button onclick="window.closePushNotificationModal()" style="position: absolute; top: 16px; right: 16px; border: none; background: #F1F5F9; color: #64748B; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; cursor: pointer; font-size: 14px; transition: background 0.2s; z-index: 10;">✕</button>
+            <h2 style="font-size: 19px; font-weight: 850; color: #1E293B; margin: 0 0 16px 0; display: flex; align-items: center; gap: 8px;">
+                <span>🔔 পুশ নোটিফিকেশন</span>
+            </h2>
+            <div style="display: flex; flex-direction: column; gap: 12px;">
+                <input type="text" id="pushNotifTitle" placeholder="নোটিফিকেশন শিরোনাম" style="width: 100%; height: 44px; border-radius: 12px; border: 1.5px solid #CBD5E1; padding: 0 12px; font-size: 14px; font-weight: 600;">
+                <textarea id="pushNotifMessage" placeholder="নোটিফিকেশনের বার্তা..." style="width: 100%; height: 100px; border-radius: 12px; border: 1.5px solid #CBD5E1; padding: 12px; font-size: 14px; font-weight: 500;"></textarea>
+                <button onclick="window.sendPushNotification()" style="width: 100%; height: 44px; background: #E11D48; color: white; border: none; border-radius: 12px; font-weight: 800; cursor: pointer;">পাঠান</button>
+            </div>
+        </div>
+    </div>
+    <!-- Notification History Page -->
+    <div id="notification-history-page" style="display: none; padding: 20px; max-width: 600px; margin: 0 auto;">
+        <h2 style="font-size: 24px; font-weight: 850; color: #1E293B; margin-bottom: 20px;">📜 নোটিফিকেশন ইতিহাস</h2>
+        <div id="notificationHistoryContainer"></div>
+    </div>
+    <script>
+        window.togglePDFPreview = function() {
+            const container = document.querySelector('.pdf-booklet-container');
+            const iframe = document.getElementById('pdf-preview-frame');
+            
+            if (!container || !iframe) return;
+
+            if (iframe.style.display === 'none') {
+                // Show preview
+                // Do NOT hide container here, do it after rendering
+                iframe.style.display = 'block';
+                
+                // Use html2pdf to generate PDF blob
+                const opt = {
+                    margin:       10,
+                    filename:     'preview.pdf',
+                    image:        { type: 'jpeg', quality: 0.98 },
+                    html2canvas:  { scale: 1 },
+                    jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' },
+                    pagebreak:    { mode: 'avoid', selector: '.pdf-page-content' }
+                };
+                
+                if (typeof html2pdf !== 'function') {
+                    console.error("html2pdf is not loaded.");
+                    alert("পিডিএফ জেনারেটর লোড হয়নি। দয়া করে পেজটি রিলোড দিন।");
+                    return;
+                }
+                
+                container.style.display = 'flex'; // Ensure it's flex (the correct display)
+                
+                console.log("html2pdf is:", typeof html2pdf);
+                const worker = html2pdf().from(container).set(opt);
+                console.log("Worker has output:", typeof worker.output);
+                worker.output('blob').then((pdfBlob) => {
+                    iframe.src = URL.createObjectURL(pdfBlob);
+                    container.style.display = 'none'; // Hide after rendering
+                }).catch(err => {
+                    console.error("html2pdf generation error:", err);
+                    alert("পিডিএফ জেনারেট করতে সমস্যা হয়েছে: " + err.message);
+                    container.style.display = 'flex';
+                });
+            } else {
+                // Hide preview
+                container.style.display = 'flex';
+                iframe.style.display = 'none';
+            }
+        };
+        window.updatePdfStyles = function() {
+            const container = document.querySelector('.pdf-booklet-container');
+            const fontSizeInput = document.getElementById('font-size-input');
+            const columnSelector = document.getElementById('column-selector');
+            
+            if (container && fontSizeInput && columnSelector) {
+                const fontSize = fontSizeInput.value;
+                const columns = columnSelector.value;
+                
+                container.style.fontSize = `${fontSize}px`;
+                
+                if (columns === '2') {
+                    container.classList.add('two-column-layout');
+                    localStorage.setItem('pdfColumns', '2');
+                } else {
+                    container.classList.remove('two-column-layout');
+                    localStorage.setItem('pdfColumns', '1');
+                }
+                localStorage.setItem('pdfFontSize', fontSize);
+            }
+        };
+        window.downloadBookletAsPDF = function(button, twoColumn) {
+            console.log("downloadBookletAsPDF called, twoColumn:", twoColumn);
+            const container = document.querySelector('.pdf-booklet-container');
+            console.log("container:", container);
+            if (!container) {
+                console.error("PDF container not found");
+                alert("পিডিএফ জেনারেট করার জন্য প্রয়োজনীয় এলিমেন্ট পাওয়া যায়নি।");
+                return;
+            }
+            runPdfDownload(container, button, twoColumn);
+        };
+
+        async function runPdfDownload(container, button, twoColumn) {
+            console.log("Container innerHTML start:", container.innerHTML.substring(0, 500));
+            
+            // Debugging selectors
+            const badge = container.querySelector('.pdf-download-badge');
+            const progressEl = container.querySelector('.pdf-progress');
+            console.log("badge found:", !!badge, "progressEl found:", !!progressEl);
+            console.log("Container children classes:", Array.from(container.children).map(c => c.className));
+            
+            if (!badge || !progressEl) {
+                // If not found inside container, check if they are siblings or elsewhere
+                console.error("PDF elements not found inside container. Checking document instead.");
+                const badgeInDoc = document.querySelector('.pdf-download-badge');
+                const progressElInDoc = document.querySelector('.pdf-progress');
+                console.log("badge in doc:", !!badgeInDoc, "progressEl in doc:", !!progressElInDoc);
+                
+                if (badgeInDoc && progressElInDoc) {
+                    console.log("Found badge and progress in document, using those.");
+                    return runPdfDownloadWithElements(container, button, twoColumn, badgeInDoc, progressElInDoc);
+                }
+                
+                alert("পিডিএফ জেনারেট করার জন্য প্রয়োজনীয় এলিমেন্ট পাওয়া যায়নি।");
+                return;
+            }
+            
+            return runPdfDownloadWithElements(container, button, twoColumn, badge, progressEl);
+        }
+
+        async function runPdfDownloadWithElements(container, button, twoColumn, badge, progressEl) {
+            // Apply layout via class
+            if (twoColumn) {
+                container.classList.add('two-column-layout');
+            } else {
+                container.classList.remove('two-column-layout');
+            }
+            
+            // Add cover page
+            const categoryName = document.getElementById('category-selector').value;
+            const subcategoryName = document.getElementById('subcategory-selector').options[document.getElementById('subcategory-selector').selectedIndex].text;
+            
+            const coverPage = document.createElement('div');
+            coverPage.className = 'pdf-page-content';
+            coverPage.style.cssText = 'height: 297mm; display: flex; flex-direction: column; justify-content: center; align-items: center; border: 1px solid #ddd; padding: 40px;';
+            coverPage.innerHTML = `
+                <h1 style="font-size: 36px; font-weight: bold; margin-bottom: 20px;">${categoryName}</h1>
+                <h2 style="font-size: 28px; color: #475569; margin-bottom: 50px;">${subcategoryName}</h2>
+                <p style="font-size: 18px; color: #94a3b8;">সংগ্রহে: ${new Date().toLocaleDateString('bn-BD')}</p>
+            `;
+            container.prepend(coverPage);
+
+            const pages = container.querySelectorAll('.pdf-page-content');
+            const totalPages = pages.length;
+            const docTitle = "আমার বুকলেট";
+            
+            badge.style.display = 'block';
+            progressEl.innerText = '0';
+
+            pages.forEach((page, index) => {
+                const titleEl = page.querySelector('.doc-title-element');
+                const pageNumEl = page.querySelector('.page-number-element');
+                
+                if (titleEl) titleEl.innerText = `${docTitle}`;
+                if (pageNumEl) pageNumEl.innerText = `পৃষ্ঠা ${index + 1} of ${totalPages}`;
+                
+                const percent = 5 + Math.floor(((index + 1) / totalPages) * 50);
+                progressEl.innerText = percent.toString();
+            });
+            
+            // Temporarily set for PDF generation
+            const originalStyle = container.style.cssText;
+            const originalClassList = Array.from(container.classList);
+            
+            // Ensure container is visible and has a reasonable width for PDF
+            container.style.width = '210mm';
+            container.style.background = 'white';
+            container.style.display = 'block'; // Force block for PDF
+            container.style.position = 'static'; // Force static for PDF
+
+            const element = container;
+            const opt = {
+                margin:       10,
+                filename:     'booklet.pdf',
+                image:        { type: 'jpeg', quality: 0.98 },
+                html2canvas:  { scale: 2, useCORS: true },
+                jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            };
+            
+            progressEl.innerText = '60';
+
+            // Ensure html2pdf is available
+            if (typeof html2pdf !== 'function') {
+                console.error("html2pdf not found");
+                alert("PDF লাইব্রেরি লোড হয়নি।");
+                return;
+            }
+            if (typeof html2canvas === 'undefined') {
+                console.error("html2canvas not found");
+                alert("html2canvas লাইব্রেরি লোড হয়নি।");
+                return;
+            }
+            if (typeof jsPDF === 'undefined') {
+                console.error("jsPDF not found");
+                alert("jsPDF লাইব্রেরি লোড হয়নি।");
+                return;
+            }
+            
+            // Short delay to allow browser to render styles
+            await new Promise(resolve => setTimeout(resolve, 500));
+            
+            html2pdf().set(opt).from(element).save().then(() => {
+                coverPage.remove();
+                progressEl.innerText = '100';
+                // Restore original style
+                container.style.cssText = originalStyle;
+                container.className = originalClassList.join(' ');
+                
+                // Save to Firestore
+                window.saveDownloadToFirestore(subcategoryName, categoryName);
+
+                setTimeout(() => {
+                    if (badge) badge.style.display = 'none';
+                }, 500);
+            }).catch(err => {
+                console.error("html2pdf error:", err);
+                alert("পিডিএফ তৈরি করতে সমস্যা হয়েছে: " + err.message);
+                coverPage.remove();
+                if (badge) badge.style.display = 'none';
+                container.style.cssText = originalStyle;
+                container.className = originalClassList.join(' ');
+            });
+        }
+        window.generatePDF = async function(button) {
+            const printArea = document.getElementById("printArea");
+            if (!printArea) return;
+            
+            // Re-prepare print area with current data
+            const subcategorySelect = document.getElementById('subcategory-selector');
+            const subId = subcategorySelect.options[subcategorySelect.selectedIndex].getAttribute('data-subid');
+            const qRef = window.collection(window.db, "questions");
+            const qQuery = window.query(qRef, window.where("subId", "==", subId));
+            const querySnapshot = await window.getDocs(qQuery);
+            await window.preparePrintArea(querySnapshot);
+
+            button.disabled = true;
+            const originalText = button.innerText;
+            button.innerText = 'জেনারেট হচ্ছে...';
+
+            try {
+                // Wait for everything to be ready
+                await document.fonts.ready;
+                await new Promise(resolve => requestAnimationFrame(resolve));
+                await new Promise(resolve => setTimeout(resolve, 800)); // Increased delay for fonts/DOM
+                
+                const subject = document.getElementById('category-selector').value;
+                const topic = document.getElementById('subcategory-selector').options[document.getElementById('subcategory-selector').selectedIndex].text;
+                
+                // Using jspdf with autoPaging for A4
+                const pdf = new jspdf.jsPDF('p', 'mm', 'a4');
+                
+                await pdf.html(printArea, {
+                    callback: function (doc) {
+                        doc.save(`MCQ_${subject}_${topic}.pdf`);
+                    },
+                    margin: [10, 10, 10, 10],
+                    autoPaging: 'slice', // 'slice' or 'text' can be tried
+                    width: 190,
+                    windowWidth: 790
+                });
+                
+            } catch (e) {
+                console.error(e);
+                alert("পিডিএফ তৈরি করতে সমস্যা হয়েছে।");
+            } finally {
+                button.disabled = false;
+                button.innerText = originalText;
+            }
+        };
+
+
+        function initMyDownloadsSection() {
+            const profilePage = document.getElementById('profile-page');
+            if (!profilePage) return;
+            const downloadsSection = document.createElement('div');
+            downloadsSection.className = 'card';
+            downloadsSection.style.marginTop = '20px';
+            downloadsSection.innerHTML = `
+                <h3 style="font-size: 18px; font-weight: 800; color: #1E293B; margin-bottom: 15px;">📥 My Downloads</h3>
+                <div id="my-downloads-container">লোড হচ্ছে...</div>
+            `;
+            profilePage.appendChild(downloadsSection);
+            window.loadMyDownloads();
+        }
+        
+        window.saveDownloadToFirestore = async function(subcategoryName, categoryName) {
+            try {
+                const uid = (window.auth && window.auth.currentUser) ? window.auth.currentUser.uid : localStorage.getItem("uid");
+                if (!uid) return;
+                
+                await window.addDoc(window.collection(window.db, "downloads"), {
+                    userId: uid,
+                    subcategoryName,
+                    categoryName,
+                    downloadDate: new Date().toISOString()
+                });
+                window.loadMyDownloads();
+            } catch (e) {
+                console.error("Error saving download:", e);
+            }
+        };
+
+        window.loadMyDownloads = async function() {
+            const container = document.getElementById('my-downloads-container');
+            if (!container) return;
+            
+            try {
+                const uid = (window.auth && window.auth.currentUser) ? window.auth.currentUser.uid : localStorage.getItem("uid");
+                if (!uid) {
+                    container.innerHTML = 'লগইন করুন আপনার ডাউনলোড দেখতে।';
+                    return;
+                }
+                
+                const qRef = window.collection(window.db, "downloads");
+                const qQuery = window.query(qRef, window.where("userId", "==", uid));
+                const querySnapshot = await window.getDocs(qQuery);
+                
+                // Sort locally to avoid composite index requirement
+                const docs = querySnapshot.docs.sort((a, b) => new Date(b.data().downloadDate) - new Date(a.data().downloadDate));
+                
+                if (docs.length === 0) {
+                    container.innerHTML = 'কোন ডাউনলোড পাওয়া যায়নি।';
+                    return;
+                }
+                
+                container.innerHTML = '<div style="display:flex; flex-direction:column; gap:10px;">' +
+                    docs.map(doc => {
+                        const data = doc.data();
+                        return `<div style="padding:10px; background:#F8FAFC; border-radius:6px; border:1px solid #E2E8F0;">
+                            <div style="font-weight:600;">${data.subcategoryName}</div>
+                            <div style="font-size:12px; color:#64748B;">${data.categoryName} | ${new Date(data.downloadDate).toLocaleDateString('bn-BD')}</div>
+                        </div>`;
+                    }).join('') + '</div>';
+            } catch (e) {
+                console.error("Error loading downloads:", e);
+                container.innerHTML = 'ডাউনলোড লোড করতে সমস্যা হয়েছে।';
+            }
+        };
     </script>
 </body>
-
-</html>

@@ -1,0 +1,1 @@
+2605:        <div id="pdf-booklet-container" style="display: flex; flex-direction: column; gap: 60px; align-items: center; padding: 40px 20px; background: #E2E8F0; position: relative;">

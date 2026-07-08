@@ -7,7 +7,7 @@ export const SAMPLE_EXAMS: LiveExam[] = [
     courseId: "course_bcs",
     duration: 10, // 10 minutes for testing convenience
     negativeMark: 0.5,
-    questionIds: ["q1", "q2", "q3", "q4", "q5"],
+    questionIds: ["q1", "q2", "q3", "q4", "q5", "q11"],
     access: "free"
   },
   {
@@ -130,6 +130,16 @@ export const SAMPLE_QUESTIONS: Record<string, Question> = {
     option4: "২০৪৮ MB",
     correctAnswer: 1,
     explanation: "১ গিগাবাইট (GB) = ১০২৪ মেগাবাইট (MB)।"
+  },
+  q11: {
+    id: "q11",
+    question: "বাংলাদেশের সংবিধানের কোন অনুচ্ছেদ অনুযায়ী জাতীয় সংসদ গঠিত হয়?",
+    option1: "অনুচ্ছেদ ৬৫",
+    option2: "অনুচ্ছেদ ৬৬",
+    option3: "অনুচ্ছেদ ৬৭",
+    option4: "অনুচ্ছেদ ৬৮",
+    correctAnswer: 1,
+    explanation: "বাংলাদেশের সংবিধানের ৬৫ অনুচ্ছেদ অনুযায়ী জাতীয় সংসদ গঠিত হয়।"
   }
 };
 

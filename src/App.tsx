@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo, useRef } from "react";
 import { SAMPLE_EXAMS, SAMPLE_QUESTIONS, SAMPLE_GLOBAL_USERS } from "./simulationData";
 import { LiveExam, Question, ExamResult, UserProfile } from "./types";
 import Sidebar from "./components/Sidebar";
@@ -15,8 +15,15 @@ import PremiumModal from "./components/PremiumModal";
 import { testConnection, db, messaging } from "./firebase";
 import { getToken } from "firebase/messaging";
 import { collection, doc, onSnapshot } from "firebase/firestore";
-import AdminSettingsPage from "./components/AdminSettingsPage";
+
 import RoutinePage from "./components/RoutinePage";
+import AiAsk from "./components/AiAsk";
+import AiPage from "./components/AiPage";
+import NoticeManagementPage from "./components/NoticeManagementPage";
+import PushNotificationPage from "./components/PushNotificationPage";
+import ConfirmationModal from "./components/ConfirmationModal";
+import Toast from "./components/Toast";
+import { QuestionGenerator } from "./components/QuestionGenerator";
 
 export default function App() {
   const [user, setUser] = useState<UserProfile | null>({
@@ -30,7 +37,65 @@ export default function App() {
     totalPoints: 1280,
   });
 
+  useEffect(() => {
+    const showToast = () => {
+      if (activePageRef.current === 'exam-page') {
+        setToastMessage('কপি বা স্ক্রিনশট নেওয়া নিষেধ!');
+      }
+    };
+
+    const handlePopState = (e: PopStateEvent) => {
+      if (activePageRef.current === 'mcq-page') {
+        setShowExitModal(true);
+        // Push state again to prevent immediate navigation if user cancels
+        window.history.pushState(null, '', window.location.href);
+      }
+    };
+
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      if (activePageRef.current === 'mcq-page') {
+        e.preventDefault();
+        e.returnValue = '';
+      }
+    };
+
+    const handleContextMenu = (e: MouseEvent) => {
+      e.preventDefault();
+      showToast();
+    };
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Prevent Ctrl+C, Ctrl+A, Ctrl+S, Ctrl+P, PrintScreen
+      if ((e.ctrlKey || e.metaKey) && ['c', 'a', 's', 'p'].includes(e.key.toLowerCase())) {
+        e.preventDefault();
+        showToast();
+      }
+      if (e.key === 'PrintScreen') {
+        e.preventDefault();
+        showToast();
+      }
+    };
+
+    document.addEventListener('contextmenu', handleContextMenu);
+    document.addEventListener('keydown', handleKeyDown);
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    window.addEventListener('popstate', handlePopState);
+    
+    // Push initial state to history for back button interception
+    window.history.pushState(null, '', window.location.href);
+
+    return () => {
+      document.removeEventListener('contextmenu', handleContextMenu);
+      document.removeEventListener('keydown', handleKeyDown);
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+      window.removeEventListener('popstate', handlePopState);
+    };
+  }, []);
+
   const [activePage, setActivePage] = useState<string>("home-page");
+  const [showExitModal, setShowExitModal] = useState(false);
+  const activePageRef = useRef(activePage);
+  useEffect(() => { activePageRef.current = activePage; }, [activePage]);
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [selectedExamId, setSelectedExamId] = useState<string | null>(null);
   const [savedAnswers, setSavedAnswers] = useState<Record<number, { questionId: string; answer: number }>>({});
@@ -280,9 +345,26 @@ export default function App() {
     return baseCourses;
   }, [firestoreCourses, firestoreRoutines, user]);
 
+  const filteredCourses = useMemo(() => {
+    if (!user || user.role === 'premium') return mergedCourses;
+
+    const purchased = user.purchasedCourses || [];
+
+    return mergedCourses.filter(course => {
+      // If course is free, show it
+      if (course.access === 'free') return true;
+      // If user purchased this course, show it
+      if (purchased.includes(course.id)) return true;
+      // Otherwise hide it
+      return false;
+    });
+  }, [mergedCourses, user]);
+
   // Dynamic Real-time listener for the currently selected exam's questions. Runs only when selectedExamId changes.
   // This solves performance (dashboard and courses load instantly) and enables real-time question additions/updates instantly without refresh!
   useEffect(() => {
+    console.log("🔥 selectedExamId:", selectedExamId);
+    console.log("🔥 mergedExams:", mergedExams);
     if (!selectedExamId) {
       setFirestoreQuestions({});
       return;
@@ -302,6 +384,7 @@ export default function App() {
         (snapshot) => {
           if (snapshot.exists()) {
             const data = snapshot.data();
+            console.log("🔥 Loaded question:", qid, data);
             setFirestoreQuestions((prev) => ({
               ...prev,
               [qid]: {
@@ -327,6 +410,34 @@ export default function App() {
       unsubscribes.forEach((unsub) => unsub());
     };
   }, [selectedExamId, mergedExams]);
+
+  // Exam notification system
+  const notifiedExams = React.useRef(new Set<string>());
+
+  useEffect(() => {
+    const checkExams = () => {
+      const now = new Date();
+      mergedExams.forEach((exam) => {
+        if (!exam.startTime || notifiedExams.current.has(exam.id)) return;
+
+        const startTime = new Date(exam.startTime);
+        const timeDiff = startTime.getTime() - now.getTime();
+        
+        // Notify if exam starts within 10 minutes and is in the future
+        if (timeDiff > 0 && timeDiff <= 10 * 60 * 1000) {
+          if (Notification.permission === 'granted') {
+            new Notification('আসন্ন পরীক্ষা', {
+              body: `আপনার পরীক্ষা '${exam.title}' ১০ মিনিটের মধ্যে শুরু হবে।`,
+            });
+            notifiedExams.current.add(exam.id);
+          }
+        }
+      });
+    };
+
+    const interval = setInterval(checkExams, 60000); // Check every minute
+    return () => clearInterval(interval);
+  }, [mergedExams]);
 
   const mergedQuestions = useMemo(() => {
     return { ...SAMPLE_QUESTIONS, ...firestoreQuestions };
@@ -385,6 +496,13 @@ export default function App() {
 
     const userRole = user ? (user.role || 'free') : 'free';
     const purchased = user ? (user.purchasedCourses || []) : [];
+
+    // Check if exam time has started
+    const now = new Date();
+    if (exam.startTime && new Date(exam.startTime) > now) {
+      alert("পরীক্ষা এখনো শুরু হয়নি।");
+      return;
+    }
 
     if (userRole === 'premium' || user?.premium) {
       // Premium champion users can access absolutely everything.
@@ -540,26 +658,41 @@ export default function App() {
     switch (activePage) {
       case "home-page":
         return (
-          <Dashboard 
-            onOpenSidebar={() => setSidebarOpen(true)}
-            exams={mergedExams}
-            onStartExam={handleStartExam}
-            isPremium={user.premium}
-            user={user}
-            onUpgrade={() => {
-              setUser((prev) => prev ? { ...prev, premium: true, role: "premium" } : null);
-              alert("🎉 অভিনন্দন! আপনি সফলভাবে প্রিমিয়াম মেম্বারশিপে আপগ্রেড করেছেন।");
-            }}
-            onNavigate={(id) => setActivePage(id)}
-            userStats={{
-              totalPoints: user.todayPoints || 0,
-              totalExams: currentStats.totalExams,
-              accuracy: currentStats.accuracy,
-              rank: user.premium || user.role === 'premium' ? "#17" : "#42",
-            }}
-            courses={mergedCourses}
-          />
+          <div id="home-page" className="relative p-6">
+            <button onClick={() => setActivePage("notice-management-page")} className="bg-blue-500 text-white p-2 rounded mb-4">নোটিশ ম্যানেজমেন্ট</button>
+            <Dashboard 
+              onOpenSidebar={() => setSidebarOpen(true)}
+              exams={mergedExams}
+              onStartExam={handleStartExam}
+              isPremium={user.premium}
+              user={user}
+              onUpgrade={() => {
+                setUser((prev) => prev ? { ...prev, premium: true, role: "premium" } : null);
+                alert("🎉 অভিনন্দন! আপনি সফলভাবে প্রিমিয়াম মেম্বারশিপে আপগ্রেড করেছেন।");
+              }}
+              onNavigate={(id) => setActivePage(id)}
+              userStats={{
+                totalPoints: user.todayPoints || 0,
+                totalExams: currentStats.totalExams,
+                accuracy: currentStats.accuracy,
+                rank: user.premium || user.role === 'premium' ? "#17" : "#42",
+              }}
+              courses={filteredCourses}
+            />
+          </div>
         );
+
+      case "pdf-generator-page":
+        return <QuestionGenerator />;
+      
+      case "ai-page":
+        return <AiPage />;
+
+      case "notice-management-page":
+        return <NoticeManagementPage onBack={() => setActivePage("home-page")} />;
+
+      case "push-notification-page":
+        return <PushNotificationPage onBack={() => setActivePage("home-page")} />;
 
       case "exam-page":
         return (
@@ -628,8 +761,7 @@ export default function App() {
               onSelectAnswer={handleSelectAnswer}
               onFinishExam={handleFinishExam}
               onCancel={() => {
-                setSavedAnswers({});
-                setActivePage("home-page");
+                setShowExitModal(true);
               }}
             />
           ) : null;
@@ -675,24 +807,15 @@ export default function App() {
             }}
             resultsHistory={resultsHistory}
             onSignOut={handleSignOut}
-            courses={mergedCourses}
+            courses={filteredCourses}
           />
         );
 
-      case "admin-settings-page":
-        return (
-          <AdminSettingsPage
-            onBack={() => setActivePage("home-page")}
-            courses={mergedCourses}
-            currentLimit={questionLimit}
-            onUpdateLimit={(limit) => setQuestionLimit(limit)}
-          />
-        );
 
       case "routine-page":
         return (
           <RoutinePage
-            courses={mergedCourses}
+            courses={filteredCourses}
             customFiles={[]}
             onBack={() => setActivePage("home-page")}
           />
@@ -704,7 +827,8 @@ export default function App() {
   };
 
   return (
-    <div className="bg-neutral-50 min-h-screen">
+    <div className="bg-neutral-50 min-h-screen select-none">
+      {toastMessage && <Toast message={toastMessage} onClose={() => setToastMessage(null)} />}
       
       {/* Dynamic Slide Drawer Menu */}
       <Sidebar 
@@ -728,6 +852,9 @@ export default function App() {
         />
       )}
 
+      {/* Ai Ask Button */}
+      <AiAsk onNavigate={(id) => setActivePage(id)} />
+
       {/* Premium Lock Popup Modal */}
       <PremiumModal
         isOpen={isPremiumModalOpen}
@@ -737,6 +864,17 @@ export default function App() {
           setIsPremiumModalOpen(false);
           alert("🎉 অভিনন্দন! আপনি সফলভাবে প্রিমিয়াম মেম্বারশিপে আপগ্রেড করেছেন।");
         }}
+      />
+
+      <ConfirmationModal
+        isOpen={showExitModal}
+        message="আপনি কি পরীক্ষা থেকে বের হতে চান? আপনার অগ্রগতি সংরক্ষিত হবে না।"
+        onConfirm={() => {
+          setSavedAnswers({});
+          setActivePage("home-page");
+          setShowExitModal(false);
+        }}
+        onCancel={() => setShowExitModal(false)}
       />
     </div>
   );

@@ -1,22 +1,27 @@
 import { initializeApp } from "firebase/app";
-import { getFirestore } from "firebase/firestore";
+import { getFirestore, doc, getDocFromServer } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
 import { getMessaging } from "firebase/messaging";
-
-const firebaseConfig = {
-    apiKey: "AIzaSyAOBUkkt6zGBgOfcHDG-MpnJQuH98ke1mQ",
-    authDomain: "mcq-preparation-app.firebaseapp.com",
-    projectId: "mcq-preparation-app",
-    storageBucket: "mcq-preparation-app.firebasestorage.app",
-    messagingSenderId: "334888199318",
-    appId: "1:334888199318:web:f8e078cb087749bbbfceb7"
-};
+import firebaseConfig from "../firebase-applet-config.json";
+import html2pdf from 'html2pdf.js';
+(window as any).html2pdf = html2pdf;
 
 const app = initializeApp(firebaseConfig);
-export const db = getFirestore(app);
+export const db = firebaseConfig.firestoreDatabaseId && firebaseConfig.firestoreDatabaseId !== "(default)"
+    ? getFirestore(app, firebaseConfig.firestoreDatabaseId)
+    : getFirestore(app);
+
 export const auth = getAuth(app);
 export const messaging = getMessaging(app);
 
 export const testConnection = async () => {
-    return true;
+    try {
+        await getDocFromServer(doc(db, 'test', 'connection'));
+        return true;
+    } catch (error) {
+        if(error instanceof Error && error.message.includes('the client is offline')) {
+            console.error("Please check your Firebase configuration.");
+        }
+        return false;
+    }
 };

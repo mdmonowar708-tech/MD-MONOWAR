@@ -1,0 +1,10 @@
+{
+  "projectId": "mcq-preparation-app",
+  "appId": "1:334888199318:web:f8e078cb087749bbbfceb7",
+  "apiKey": "AIzaSyAOBUkkt6zGBgOfcHDG-MpnJQuH98ke1mQ",
+  "authDomain": "mcq-preparation-app.firebaseapp.com",
+  "firestoreDatabaseId": "(default)",
+  "storageBucket": "mcq-preparation-app.firebasestorage.app",
+  "messagingSenderId": "334888199318",
+  "measurementId": "G-CF1G2B8QLN"
+}
