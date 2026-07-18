@@ -683,7 +683,15 @@ export default function App() {
         );
 
       case "pdf-generator-page":
-        return <QuestionGenerator />;
+        return (
+          <QuestionGenerator 
+            isPremium={user?.premium || user?.role === 'premium'} 
+            onUpgrade={() => {
+              setUser((prev) => prev ? { ...prev, premium: true, role: "premium" } : null);
+              alert("🎉 অভিনন্দন! আপনি সফলভাবে প্রিমিয়াম মেম্বারশিপে আপগ্রেড করেছেন।");
+            }}
+          />
+        );
       
       case "ai-page":
         return <AiPage />;

@@ -3,7 +3,12 @@ import { db } from '../firebase';
 import { collection, getDocs, query, where } from 'firebase/firestore';
 import html2pdf from 'html2pdf.js';
 
-export const QuestionGenerator: React.FC = () => {
+interface QuestionGeneratorProps {
+    isPremium?: boolean;
+    onUpgrade?: () => void;
+}
+
+export const QuestionGenerator: React.FC<QuestionGeneratorProps> = ({ isPremium = false, onUpgrade }) => {
     const [categories, setCategories] = useState<string[]>([]);
     const [subCategories, setSubCategories] = useState<string[]>([]);
     const [selectedCategory, setSelectedCategory] = useState('');
@@ -54,9 +59,17 @@ export const QuestionGenerator: React.FC = () => {
             if (!container) return;
             container.innerHTML = '';
             
+            let docs = snapshot.docs;
+            const fullTotal = docs.length;
+
+            // Enforce limit of 10 questions for free users
+            if (!isPremium) {
+                docs = docs.slice(0, 10);
+            }
+            
             let i = 0;
-            const total = snapshot.size;
-            snapshot.forEach((qSnap) => {
+            const total = docs.length;
+            docs.forEach((qSnap) => {
                 i++;
                 const qData = qSnap.data();
                 const page = document.createElement('div');
@@ -84,12 +97,16 @@ export const QuestionGenerator: React.FC = () => {
                 const opt = {
                     margin: 10,
                     filename: 'booklet.pdf',
-                    image: { type: 'jpeg', quality: 0.98 },
+                    image: { type: 'jpeg' as const, quality: 0.98 },
                     html2canvas: { scale: 2 },
-                    jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+                    jsPDF: { unit: 'mm' as const, format: 'a4' as const, orientation: 'portrait' as const }
                 };
                 
-                html2pdf().set(opt).from(container).save().catch((err) => console.error("PDF generation error:", err));
+                html2pdf().set(opt).from(container).save().then(() => {
+                    if (!isPremium && fullTotal > 10) {
+                        alert(`বুকলেট ডাউনলোড হয়েছে! আপনি ফ্রি ইউজার হওয়ায় ১০ টি প্রশ্ন ডাউনলোড হয়েছে (মোট প্রশ্ন ছিল ${fullTotal} টি)। সব প্রশ্ন ডাউনলোড করতে প্রিমিয়াম মেম্বারশিপে আপগ্রেড করুন।`);
+                    }
+                }).catch((err) => console.error("PDF generation error:", err));
             } else {
                 alert("কোনো প্রশ্ন পাওয়া যায়নি।");
             }
@@ -102,7 +119,34 @@ export const QuestionGenerator: React.FC = () => {
 
     return (
         <div className="max-w-md mx-auto p-6 bg-white rounded-2xl shadow-lg border border-gray-100">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">PDF বুকলেট জেনারেটর</h2>
+            <h2 className="text-2xl font-bold text-gray-900 mb-2">PDF বুকলেট জেনারেটর</h2>
+            
+            {/* Subscription status notice */}
+            <div className="mb-6">
+                {isPremium ? (
+                    <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-3 text-xs text-emerald-800 flex items-center justify-between">
+                        <span className="font-semibold">🌟 প্রিমিয়াম মেম্বারশিপ সচল</span>
+                        <span className="bg-emerald-600 text-white font-bold px-2 py-0.5 rounded-full uppercase text-[9px]">unlimited</span>
+                    </div>
+                ) : (
+                    <div className="bg-amber-50 border border-amber-200 rounded-xl p-3 text-xs text-amber-800 space-y-2">
+                        <div className="flex items-center justify-between">
+                            <span className="font-semibold">⚠️ ফ্রি ইউজার লিমিট অ্যাক্টিভ</span>
+                            <span className="bg-amber-600 text-white font-bold px-2 py-0.5 rounded-full uppercase text-[9px]">Max 10 Qs</span>
+                        </div>
+                        <p className="leading-relaxed">ফ্রি ইউজার হিসেবে আপনি সর্বোচ্চ ১০ টি প্রশ্ন সম্বলিত পিডিএফ বুকলেট ডাউনলোড করতে পারবেন। সব প্রশ্ন সহ ডাউনলোড করতে প্রিমিয়াম মেম্বারশিপে আপগ্রেড করুন।</p>
+                        {onUpgrade && (
+                            <button 
+                                onClick={onUpgrade}
+                                className="w-full mt-1 bg-amber-600 hover:bg-amber-700 text-white font-bold py-1.5 px-3 rounded-lg text-xs transition-colors cursor-pointer border-none"
+                            >
+                                প্রিমিয়াম মেম্বারশিপ নিন (সব প্রশ্ন আনলক)
+                            </button>
+                        )}
+                    </div>
+                )}
+            </div>
+
             <div className="space-y-4">
                 <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">বিষয়</label>
@@ -129,7 +173,7 @@ export const QuestionGenerator: React.FC = () => {
                 </div>
                 <button 
                     onClick={generatePDF} 
-                    className="w-full flex justify-center py-3 px-4 border border-transparent rounded-xl shadow-sm text-sm font-bold text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors"
+                    className="w-full flex justify-center py-3 px-4 border border-transparent rounded-xl shadow-sm text-sm font-bold text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors cursor-pointer"
                 >
                     {loading ? 'লোড হচ্ছে...' : 'PDF ডাউনলোড করুন'}
                 </button>

@@ -1,0 +1,48 @@
+/* A4 booklet print-specific layout styling */
+
+.pdf-document-print-wrapper {
+  background-color: #f1f5f9;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding: 24px;
+  align-items: center;
+}
+
+.pdf-page {
+  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  background-color: #ffffff;
+  position: relative;
+}
+
+.pdf-column {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.question-card-block {
+  background: transparent;
+  page-break-inside: avoid;
+  break-inside: avoid;
+}
+
+@media print {
+  body {
+    margin: 0;
+    padding: 0;
+    background: none;
+  }
+
+  .pdf-document-print-wrapper {
+    padding: 0;
+    gap: 0;
+    background: none;
+  }
+
+  .pdf-page {
+    box-shadow: none;
+    page-break-after: always;
+    break-after: page;
+  }
+}

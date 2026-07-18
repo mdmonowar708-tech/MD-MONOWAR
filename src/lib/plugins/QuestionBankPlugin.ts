@@ -1,4 +1,13 @@
-import { DocumentPlugin } from '../pdfEngine';
+export interface DocumentPlugin {
+  name: string;
+  render(data: any): any[];
+  getStyles(): any;
+  getHeader?(data: any): any;
+  getFooter?(data: any): any;
+  getPageSize?(): any;
+  getPageOrientation?(): any;
+  getWatermark?(data: any): any;
+}
 
 export class QuestionBankPlugin implements DocumentPlugin {
   name = 'QuestionBank';

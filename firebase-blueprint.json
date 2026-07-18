@@ -1,0 +1,26 @@
+{
+  "collections": {
+    "users": {
+      "schema": {
+        "uid": "string",
+        "name": "string",
+        "email": "string",
+        "premium": "boolean",
+        "role": "string",
+        "todayPoints": "number",
+        "totalPoints": "number",
+        "createdAt": "timestamp",
+        "xp": "number",
+        "coins": "number",
+        "level": "number",
+        "currentStreak": "number",
+        "longestStreak": "number",
+        "lastChallengeDate": "string",
+        "dailyChallengeCompleted": "boolean",
+        "practiceQuestionsSolved": "number",
+        "mockTestsCompleted": "number",
+        "badges": "array"
+      }
+    }
+  }
+}
